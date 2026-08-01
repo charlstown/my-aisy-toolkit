@@ -27,7 +27,7 @@ This document covers the technical installation mechanism (`setup-ai`) and the c
 > There are no npm packages, gems, or binaries to install. The whole mechanism relies on the native fetch, read, and write tools of the AI agent running `setup-ai`.
 
 > [!tip] Internal vs. distributed catalog
-> This repo's own `.claude/commands` and `.claude/agents` are used only to develop my-aisy-toolkit itself (dogfooding the skills while building them) and are never fetched by `setup-ai`. The distributable catalog lives under `ai-toolkit/default/`, mirroring Claude Code's native file shape so it can be dropped as-is into a target repo's `.claude/`. Its content is populated from the maintainer's local skills vault (`D:\MisProyectos\0_TEMPLATES\AI\SKILLS`), not authored from scratch in this repo.
+> This repo's own `.claude/commands` and `.claude/agents` are used only to develop my-aisy-toolkit itself (dogfooding the skills while building them) and are never fetched by `setup-ai`. The distributable catalog lives under `ai-toolkit/default/`, mirroring Claude Code's native file shape so it can be dropped as-is into a target repo's `.claude/`. Its content is populated from the maintainer's local skills vault (`D:\MisProyectos\0_TEMPLATES\SETUP-AI`), not authored from scratch in this repo.
 
 ## 🏗️ Module Design
 
@@ -127,7 +127,7 @@ Prerequisite: an empty scratch repo. Flow verified manually before merging relev
 
 **Tools**
 
-No automated tooling for now. Manual verification is the only process, documented as a conscious limitation in Known Limitations.
+No persistent automated tooling in the repo. A temporary automated verification script was built and run once (evidence recorded in `specs/005-automated-install-verification-check/evidence.md`) to confirm the manual scratch-repo flow described above, then deleted by design. Manual verification remains the repeatable process, documented as a conscious limitation in Known Limitations.
 
 ## 🔌 Deployment
 
@@ -222,9 +222,9 @@ None.
 
 ## ⚠️ Known Limitations
 
-- No automated tests or CI/CD: validation is manual, in a scratch repo, before publishing changes to main.
+- No persistent automated tests or CI/CD: validation is normally manual, in a scratch repo, before publishing changes to main. A one-off automated verification script (`scripts/verify-install-temp.ps1`) was built and run once to confirm this manual process (see `specs/005-automated-install-verification-check/evidence.md`), then deleted by design — there is no repeatable automated tooling checked into the repo.
 - Codex CLI support is best-effort: it hasn't been possible to verify it in a real Codex environment.
-- The `ai-toolkit/default/` catalog has no automated sync with its canonical source (the maintainer's local skills vault at `D:\MisProyectos\0_TEMPLATES\AI\SKILLS`); updates are copied over by hand.
+- The `ai-toolkit/default/` catalog has no automated sync with its canonical source (the maintainer's local skills vault at `D:\MisProyectos\0_TEMPLATES\SETUP-AI`); updates are copied over by hand.
 - Requests to `raw.githubusercontent.com` are anonymous and subject to GitHub's unauthenticated rate limit.
 - Correct installation depends on the target agent faithfully following the natural-language instructions in `setup-ai.md`; there's no deterministic behavior guarantee like with a script.
 

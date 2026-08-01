@@ -43,7 +43,8 @@ flowchart LR
     S -->|fetch| CAT[(my-aisy-toolkit<br/>profile catalog)]
     CAT -->|available profiles| S
     S -->|asks for profile if more than one| U
-    S -->|detects active agent| AG{AI Agent}
+    S -->|asks which agent| U
+    U -->|answers| AG{AI Agent}
     AG -->|Claude Code| CC[".claude/commands + .claude/agents"]
     AG -->|Codex CLI — best-effort| CX[".codex/skills"]
     CC --> D[Target repo ready for<br/>spec-driven development]
@@ -51,7 +52,7 @@ flowchart LR
 ```
 
 - **User** — starts the installation from the repo where they want the kit; picks a profile if asked. Does not interact directly with the `my-aisy-toolkit` repo.
-- **setup-ai** — entry point (instructions/script) that fetches the catalog, detects or asks for the profile, detects the active AI agent, and writes the corresponding files into the target repo. Does not modify target-repo application code or configuration unrelated to skills/agents.
+- **setup-ai** — entry point (instructions/script) that fetches the catalog, always asks the user which AI agent to target (never inferred from the target repo's structure), asks for the profile only if the catalog declares more than one, and writes the corresponding files into the target repo. Does not modify target-repo application code or configuration unrelated to skills/agents.
 - **my-aisy-toolkit (catalog)** — single source of truth for profiles, skills, and agents, published under `/ai-toolkit/<profile>/` (e.g. `/ai-toolkit/default/`). Does not execute itself; it only serves as content for `setup-ai` to consume. This is decoupled from the repo's own internal `.claude/` folder, which is used only to develop this toolkit itself (dogfooding) and is never what gets installed into a target repo.
 - **Target repo** — receives the installed files and becomes operational for spec-driven development through the corresponding AI agent's skills. Each skill/agent's internal logic lives in its own self-documented file.
 
@@ -169,5 +170,5 @@ Verifying the installation means checking that the expected files for the instal
 - [x] ~~Is Codex CLI supported in v1?~~ → Yes, in best-effort mode (translated to `.codex/skills/`), documented as unverified in a real environment until it can be tested.
 - [x] ~~How is the catalog versioned?~~ → Always the latest version (latest of the main branch); no semantic versioning for now.
 - [x] ~~Tone for user-facing content?~~ → Direct, jargon-free, with a light easygoing touch ("Keep it AIsy").
-- [ ] Exact location of the `setup-ai` script/instructions within the repo (root, `scripts/`, etc.) — to be defined in the TechSpec.
-- [ ] Concrete mechanism for profile and active-agent detection (file heuristic, always explicit question, flag) — to be defined in the TechSpec.
+- [x] ~~Exact location of the `setup-ai` script/instructions within the repo?~~ → Repo root (`setup-ai.md`), per tech-spec.md.
+- [x] ~~Concrete mechanism for profile and active-agent selection?~~ → ADR-004: the agent is always asked explicitly (never inferred/detected from folders present); the profile is asked only if the catalog declares more than one.

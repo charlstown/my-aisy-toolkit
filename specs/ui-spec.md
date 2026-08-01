@@ -49,17 +49,21 @@ Referencia de estilo: [FlorianBruniaux/claude-code-ultimate-guide](https://githu
 
 #### Quick start como sección principal (no como "Install" separado)
 
-Decisión explícita: no hay una sección "Installation" independiente antes del Quick start. El bloque de instalación (one-liner + alternativa copy-paste) vive **dentro** de Quick start, seguido inmediatamente del primer comando a ejecutar (`/constitution`). Razón: instalar y arrancar es un único flujo de menos de 2 minutos, separarlo en dos secciones obligaba a repetir contexto.
+Decisión explícita: no hay una sección "Installation" independiente antes del Quick start. El bloque de instalación (one-liner + copy-paste, ambos con igual peso) vive **dentro** de Quick start, seguido inmediatamente del primer comando a ejecutar (`/constitution`). Razón: instalar y arrancar es un único flujo de menos de 2 minutos, separarlo en dos secciones obligaba a repetir contexto.
 
 ```
 ## ⚡ Quick start
+
+#### Option A — One-liner
 
 Paste this into your AI agent's conversation, inside the repo you want to set up:
 
     Fetch and follow the setup instructions at:
     https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 
-Can't fetch URLs? Open `setup-ai.md`, copy its full contents, and paste those instead.
+#### Option B — Copy-paste
+
+Open `setup-ai.md`, copy its full contents, and paste those into your agent instead.
 
 Your agent installs the catalog, then prints a short summary of what got written.
 Kick things off with:
@@ -113,7 +117,7 @@ Se descartó tanto "sin badges" como "estilo `for-the-badge` grande". Se usan 3 
 
 #### Estado "aspiracional" (contenido vs. estado real del repo)
 
-`setup-ai.md`, `catalog.yaml` y `ai-toolkit/default/` **no existen todavía** en el repo (F1.1–F1.3 del roadmap siguen pendientes; solo hay specs). El README se redacta igualmente como el resultado **final**, listo para cuando esas features se completen — sin badge ni nota de "🚧 en construcción". Esta pantalla (`specs/ui-spec.md`) documenta ese diseño final; no bloquea que el `README.md` real ya exista en el repo con este contenido antes de que `setup-ai.md` esté escrito — es intencional, es el "front" apuntando hacia adelante.
+`setup-ai.md`, `catalog.yaml` y `ai-toolkit/default/` **no existían** en el repo cuando se diseñó esta pantalla (F1.1–F1.3 del roadmap estaban pendientes; solo había specs). El README se redactó igualmente como el resultado **final**, sin badge ni nota de "🚧 en construcción" — y esa decisión se mantuvo al cerrar 004-readme-as-product-front: F1.1–F1.3 ya están completas y mergeadas a `main`, por lo que ahora los tres elementos existen realmente en el repo y el README ya no es aspiracional sino descriptivo del estado actual. Esta pantalla (`specs/ui-spec.md`) documenta ese diseño final; no bloquea que el `README.md` real ya exista en el repo con este contenido antes de que `setup-ai.md` esté escrito — es intencional, es el "front" apuntando hacia adelante.
 
 ---
 
@@ -127,6 +131,7 @@ my-aisy-toolkit/
 │   └── default/
 │       ├── commands/    # 12 skills
 │       └── agents/      # 6 subagents
+├── catalog.yaml
 ├── setup-ai.md
 └── README.md
 ```
