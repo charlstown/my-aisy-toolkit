@@ -96,7 +96,7 @@ Source: specs/004-readme-as-product-front/requirements.md
 
 ## Batch 3 — Assemble and finalize
 
-- [ ] @code-developer · Assemble the final README.md: Combine the Batch 2 sections in the order locked in by Batch 1's decision note, and replace the current root `README.md` content in full (this removes the stale `agents.md` mention as decided in Batch 1). Do a final tone pass for directness, jargon-free language, and "Keep it AIsy" consistency across all sections (FR-008). Self-check the assembled file line by line against FR-001 through FR-010 and SC-001 through SC-004 before handing off for review, and note explicitly in the commit/handoff whether the install section was sourced from `setup-ai.md` (stable) or from `product-spec.md`/`tech-spec.md` (fallback, needs re-verification once F1.3 ships).
+- [x] @code-developer · Assemble the final README.md: Combine the Batch 2 sections in the order locked in by Batch 1's decision note, and replace the current root `README.md` content in full (this removes the stale `agents.md` mention as decided in Batch 1). Do a final tone pass for directness, jargon-free language, and "Keep it AIsy" consistency across all sections (FR-008). Self-check the assembled file line by line against FR-001 through FR-010 and SC-001 through SC-004 before handing off for review, and note explicitly in the commit/handoff whether the install section was sourced from `setup-ai.md` (stable) or from `product-spec.md`/`tech-spec.md` (fallback, needs re-verification once F1.3 ships).
 
 ## Batch 4 — Review
 
