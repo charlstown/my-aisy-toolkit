@@ -15,7 +15,7 @@ Feature Branch: 002-catalog-yaml-manifest
 
 ## Batch 2 — Author catalog.yaml
 
-- [ ] @code-developer · Create `catalog.yaml` at the repository root: author `catalog.yaml` in `D:\00_WIP\2608_MyAIsyToolkit\my-aisy-toolkit\catalog.yaml` using the schema and the 18 source paths confirmed in Batch 1. Structure:
+- [x] @code-developer · Create `catalog.yaml` at the repository root: author `catalog.yaml` in `D:\00_WIP\2608_MyAIsyToolkit\my-aisy-toolkit\catalog.yaml` using the schema and the 18 source paths confirmed in Batch 1. Structure:
   ```yaml
   profiles:
     default:
