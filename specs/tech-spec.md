@@ -246,6 +246,28 @@ None.
 - (+) Unambiguous single path (`ai-toolkit/default/`) for anything `setup-ai` may fetch; the internal `.claude/` can evolve freely.
 - (-) The `default` profile catalog must be kept manually in sync with its canonical source (the maintainer's local skills vault) instead of being read live from `.claude/`.
 
+### ADR-006: Repo-level SemVer via `VERSION`, `CHANGELOG.md`, and git tags, decoupled from catalog distribution
+
+**Decision**: The repo adopts Semantic Versioning at the repository level: a plain-text `VERSION` file at the root, a `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/), and a git tag `vX.Y.Z` per release, surfaced by a dynamic shields.io badge (`img.shields.io/github/v/tag/...`) in both `README.md` and `README-ES.md`, replacing the previous hand-maintained static badge. `VERSION` holds the bare number (`0.1.0`, no `v` prefix) while the matching tag carries it (`v0.1.0`): a deliberate asymmetry so the file stays pure SemVer for any future script to read without stripping a prefix, and the tag keeps git's usual convention.
+
+**Context**: Two distinct things could be called "versioning" here, and only one of them changes. (a) *Catalog distribution versioning* — unchanged: `setup-ai` always fetches `main`, there is no version selection for the end user and no SemVer involved in installing or re-installing, exactly as [[product-spec]] states ("always the latest version"); change detection keeps comparing content directly, never version numbers. (b) *Repo versioning* — new, and its only purpose is maintainer visibility: knowing at a glance which state the catalog is in without reading the commit history. Two alternatives that would have collapsed that distinction were discarded: adding a `version` field to `catalog.yaml`, or to each skill's/agent's frontmatter. Both push version numbers into the distribution path, turn every catalog edit into a per-file bump, and invite `setup-ai` to compare versions instead of content — while ADR-003 keeps `catalog.yaml` as a pure "what's in each profile" manifest. Publishing GitHub Releases and pointing the badge at the `/github/v/release/` endpoint was also considered and discarded for now: it adds a publishing step to every release without adding information that plain tags don't already carry; it is left as a possible future improvement if releases ever need attached notes or assets.
+
+**Consequences**:
+- (+) The repo's version is visible on the front page and traceable in `CHANGELOG.md`, with no manual badge editing to keep in sync.
+- (+) The installation path is untouched: no `version` field enters `catalog.yaml` or any catalog file, so nothing about what users get changes.
+- (-) No automated check that `VERSION`, the topmost `CHANGELOG.md` entry, and the latest git tag agree; the repo has no CI to enforce it, so the three can silently drift apart.
+- Mitigation: the three release steps documented below must be executed as a single unit for every release, tag included.
+- (-) Until the first tag exists in the repo, the badge renders as "version | no tags found" in red on both READMEs (verified against the shields.io API); it does not break the layout, but it does look like an error.
+- Mitigation: create and push the tag matching the current `VERSION` right after merging, which is exactly step 3 of the process below.
+- (-) `github/v/tag` without `sort=semver` picks the most recently created tag, not the highest SemVer, so an out-of-order tag (e.g. a `v0.1.1` hotfix cut after `v0.2.0`) would show the wrong version.
+- Mitigation: harmless while releases stay strictly linear; revisit the badge query if maintenance branches ever appear.
+
+**Release process (manual, 3 steps)**: there is no CI to run or enforce this, so every release is cut by hand, in this order, and the three steps count as a single unit — a release is not done until step 3 is pushed.
+
+1. **Bump `VERSION`** to the new `X.Y.Z`, as a bare number with no `v` prefix (e.g. `0.2.0`), choosing major/minor/patch per SemVer.
+2. **Add the version entry to `CHANGELOG.md`**: open a new `## [X.Y.Z] - YYYY-MM-DD` section directly under `## [Unreleased]`, move into it everything accumulated in `[Unreleased]`, and leave `[Unreleased]` empty again for the next cycle. The version number must match `VERSION` exactly.
+3. **Tag and push**: `git tag vX.Y.Z && git push --tags` (tag *with* the `v` prefix — the asymmetry with `VERSION` is deliberate, see **Decision** above). This is the step that feeds the README badge: shields.io reads the repo's tags, so until the tag is pushed both `README.md` and `README-ES.md` keep showing the previous version (or "no tags found" while no tag exists at all), no matter what `VERSION` and `CHANGELOG.md` say. It is also the easiest step to forget, because steps 1 and 2 are ordinary file edits that ride along with the release commit or PR, while this one is a separate write to the remote after merging.
+
 ### ADR-007: Global launcher as a pointer, not a copy of `setup-ai.md`
 
 **Decision**: The entry point (`setup-ai.md` at the repo root, reached from the README one-liner or by copy-paste) and the optional global launcher (`~/.claude/commands/setup-ai.md`, or `~/.codex/skills/setup-ai/SKILL.md` with `~/.agents/` fallback) are **two different files with two different jobs**. The launcher contains no catalog content and no installation logic of its own — it only fetches the live `setup-ai.md` and follows it — and it is written only with the user's explicit yes, only for an agent whose user-level directory actually exists, only once, and never over an existing file.
