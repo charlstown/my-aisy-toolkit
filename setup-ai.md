@@ -4,8 +4,10 @@ These are the installation instructions for **My AIsy Toolkit** — a kit of ski
 spec-driven development. An AI coding agent reads this file and installs the kit into your repo with
 its own tools. There is nothing to download, no package manager, and no script to run.
 
-Side effects are limited to writing files inside `.claude/` and/or `.codex/` in your repo. Nothing
-else is touched.
+Side effects are limited to writing files inside `.claude/` and/or `.codex/` in your repo. With
+your explicit yes at the end of the install, it may also write **one single file** — a global
+launcher — to your agent's user-level command directory. Without that yes, nothing outside your
+repo is touched.
 
 ## How to install
 
@@ -49,7 +51,11 @@ Everything above this line is for the human reading the repo. You do not need it
 
 - Start at **Step 1** and work through the steps in order.
 - Do **not** fetch this file again, whatever route brought you here. You already have it.
-- Do **not** write, move, or delete anything outside `.claude/` and `.codex/` in the user's repo.
+- Do **not** write, move, or delete anything outside `.claude/` and `.codex/` in the user's
+  repo, except — only with the user's explicit yes in Step 6 — the single file
+  `~/.claude/commands/setup-ai.md` or `~/.codex/skills/setup-ai/SKILL.md` (fallback
+  `~/.agents/skills/setup-ai/SKILL.md`). Outside those two exact paths the prohibition is
+  absolute, and nothing in the user's home is ever deleted or moved.
 - Report problems to the user in plain language, in the conversation, as they happen.
 
 ### Step 1 — Ask what you're installing
@@ -218,6 +224,60 @@ between runs and there's no guarantee it's a perfect equivalent of the Claude Co
 is a documented, known limitation of Codex support (see Edge Cases and Known Limitations) — do the
 best job you can, but don't claim it's an exact translation when you tell the user what happened.
 
+### Step 6 — Offer to save the global launcher
+
+**If you reached this file from the already-installed global launcher, stop here and skip straight
+to the Wrap up — do nothing else in this step** (FR-005). That launcher already told you not to run
+this step when it pointed you here; treat that as settled and move on.
+
+**Detect which agents are actually present in the user's environment.** Check whether `~/.claude/`
+exists (Claude Code) and whether `~/.codex/` or `~/.agents/` exists (Codex CLI). An agent only
+becomes a candidate for this step if its user-level directory exists — a missing directory means
+that agent is not a candidate, full stop; there is no such thing here as a candidate based on an
+orphaned file or a guess. **This detection applies only to the global launcher in this step. It
+never replaces, weakens, or stands in for the mandatory question in Step 1** — which agent to
+install the catalog for, in this repo, is always asked word for word, exactly as Step 1 describes,
+no matter what you detect here (ADR-004, D-03).
+
+**Discard any candidate whose launcher file already exists at its destination.** For Claude Code,
+check whether `~/.claude/commands/setup-ai.md` exists. For Codex CLI, check **both** possible
+paths — `~/.codex/skills/setup-ai/SKILL.md` and `~/.agents/skills/setup-ai/SKILL.md`. This is an
+existence check only: do not open the file, do not read or compare its content, and do not
+overwrite it. If a candidate's file already exists, drop it from the list and make a note — you'll
+report it in the Wrap up (FR-006, FR-009, D-05).
+
+**If no candidate is left after detection and this existing-file check, skip straight to the Wrap
+up — do not ask anything** (SC-004). There's no informational or partial version of the question
+below; either it gets asked in full, to at least one remaining candidate, or it isn't shown at all.
+
+**If at least one candidate remains, ask this once, word for word**, keeping only the lines for the
+agents you'd actually write for (drop the other agent's line entirely if it isn't a candidate; if
+you're using the `~/.agents/` fallback for Codex — see Step 6 detection above — write that path
+instead of `~/.codex/...` on its line):
+
+```
+One last thing — want a shortcut for next time?
+
+I can save a global setup-ai command so you can install this kit in any other repo without coming
+back to the README. It's one small file, it lives outside this repo, and all it does is fetch these
+same instructions fresh every time — nothing gets frozen or copied.
+
+Where it'd go:
+
+  - Claude Code — ~/.claude/commands/setup-ai.md, then run it with /setup-ai
+  - Codex CLI — ~/.codex/skills/setup-ai/SKILL.md, then run it with $setup-ai
+
+Yes or no? Either way, this repo is already set up.
+```
+
+**If the user says no, or doesn't answer clearly, write nothing outside this repo and continue to
+the Wrap up.** Unlike Step 1, an ambiguous or missing answer here does not block anything and is
+not asked again — it's treated exactly the same as a no. By this point the catalog is already
+installed, so there is nothing at risk in moving on.
+
+If the user says yes: what exactly gets written, and how, for each remaining candidate is covered
+later in this file — this point is intentionally left marked here and filled in next.
+
 ### Wrap up — Tell the user what happened
 
 There is no log file. You are the log. At the end of every run — Claude Code or Codex CLI, fresh
@@ -234,6 +294,37 @@ file you touched or tried to touch:
 Files that already matched what you were about to write don't need a mention — nothing changed,
 nothing to report.
 
+- **Global launcher** — everything Step 6 did or didn't do gets its own `Global launcher:` section,
+  separate from Installed/Updated/Skipped above. It's the one thing that isn't a file in this repo,
+  so it needs to stand out clearly as something written outside it. Unlike the repo files above,
+  report the launcher whenever there's something to say about it — **including the case where it
+  already existed and you left it alone.** Omit the section entirely only when there is truly
+  nothing to say: you skipped Step 6 because you arrived here from the already-installed launcher,
+  or no candidate agent was detected at all.
+
+  Cover whichever of these happened, one line per agent affected:
+
+  - **Written** — the launcher didn't exist and you saved it. Give the absolute path and how to run
+    it: `/setup-ai` for Claude Code, `$setup-ai` for Codex CLI.
+    ```
+    - Saved ~/.claude/commands/setup-ai.md — from now on, just run /setup-ai in any repo.
+    ```
+    ```
+    - Saved ~/.codex/skills/setup-ai/SKILL.md — from now on, just run $setup-ai in any repo.
+    ```
+  - **Already existed, left untouched** — you never overwrite it, so say so plainly:
+    ```
+    - ~/.claude/commands/setup-ai.md was already there, so I left it exactly as it was — I never overwrite it. If that file isn't this kit's launcher, delete it and run the setup again to get the new one.
+    ```
+  - **User declined** — a single line, not one per agent:
+    ```
+    - You said no, so nothing was written outside this repo. The README one-liner still works whenever you change your mind.
+    ```
+  - **Write failed** — give the actual reason, never a generic "something went wrong":
+    ```
+    - Couldn't write ~/.claude/commands/setup-ai.md — <the actual reason>. Everything in this repo installed fine; you're just missing the shortcut. Use the README one-liner next time, or fix that and run the setup again.
+    ```
+
 Something like this is enough:
 
 ```
@@ -248,7 +339,10 @@ Updated:
 
 Skipped:
 - .claude/agents/legacy-reviewer.md — fetch failed twice (404), gave up after the retry
+
+Global launcher:
+- Saved ~/.claude/commands/setup-ai.md — from now on, just run /setup-ai in any repo.
 ```
 
 Keep it short and specific. The point is that the user can see exactly what's different in their
-repo without having to go check for themselves.
+repo — and outside it — without having to go check for themselves.
