@@ -176,3 +176,31 @@ are best-effort and non-blocking (FR-007, ADR-002) regardless of their outcome.
 
 **Result: PASS** - 18/18 files present and byte-for-byte identical to their ai-toolkit/default/ source (0 failing/mismatched).
 
+## Run: target=codex, method=oneliner - 2026-08-01 15:01:28
+
+- Scratch folder: `C:\Users\carlo\AppData\Local\Temp\my-aisy-toolkit-verify\codex-oneliner`
+- Blocking for the Phase 1 gate: no (Codex CLI, best-effort per ADR-002/FR-007)
+
+| Category | Catalog source | Installed path | Source present | Installed present | Match | Status | Note |
+|---|---|---|---|---|---|---|---|
+| commands | `ai-toolkit/default/commands/constitution.md` | `codex-oneliner\.codex\skills\constitution\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/product-spec.md` | `codex-oneliner\.codex\skills\product-spec\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/tech-spec.md` | `codex-oneliner\.codex\skills\tech-spec\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/roadmap.md` | `codex-oneliner\.codex\skills\roadmap\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/get-issues.md` | `codex-oneliner\.codex\skills\get-issues\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/new-issue.md` | `codex-oneliner\.codex\skills\new-issue\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/specify-feature.md` | `codex-oneliner\.codex\skills\specify-feature\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/clarify-feature.md` | `codex-oneliner\.codex\skills\clarify-feature\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/grill-me.md` | `codex-oneliner\.codex\skills\grill-me\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/plan-feature.md` | `codex-oneliner\.codex\skills\plan-feature\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/implement-feature.md` | `codex-oneliner\.codex\skills\implement-feature\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| commands | `ai-toolkit/default/commands/clean-feature.md` | `codex-oneliner\.codex\skills\clean-feature\SKILL.md` | yes | yes | no | MISMATCH | Expected: Codex translation rewrites the frontmatter, so the hash legitimately differs from the Claude Code source (best-effort, ADR-002). |
+| agents | `ai-toolkit/default/agents/architect.md` | `n/a` | yes | no | no | NOT_APPLICABLE | Codex CLI has no subagent equivalent (setup-ai.md Step 5 / ADR-002) - not installed for this target by design, not a failure. |
+| agents | `ai-toolkit/default/agents/code-developer.md` | `n/a` | yes | no | no | NOT_APPLICABLE | Codex CLI has no subagent equivalent (setup-ai.md Step 5 / ADR-002) - not installed for this target by design, not a failure. |
+| agents | `ai-toolkit/default/agents/test-developer.md` | `n/a` | yes | no | no | NOT_APPLICABLE | Codex CLI has no subagent equivalent (setup-ai.md Step 5 / ADR-002) - not installed for this target by design, not a failure. |
+| agents | `ai-toolkit/default/agents/tester.md` | `n/a` | yes | no | no | NOT_APPLICABLE | Codex CLI has no subagent equivalent (setup-ai.md Step 5 / ADR-002) - not installed for this target by design, not a failure. |
+| agents | `ai-toolkit/default/agents/ui-developer.md` | `n/a` | yes | no | no | NOT_APPLICABLE | Codex CLI has no subagent equivalent (setup-ai.md Step 5 / ADR-002) - not installed for this target by design, not a failure. |
+| agents | `ai-toolkit/default/agents/judge.md` | `n/a` | yes | no | no | NOT_APPLICABLE | Codex CLI has no subagent equivalent (setup-ai.md Step 5 / ADR-002) - not installed for this target by design, not a failure. |
+
+**Result: FAIL** - 0/18 files present and byte-for-byte identical to their ai-toolkit/default/ source (6 not applicable to this target, 12 failing/mismatched).
+

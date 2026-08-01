@@ -38,7 +38,7 @@ These were explicitly authorized by the user as decisions this plan should make 
 
 ## Batch 3 — Verify Codex CLI (best-effort, non-blocking)
 
-- [ ] @tester · Run the install verification against Codex CLI at least once: execute `scripts/verify-install-temp.ps1 -Target codex -Method oneliner`, capture output, and record the pass/fail result in `evidence.md` regardless of outcome (FR-005/FR-006). Explicitly note in the evidence that this result does not block the Phase 1 gate (ADR-002, best-effort).
+- [x] @tester · Run the install verification against Codex CLI at least once: execute `scripts/verify-install-temp.ps1 -Target codex -Method oneliner`, capture output, and record the pass/fail result in `evidence.md` regardless of outcome (FR-005/FR-006). Explicitly note in the evidence that this result does not block the Phase 1 gate (ADR-002, best-effort).
 
 ## Batch 4 — Confirm gate evidence and close out
 
