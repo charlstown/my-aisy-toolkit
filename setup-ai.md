@@ -275,8 +275,117 @@ the Wrap up.** Unlike Step 1, an ambiguous or missing answer here does not block
 not asked again — it's treated exactly the same as a no. By this point the catalog is already
 installed, so there is nothing at risk in moving on.
 
-If the user says yes: what exactly gets written, and how, for each remaining candidate is covered
-later in this file — this point is intentionally left marked here and filled in next.
+If the user says yes: what exactly gets written, and how, for each remaining candidate follows
+below.
+
+**For Claude Code**, write to `~/.claude/commands/setup-ai.md` — creating `~/.claude/commands/`
+first if it doesn't already exist. Never touch, read, or write anything else inside `~/.claude/`
+while doing this; the prohibition from the top of these instructions is absolute here too.
+
+Write this content exactly as it appears below — byte-for-byte, no reformatting, no reflowing, no
+improvising a variant of your own, same criterion as Step 4 applies to the catalog files (FR-008).
+Its body is deliberately built to hold nothing but instructions that point at fetching this file's
+live version from GitHub — zero static content copied from the catalog (FR-004) — and it tells
+whoever runs it not to run this same save-the-launcher step again, since the launcher is what got
+them here (FR-005). Its own "If the fetch fails" section already covers what happens if that fetch
+comes back empty: inform the user and write nothing (D-08).
+
+```markdown
+---
+description: Installs or updates My AIsy Toolkit — its spec-driven skills and subagents — in the repo you are currently working in. Fetches the live setup instructions from GitHub on every run, so you always get the current catalog. Trigger when the user says "setup-ai", "install the toolkit", "instala el kit", "reinstala las skills", or invokes /setup-ai.
+argument-hint: "[profile]"
+---
+
+# setup-ai
+
+Install My AIsy Toolkit into the repo we are working in right now.
+
+## What to do
+
+1. Fetch this URL:
+
+   https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
+
+2. Follow that file's instructions, starting at **Step 1**, against the current repo. That file is
+   the source of truth: which questions to ask, which catalog to read, and where every file goes are
+   all in there. This command is only a pointer — do not infer anything from it, and do not fill in
+   gaps from memory.
+
+3. **Do not run the final step that offers to save the global setup-ai launcher.** That launcher is
+   this very file, and it is already installed. Finish the installation and go straight to the
+   wrap-up report.
+
+If an argument was passed ($ARGUMENTS), treat it as the catalog profile the user has already chosen
+and do not ask them for it again. If it is empty, ignore it.
+
+## If the fetch fails
+
+If the URL 404s, times out, or is unreachable for any other reason: stop right there. Tell the user
+plainly that you could not reach the setup instructions and that nothing was installed. Do not write,
+overwrite, or delete a single file, do not fall back to a cached or remembered copy, and do not try
+to install the kit from memory.
+```
+
+If the write itself fails — permission denied, `~/.claude/` can't be created, disk full, whatever
+the reason — do not retry, do not look for an alternative path, and do not abort or revert the
+catalog install you already finished for this repo. Make a note of the actual reason; you'll report
+it in the Wrap up (D-07).
+
+**For Codex CLI**, write to `~/.codex/skills/setup-ai/SKILL.md` — creating `~/.codex/skills/setup-ai/`
+first if it doesn't already exist. If `~/.codex/` doesn't exist but `~/.agents/` does, write to
+`~/.agents/skills/setup-ai/SKILL.md` instead, creating `~/.agents/skills/setup-ai/` first (D-04).
+Never touch, read, or write anything else inside `~/.codex/` or `~/.agents/` while doing this; the
+prohibition from the top of these instructions is absolute here too.
+
+Write this content exactly as it appears below — byte-for-byte, no reformatting, no reflowing, no
+improvising a variant of your own. Unlike Step 5, there is no free translation here: the launcher
+never leaves the catalog, so you write the template as it is, word for word, without reinterpreting
+it — same criterion Step 4 applies to the catalog files (FR-008).
+
+```markdown
+---
+name: setup-ai
+description: Installs or updates My AIsy Toolkit — its spec-driven skills and subagents — in the repo the user is currently working in, by fetching the live setup instructions from GitHub on every run. Use it when the user says "setup-ai", "install the toolkit", "instala el kit", "reinstala las skills", or invokes $setup-ai. Do not use it for anything other than installing this kit.
+---
+
+# setup-ai
+
+Install My AIsy Toolkit into the repo we are working in right now.
+
+## What to do
+
+1. Fetch this URL:
+
+   https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
+
+2. Follow that file's instructions, starting at **Step 1**, against the current repo. That file is
+   the source of truth: which questions to ask, which catalog to read, and where every file goes are
+   all in there. This skill is only a pointer — do not infer anything from it, and do not fill in
+   gaps from memory.
+
+3. **Do not run the final step that offers to save the global setup-ai launcher.** That launcher is
+   this very skill, and it is already installed. Finish the installation and go straight to the
+   wrap-up report.
+
+If the user named a catalog profile when invoking this skill, treat it as already chosen and do not
+ask them for it again.
+
+## If the fetch fails
+
+If the URL 404s, times out, or is unreachable for any other reason: stop right there. Tell the user
+plainly that you could not reach the setup instructions and that nothing was installed. Do not write,
+overwrite, or delete a single file, do not fall back to a cached or remembered copy, and do not try
+to install the kit from memory.
+```
+
+In Codex CLI this command is invoked as `$setup-ai`, not a slash command. As with the rest of Codex
+support, this path is best-effort (ADR-002) — including the path itself, it hasn't been verified
+against a real Codex CLI installation (U-01).
+
+If the write itself fails — permission denied, `~/.codex/` (or `~/.agents/`) can't be created, disk
+full, whatever the reason — do not retry, do not look for an alternative path, and do not abort or
+revert the catalog install you already finished for this repo. Make a note of the actual reason;
+you'll report it in the Wrap up (D-07).
 
 ### Wrap up — Tell the user what happened
 
