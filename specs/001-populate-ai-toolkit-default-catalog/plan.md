@@ -19,8 +19,8 @@
 
 ## Batch 3 — Validate
 
-- [ ] @code-developer · Validate frontmatter on all copied files: parse the YAML frontmatter block of every file in `ai-toolkit/default/commands/` and `ai-toolkit/default/agents/` and confirm each has a usable description/name field, matching the schema already used by this repo's own `.claude/commands/*.md` and `.claude/agents/*.md`; note any mismatch found.
-- [ ] @judge · Final consistency review: verify `ai-toolkit/default/commands/` contains exactly the skills confirmed in Batch 1 (12, or 13 if `setup-ai` was included — no extras, no omissions) and `ai-toolkit/default/agents/` contains exactly the 6 agents; confirm no file has malformed frontmatter; confirm the file contents match the vault byte-for-byte modulo the leakage cleanup from Batch 2. If the skill count differs from `specs/product-spec.md`'s documented 12, explicitly flag that product-spec.md's catalog table needs a follow-up update (separate from this plan). Report PASS or CHANGES_REQUESTED.
+- [x] @code-developer · Validate frontmatter on all copied files: parse the YAML frontmatter block of every file in `ai-toolkit/default/commands/` and `ai-toolkit/default/agents/` and confirm each has a usable description/name field, matching the schema already used by this repo's own `.claude/commands/*.md` and `.claude/agents/*.md`; note any mismatch found.
+- [x] @judge · Final consistency review: verify `ai-toolkit/default/commands/` contains exactly the skills confirmed in Batch 1 (12, or 13 if `setup-ai` was included — no extras, no omissions) and `ai-toolkit/default/agents/` contains exactly the 6 agents; confirm no file has malformed frontmatter; confirm the file contents match the vault byte-for-byte modulo the leakage cleanup from Batch 2. If the skill count differs from `specs/product-spec.md`'s documented 12, explicitly flag that product-spec.md's catalog table needs a follow-up update (separate from this plan). Report PASS or CHANGES_REQUESTED.
 
 ### Critical Files for Implementation
 - D:\MisProyectos\0_TEMPLATES\SETUP-AI\agents\*.md (6 source agent files — corrected vault path)
