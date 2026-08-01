@@ -1,12 +1,36 @@
-# My AIsy Toolkit
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.png">
+    <img alt="My AIsy Toolkit" src="assets/logo-blue.png" width="320" height="160">
+  </picture>
+</p>
 
-![Skills](https://img.shields.io/badge/skills-12-blue?style=flat-square)
-![Agents](https://img.shields.io/badge/agents-6-informational?style=flat-square)
-![Updated](https://img.shields.io/badge/updated-2026--08--01-lightgrey?style=flat-square)
+<p align="center">
+  <strong>Go from vibe coding to Spec-Driven Development. Orchestrate agentic loops with a copy-paste catalog of skills and subagents, no install required.</strong>
+</p>
 
-**My AIsy Toolkit** is a distributable kit of skills and subagents for spec-driven development with AI coding agents — Claude Code, and Codex CLI in best-effort mode. Point your agent at one URL (or paste one file), and any repo gets the same catalog of commands and subagents, ready to use — no libraries, no package managers, nothing to install globally.
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0-orange?style=flat-square" alt="Version">
+</p>
 
-## ⚡ Quick start
+<p align="center">
+  <img src="https://img.shields.io/badge/skills-12-blue?style=flat-square" alt="Skills">
+  <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agents">
+  <img src="https://img.shields.io/badge/updated-2026--08--01-lightgrey?style=flat-square" alt="Updated">
+</p>
+
+<p align="center">
+  🌐 <strong>English</strong> · <a href="README-ES.md">Español</a>
+</p>
+
+<p align="center">
+  My AIsy Toolkit brings together skills and subagents ready to install in your repo, so you can start building with Spec-Driven Development and agentic loops, compatible with Claude Code and Codex CLI in best-effort mode. Point your agent at one URL (or paste one file), and any repo gets the same catalog of commands and subagents, ready to use, no libraries, no package managers, nothing to install globally.
+</p>
+
+---
+
+## ⚡ Quick Setup
 
 ### 1. Install
 
@@ -26,18 +50,27 @@ claude "Fetch and follow the setup instructions at https://raw.githubusercontent
 codex "Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md"
 ```
 
-Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo — nothing else is touched.
+Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo. Nothing else is touched.
 
 ### 2. Answer two questions
 
 Before writing anything, your agent asks:
 
-- **Which agent are you setting this up for?** — Claude Code or Codex CLI (best-effort support). Asked every time, word for word, even if `.claude/` or `.codex/` already exist in your repo — it's never inferred from what's already there.
-- **Which profile do you want?** — only asked if the catalog has more than one profile and you haven't already named one. Defaults to `default` (12 skills, 6 agents) whenever there's just a single profile, or once you've named the one you want.
+- **Which agent are you setting this up for?** Claude Code or Codex CLI (best-effort support). Asked every time, word for word, even if `.claude/` or `.codex/` already exist in your repo. It's never inferred from what's already there.
+- **Which profile do you want?** Only asked if the catalog has more than one profile and you haven't already named one. Defaults to `default` (12 skills, 6 agents) whenever there's just a single profile, or once you've named the one you want.
 
 Nothing gets written to disk until both are answered.
 
-## 📚 Catalog — default profile
+## 📦 What will you find here?
+
+- **12 skills** covering the full spec-driven workflow, from `/constitution` to `/clean-feature`
+- **6 subagents** for architecture, implementation, testing, UI, and review
+- **1 install method**: one URL or one pasted file, nothing to download
+- **2 AI coding agents** supported: Claude Code (native) and Codex CLI (best-effort)
+
+And the catalog keeps growing as new skills and agents are added.
+
+## 📚 Catalog: default profile
 
 **Skills**
 
@@ -87,7 +120,7 @@ my-aisy-toolkit/
 
 ## 📝 Good to know
 
-**Re-installing or updating.** Re-running either install method on a repo that already has the kit brings the latest version of the catalog, adds any skills or agents that are new since your last install, and updates the ones that changed. There's no semantic versioning to track — you always land on the current catalog.
+**Re-installing or updating.** Re-running either install method on a repo that already has the kit brings the latest version of the catalog, adds any skills or agents that are new since your last install, and updates the ones that changed. There's no semantic versioning to track. You always land on the current catalog.
 
 **Params**
 
@@ -96,4 +129,8 @@ my-aisy-toolkit/
 | `profile` | string | `default` | Catalog profile to install. If more than one is available and none is specified, your agent asks which one you want. |
 | `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly, never inferred from folders already in your repo. |
 
-Side effects stay contained to `.claude/` and/or `.codex/` in your repo — application code and everything else is left alone.
+Side effects stay contained to `.claude/` and/or `.codex/` in your repo. Application code and everything else is left alone.
+
+## 🤝 Code of Conduct
+
+This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you're expected to uphold it.
