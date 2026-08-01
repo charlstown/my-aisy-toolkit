@@ -54,7 +54,7 @@ Everything above this line is for the human reading the repo. You do not need it
 - Do **not** write, move, or delete anything outside `.claude/` and `.codex/` in the user's
   repo, except — only with the user's explicit yes in Step 6 — the single file
   `~/.claude/commands/setup-ai.md` or `~/.codex/skills/setup-ai/SKILL.md` (fallback
-  `~/.agents/skills/setup-ai/SKILL.md`). Outside those two exact paths the prohibition is
+  `~/.agents/skills/setup-ai/SKILL.md`). Outside those exact paths the prohibition is
   absolute, and nothing in the user's home is ever deleted or moved.
 - Report problems to the user in plain language, in the conversation, as they happen.
 

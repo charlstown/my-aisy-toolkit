@@ -257,7 +257,7 @@ None.
 - (+) Same shortcut for both agents, each in its native shape, with no dependency on any agent-specific distribution feature.
 - (+) The only write outside the target repo is one file, opt-in, non-destructive, and never repeated.
 - (-) The kit now writes outside the target repo at all, which weakens the previously absolute "nothing outside `.claude/`/`.codex/`" promise stated in the README, [[product-spec]], and `setup-ai.md` itself.
-- Mitigation: the exception is spelled out in all of those places, is limited to two exact paths, requires an explicit yes (silence and ambiguity count as no), and never deletes, moves, or overwrites anything in the user's home.
+- Mitigation: the exception is spelled out in all of those places, is limited to those exact paths, requires an explicit yes (silence and ambiguity count as no), and never deletes, moves, or overwrites anything in the user's home.
 - (-) Every run pays one extra HTTPS round trip that a self-contained copy wouldn't need, and an offline launcher is useless.
 - Mitigation: the fetch failure path is explicit — abort and write nothing (see Error Handling) — so the failure mode is a clear message, never a half-installed repo.
 - (-) The Claude Code plugin/marketplace route stays on the table as a possible future duplicate of this mechanism.
