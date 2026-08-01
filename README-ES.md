@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0-orange?style=flat-square" alt="Versión">
+  <img src="https://img.shields.io/badge/version-1.1-orange?style=flat-square" alt="Versión">
 </p>
 
 <p align="center">
