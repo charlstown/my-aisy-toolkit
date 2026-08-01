@@ -66,7 +66,7 @@ Single command the user pastes into their terminal (or asks their agent to run) 
 | Param | Type | Default | Description |
 |-------|------|---------|--------------|
 | `profile` | string | `default` | Catalog profile to install. If more than one is available and none is specified, `setup-ai` asks the user. |
-| `agent` | string | auto-detect | Target AI agent (`claude`, `codex`). Auto-detected from the target repo's structure (`.claude/`, `.codex/`) or asked if inconclusive. |
+| `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly; never inferred from the target repo's structure (`.claude/`, `.codex/`). |
 
 > [!warning] Side effect
 > Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders.
