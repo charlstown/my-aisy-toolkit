@@ -6,7 +6,7 @@
 
 .DESCRIPTION
     Simulates a `setup-ai.md` install run entirely with local file operations
-    (no bash/curl one-liner, no real HTTPS fetch — see plan.md decision #2)
+    (no bash/curl one-liner, no real HTTPS fetch - see plan.md decision #2)
     and checks that every file declared in `catalog.yaml` for the `default`
     profile ends up byte-for-byte identical to its source under
     `ai-toolkit/default/` once "installed" into a disposable scratch folder.
@@ -22,7 +22,7 @@
       `.codex/skills/<name>/SKILL.md` (ADR-002 / tech-spec.md, Step 5 of
       setup-ai.md). Per setup-ai.md, Codex CLI has no subagent equivalent,
       so catalog `agents` entries are intentionally NOT installed for this
-      target — they are recorded as "not applicable" in the comparison,
+      target - they are recorded as "not applicable" in the comparison,
       not as a failure. This run is NON-BLOCKING (FR-007): the script
       always exits 0 for this target, regardless of match/mismatch results,
       because the translation is a reinterpretation, not a byte-for-byte
@@ -40,7 +40,7 @@
     The install method being exercised: `oneliner` or `copypaste`. Per
     plan.md decision #4, both methods share the exact same install routine
     here (they only differ in how a human kicks off reading setup-ai.md,
-    not in what gets written) — this parameter only changes the name of the
+    not in what gets written) - this parameter only changes the name of the
     scratch folder used, so each (target, method) combination gets its own
     independently inspectable, independently verified run.
 
@@ -110,7 +110,7 @@ function Convert-ToRepoPath {
 #         - <source path>
 #
 # A flat list of plain strings under `commands:`/`agents:` for each named
-# profile — no nested objects, no per-item keys. No general-purpose YAML
+# profile - no nested objects, no per-item keys. No general-purpose YAML
 # library is needed or used.
 # ---------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ function Get-CatalogEntries {
     )
 
     if (-not (Test-Path -LiteralPath $CatalogPath)) {
-        throw "catalog.yaml not found at '$CatalogPath'. This is a hard prerequisite (see plan.md scope note: Batches 2-5 need catalog.yaml/002 to exist) — nothing to verify."
+        throw "catalog.yaml not found at '$CatalogPath'. This is a hard prerequisite (see plan.md scope note: Batches 2-5 need catalog.yaml/002 to exist) - nothing to verify."
     }
 
     $lines = Get-Content -LiteralPath $CatalogPath
@@ -196,7 +196,7 @@ function Get-CatalogEntries {
 # Best-effort Codex SKILL.md translation (ADR-002 shape: folder-per-skill,
 # `.codex/skills/<name>/SKILL.md`, YAML frontmatter). This is a deterministic
 # stand-in for what an AI agent would do at install time per setup-ai.md
-# Step 5 — it is explicitly NOT expected to be byte-for-byte identical to
+# Step 5 - it is explicitly NOT expected to be byte-for-byte identical to
 # the Claude Code source (that is the whole point of a "translation" versus
 # Step 4's verbatim copy), so a MISMATCH result here is an expected,
 # documented, non-blocking outcome (plan.md decision #5, FR-007).
@@ -367,10 +367,10 @@ function Add-EvidenceSection {
 
     if (-not (Test-Path -LiteralPath $EvidencePath)) {
         $header = @(
-            '# Evidence — Automated install verification check'
+            '# Evidence - Automated install verification check'
             ''
             'Permanent record of the Phase 1 gate defined in `specs/005-automated-install-verification-check/requirements.md`.'
-            'Generated and appended to by `scripts/verify-install-temp.ps1` (temporary — deleted once the gate is judged PASS,'
+            'Generated and appended to by `scripts/verify-install-temp.ps1` (temporary - deleted once the gate is judged PASS,'
             'see `specs/005-automated-install-verification-check/plan.md`, Batch 4). This file is NOT deleted with the script;'
             'it is the record that the check ran (SC-001-SC-004).'
             ''
@@ -383,14 +383,14 @@ function Add-EvidenceSection {
 
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $sectionLines = New-Object System.Collections.Generic.List[string]
-    [void]$sectionLines.Add("## Run: target=$Target, method=$Method — $timestamp")
+    [void]$sectionLines.Add("## Run: target=$Target, method=$Method - $timestamp")
     [void]$sectionLines.Add('')
     [void]$sectionLines.Add("- Scratch folder: ``$RunRoot``")
     [void]$sectionLines.Add("- Blocking for the Phase 1 gate: $(if ($Blocking) { 'yes (Claude Code)' } else { 'no (Codex CLI, best-effort per ADR-002/FR-007)' })")
     [void]$sectionLines.Add('')
 
     if ($FatalError) {
-        [void]$sectionLines.Add("**Result: ERROR** — the run could not complete: $FatalError")
+        [void]$sectionLines.Add("**Result: ERROR** - the run could not complete: $FatalError")
         [void]$sectionLines.Add('')
     } else {
         [void]$sectionLines.Add((New-MarkdownTable -Rows $Rows))
@@ -401,7 +401,7 @@ function Add-EvidenceSection {
         $failing = $total - $matched - $notApplicable
 
         $aggregateLabel = if ($AggregatePass) { 'PASS' } else { 'FAIL' }
-        [void]$sectionLines.Add("**Result: $aggregateLabel** — $matched/$total files present and byte-for-byte identical to their ai-toolkit/default/ source" + $(if ($notApplicable -gt 0) { " ($notApplicable not applicable to this target, $failing failing/mismatched)." } else { " ($failing failing/mismatched)." }))
+        [void]$sectionLines.Add("**Result: $aggregateLabel** - $matched/$total files present and byte-for-byte identical to their ai-toolkit/default/ source" + $(if ($notApplicable -gt 0) { " ($notApplicable not applicable to this target, $failing failing/mismatched)." } else { " ($failing failing/mismatched)." }))
         [void]$sectionLines.Add('')
     }
 
@@ -425,7 +425,7 @@ try {
     $catalog = Get-CatalogEntries -CatalogPath $CatalogPath -ProfileName $ProfileName
 
     if ($catalog.Commands.Count -eq 0 -and $catalog.Agents.Count -eq 0) {
-        throw "catalog.yaml has no commands/agents declared for profile '$ProfileName'. Nothing to verify — check that catalog.yaml (002) exists and declares the 'default' profile."
+        throw "catalog.yaml has no commands/agents declared for profile '$ProfileName'. Nothing to verify - check that catalog.yaml (002) exists and declares the 'default' profile."
     }
 
     Write-Host "Catalog entries for profile '$ProfileName': $($catalog.Commands.Count) commands, $($catalog.Agents.Count) agents"
@@ -462,7 +462,7 @@ try {
             Copy-Item -LiteralPath $srcFile -Destination $destFile -Force
         }
     } else {
-        # Codex: only `commands` translate into skills (setup-ai.md Step 5 —
+        # Codex: only `commands` translate into skills (setup-ai.md Step 5 -
         # Codex CLI has no subagent equivalent, so `agents` are intentionally
         # not written here at all).
         $codexSkillsDest = Join-Path $RunRoot '.codex\skills'
