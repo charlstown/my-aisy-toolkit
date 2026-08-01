@@ -13,9 +13,9 @@
 
 ## Batch 2 — Populate the catalog from the vault
 
-- [ ] @code-developer · Create `ai-toolkit/default/commands/` and `ai-toolkit/default/agents/`: create both folders (the repo currently has no `ai-toolkit/` directory at all).
-- [ ] @code-developer · Copy the vault's skills and agents as-is: for each skill folder and agent file confirmed in Batch 1 (the 12, or 13 if Batch 1 decided to include `setup-ai`, plus the 6 agents), copy its content into `ai-toolkit/default/commands/<name>.md` and `ai-toolkit/default/agents/<name>.md` respectively, preserving content and frontmatter exactly as found in the vault (no translation, no content invention).
-- [ ] @code-developer · Scan for vault-specific leakage: grep the copied files for references to the vault's own environment (absolute paths like `D:\MisProyectos\...`, other project names, or artifacts specific to the maintainer's local setup) that would not make sense once installed into an arbitrary end-user target repo. Generalize or remove any such reference; do not rewrite behavior otherwise.
+- [x] @code-developer · Create `ai-toolkit/default/commands/` and `ai-toolkit/default/agents/`: create both folders (the repo currently has no `ai-toolkit/` directory at all).
+- [x] @code-developer · Copy the vault's skills and agents as-is: for each skill folder and agent file confirmed in Batch 1 (the 12, or 13 if Batch 1 decided to include `setup-ai`, plus the 6 agents), copy its content into `ai-toolkit/default/commands/<name>.md` and `ai-toolkit/default/agents/<name>.md` respectively, preserving content and frontmatter exactly as found in the vault (no translation, no content invention).
+- [x] @code-developer · Scan for vault-specific leakage: grep the copied files for references to the vault's own environment (absolute paths like `D:\MisProyectos\...`, other project names, or artifacts specific to the maintainer's local setup) that would not make sense once installed into an arbitrary end-user target repo. Generalize or remove any such reference; do not rewrite behavior otherwise.
 
 ## Batch 3 — Validate
 
