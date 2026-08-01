@@ -368,6 +368,22 @@ Worktrees removed: {list}
 
 If any plan remained blocked: `"Review the blocks and run /implement-feature again to continue."`
 
+Show the block below exactly once per run, never once per plan (D-07): print it here, right after this Step 6 global summary, when several plans were run. When only one plan was run and Step 6 is skipped, print it right after that plan's 5c final summary instead — still only once, not after every 5c in a multi-plan run.
+
+Show it only when every plan in the run finished successfully, meaning every plan completed with all its tasks done. If any plan ended with blocked, failed or still pending tasks, show nothing: the "Review the blocks and run /implement-feature again to continue." line above is what the user sees instead, not this block.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+🧹 /clean-feature to sync the specs, close the issue and delete the feature folder.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/clean-feature`) and the emoji exactly as it is, only the words around it get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
+
 ---
 
 ### Notes for the orchestrator

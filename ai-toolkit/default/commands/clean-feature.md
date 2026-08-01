@@ -292,6 +292,8 @@ Push: ✅ dev updated
 
 If the user chose not to delete in Step 5: omit the folders section and the commit.
 
+This is the last step of the loop. Do not print a next-step suggestion block and do not point the user at another skill.
+
 ---
 
 ### Notes

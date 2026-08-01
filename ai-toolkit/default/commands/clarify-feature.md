@@ -105,6 +105,20 @@ When all targets are processed, show:
 
 If any feature still has open gaps, remind the user they can run `/clarify-feature` again on that feature once they have an answer.
 
+Show this block only when the run finished successfully, meaning the interrogation ran to completion on at least one target, gaps still open included. If the run ended any other way (Step 0 or Step 1 found no target and the skill stopped), show nothing: no block, no next step line.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+📋 /plan-feature to break the feature into an ordered plan of tasks.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/plan-feature`) and the emoji exactly as they are, only the words around them get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
+
 ## Constraints
 
 - **Never invent answers.** Every resolved gap must trace back to an explicit user answer in this session.

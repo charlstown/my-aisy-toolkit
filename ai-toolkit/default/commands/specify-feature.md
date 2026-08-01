@@ -172,6 +172,20 @@ After all subagents finish, show the user:
 - The folders created (`specs/{NNN}-{slug}/requirements.md`), one per feature.
 - Any candidates skipped because they already had a folder.
 - For each generated `requirements.md`: the number of `DEFINITION GAP` bullets (or "no gaps detected").
-- A reminder that gaps are not resolved automatically — the user should run `/clarify-feature` on that feature (or edit the file directly) before running `/plan-feature` on it.
+
+Show this block only when the run finished successfully, meaning at least one `requirements.md` was generated. If the run ended any other way (every candidate was skipped, or the user aborted the Step 2 confirmation), show nothing: no block, no next step line.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+❓ /clarify-feature (optional) to close the open gaps before planning. Skip it if the spec is already clear.
+📋 /plan-feature to break the feature into an ordered plan of tasks.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill names (`/clarify-feature`, `/plan-feature`) and the emojis exactly as they are, only the words around them get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
 
 Do not invoke `/clarify-feature` or `/plan-feature` automatically: `specify-feature` always stops after generating the `requirements.md` files.
