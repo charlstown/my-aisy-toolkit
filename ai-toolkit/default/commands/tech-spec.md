@@ -334,6 +334,27 @@ Checkbox list with open questions from the interview. Format for resolved items:
 
 ---
 
+### Phase 6 — Next step
+
+Show this block only when the run finished successfully, meaning `specs/tech-spec.md` was actually written. If the run ended any other way (the user rejected the Phase 4 confirmation), show nothing: no block, no next step line.
+
+Skip this block entirely when this skill was invoked as a step of `/constitution` rather than directly by the user. In that case `/constitution` prints the closing block for the whole run.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+🗺️ /roadmap (optional) to turn the specs into a phased plan. Skip it if you already know what comes first.
+🎯 /specify-feature to turn what you want to build next into a feature spec.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill names (`/roadmap`, `/specify-feature`) and the emojis exactly as they are, only the words around them get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
+
+---
+
 ## Constraints
 
 - **Never make up versions.** All versions come from real config files. If the manifest does not exist yet, mark as *TBD* instead of approximating.

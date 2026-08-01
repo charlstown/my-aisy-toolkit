@@ -45,14 +45,23 @@ Run the `tech-spec` skill now, in full. Its Phase 0 will read the `specs/product
 
 ### Step 3 — Summary
 
-Once both are done, tell the user:
+Show this block only when the run finished successfully, meaning Steps 1 and 2 both ran and both spec files were confirmed written. If the run ended any other way (the user picked `Cancel` in Step 0, or Step 0 ended with nothing to bootstrap), show nothing: no block, no next step line.
+
+Then close with:
 
 ```
 ✓ specs/product-spec.md
 ✓ specs/tech-spec.md
 
-Next: /roadmap to turn these into an execution plan.
+✅ Done. Suggested next step:
+
+🗺️ /roadmap (optional) to turn the specs into a phased plan. Skip it if you already know what comes first.
+🎯 /specify-feature to turn what you want to build next into a feature spec.
 ```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill names (`/roadmap`, `/specify-feature`) and the emojis exactly as they are, only the words around them get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
 
 ## Constraints
 

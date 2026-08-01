@@ -152,6 +152,24 @@ Open product decisions as a checkbox list. Use `AskUserQuestion` with possible p
 - [ ] Open question
 - [x] ~~Resolved question~~ → Decision taken
 
+### 5. Next step
+
+Show this block only when the run finished successfully, meaning `specs/product-spec.md` was actually written. If the run ended any other way (the user aborted the interview or rejected the write), show nothing: no block, no next step line.
+
+Skip this block entirely when this skill was invoked as a step of `/constitution` rather than directly by the user. In that case `/constitution` prints the closing block for the whole run.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+🏗️ /tech-spec to write the technical side: stack, architecture and decisions.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/tech-spec`) and the emoji exactly as it is, only the words around it get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
+
 ---
 
 ## Constraints

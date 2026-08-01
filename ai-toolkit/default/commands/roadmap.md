@@ -333,6 +333,24 @@ List of elements that are explicitly outside this roadmap. Extract from `## 🚫
 
 ---
 
+### Phase 4 — Next step
+
+Show this block only when the run finished successfully, meaning `specs/roadmap.md` was actually written and the Phase 2 confirmation was accepted. If the run ended any other way (the confirmation was rejected or there was nothing to plan), show nothing: no block, no next step line.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+🎯 /specify-feature to turn what you want to build next into a feature spec.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/specify-feature`) and the emoji exactly as it is, only the words around it get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
+
+---
+
 ## Constraints
 
 - **Do not invent features.** All features come from the TechSpec's modules, the ProductSpec's interfaces, or the deliverables of both. If a module or interface has no associated feature, create only the module's bootstrapping feature.

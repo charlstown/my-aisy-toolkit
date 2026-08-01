@@ -124,3 +124,17 @@ When the planner agent finishes, inform the user of:
 - The number of batches and tasks created
 - If the plan attributes agents: the agents used and how many tasks it assigned to each; if there were no agents in the repo, note that
 - If there were clarifications incorporated into the plan, mention them briefly
+
+Show this block only when the run finished successfully, meaning the planner agent finished and `plan.md` was written. If the run ended any other way (no `requirements.md` exists under `specs/` and the skill stopped at Step 1), show nothing: no block, no next step line.
+
+Then close with:
+
+```
+✅ Done. Suggested next step:
+
+🚀 /implement-feature to run the plan and open the PR.
+```
+
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/implement-feature`) and the emoji exactly as it is, only the words around it get translated.
+
+This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
