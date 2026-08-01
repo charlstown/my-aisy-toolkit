@@ -166,7 +166,7 @@ Then close with:
 🏗️ /tech-spec to write the technical side: stack, architecture and decisions.
 ```
 
-Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/tech-spec`) and the emoji exactly as they are, only the words around them get translated.
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/tech-spec`) and the emoji exactly as it is, only the words around it get translated.
 
 This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
 

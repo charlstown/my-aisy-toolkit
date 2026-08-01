@@ -135,6 +135,6 @@ Then close with:
 🚀 /implement-feature to run the plan and open the PR.
 ```
 
-Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill names (`/implement-feature`) and the emojis exactly as they are, only the words around them get translated.
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/implement-feature`) and the emoji exactly as it is, only the words around it get translated.
 
 This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.

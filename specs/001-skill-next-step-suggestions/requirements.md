@@ -44,7 +44,7 @@ Acceptance Scenarios:
 
 ### Functional Requirements
 
-- FR-001: El sistema DEBE hacer que cada uno de los 9 skills del flujo secuencial (`constitution`, `product-spec`, `tech-spec`, `roadmap`, `specify-feature`, `clarify-feature`, `plan-feature`, `implement-feature`, `clean-feature`) muestre, al finalizar su ejecución con éxito, un bloque visual destacado sugiriendo el/los siguiente(s) skill(s) a ejecutar.
+- FR-001: El sistema DEBE hacer que cada uno de los 8 skills del flujo secuencial con siguiente paso definido (`constitution`, `product-spec`, `tech-spec`, `roadmap`, `specify-feature`, `clarify-feature`, `plan-feature`, `implement-feature`) muestre, al finalizar su ejecución con éxito, un bloque visual destacado sugiriendo el/los siguiente(s) skill(s) a ejecutar; `clean-feature` queda excluido de forma intencionada por ser el último paso de la secuencia (ver FR-006).
 - FR-002: El bloque de sugerencia DEBE presentar entre 1 y 3 opciones, cada una acompañada de un emoji.
 - FR-003: El tono y formato del bloque de sugerencia DEBEN ser consistentes con el principio de diseño "Direct, jargon-free tone" ("Keep it AIsy") descrito en `specs/product-spec.md`.
 - FR-004: Los skills `new-issue` y `grill-me` DEBEN quedar explícitamente excluidos de mostrar el bloque de sugerencia de siguiente paso, al no pertenecer a una secuencia fija.
@@ -75,7 +75,7 @@ No aplica: esta feature no introduce ni gestiona datos persistentes. Los concept
 
 ### Measurable Outcomes
 
-- SC-001: El 100% de los 9 skills del flujo secuencial muestran el bloque de sugerencia de siguiente paso al finalizar con éxito.
+- SC-001: El 100% de los 8 skills del flujo secuencial con siguiente paso definido (`constitution`, `product-spec`, `tech-spec`, `roadmap`, `specify-feature`, `clarify-feature`, `plan-feature`, `implement-feature`) muestran el bloque de sugerencia de siguiente paso al finalizar con éxito; `clean-feature` queda excluido de forma intencionada por ser el último paso de la secuencia (ver FR-006).
 - SC-002: 0 de los 2 skills excluidos (`new-issue`, `grill-me`) muestran el bloque de sugerencia de siguiente paso.
 - SC-003: Los usuarios reportan que, tras finalizar un skill del flujo secuencial, saben qué ejecutar a continuación sin necesidad de consultar documentación externa.
 - SC-004: El formato y tono del bloque de sugerencia es percibido como consistente con la identidad "Keep it AIsy" del producto en las revisiones de contenido.
