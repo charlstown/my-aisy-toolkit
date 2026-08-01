@@ -27,7 +27,7 @@
 
 ## Batch 3 — Align supporting docs
 
-- [ ] @code-developer · Correct product-spec.md's stale "auto-detect" wording: In `specs/product-spec.md`, under 🛠️ Interfaces → One-liner (fetch of `setup-ai`) → the params table, change the `agent` row's Default/Description from "auto-detect ... Auto-detected from the target repo's structure (`.claude/`, `.codex/`) or asked if inconclusive" to reflect ADR-004 — the target agent is always asked explicitly, never inferred from folders — keeping the rest of the table and surrounding prose unchanged. This is the single-line correction flagged as resolved-separately in requirements.md's DEFINITION GAP.
+- [x] @code-developer · Correct product-spec.md's stale "auto-detect" wording: In `specs/product-spec.md`, under 🛠️ Interfaces → One-liner (fetch of `setup-ai`) → the params table, change the `agent` row's Default/Description from "auto-detect ... Auto-detected from the target repo's structure (`.claude/`, `.codex/`) or asked if inconclusive" to reflect ADR-004 — the target agent is always asked explicitly, never inferred from folders — keeping the rest of the table and surrounding prose unchanged. This is the single-line correction flagged as resolved-separately in requirements.md's DEFINITION GAP.
 
 ## Batch 4 — Verify against dummy repo (SC-001, SC-002, SC-003)
 
