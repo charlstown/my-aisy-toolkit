@@ -5,7 +5,6 @@ profiles:
       - ai-toolkit/default/commands/product-spec.md
       - ai-toolkit/default/commands/tech-spec.md
       - ai-toolkit/default/commands/roadmap.md
-      - ai-toolkit/default/commands/get-issues.md
       - ai-toolkit/default/commands/new-issue.md
       - ai-toolkit/default/commands/specify-feature.md
       - ai-toolkit/default/commands/clarify-feature.md

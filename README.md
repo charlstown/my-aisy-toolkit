@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
     <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.png">
-    <img alt="My AIsy Toolkit" src="assets/logo-blue.png" width="320" height="160">
+    <img alt="My AIsy Toolkit" src="assets/logo-light.png" width="320" height="160">
   </picture>
 </p>
 
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/skills-12-blue?style=flat-square" alt="Skills">
+  <img src="https://img.shields.io/badge/skills-11-blue?style=flat-square" alt="Skills">
   <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agents">
   <img src="https://img.shields.io/badge/updated-2026--08--01-lightgrey?style=flat-square" alt="Updated">
 </p>
@@ -32,15 +32,19 @@
 
 ## ⚡ Quick Setup
 
-### 1. Install
-
 From inside the repo you want to set up, paste this into your agent's conversation:
 
 ```
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-Or pass it straight as the prompt when you start the agent from your terminal:
+Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo. Nothing else is touched.
+
+---
+
+### Terminal setup
+
+Prefer the terminal? Pass it straight as the prompt when you start the agent:
 
 ```
 claude "Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md"
@@ -50,20 +54,9 @@ claude "Fetch and follow the setup instructions at https://raw.githubusercontent
 codex "Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md"
 ```
 
-Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo. Nothing else is touched.
-
-### 2. Answer two questions
-
-Before writing anything, your agent asks:
-
-- **Which agent are you setting this up for?** Claude Code or Codex CLI (best-effort support). Asked every time, word for word, even if `.claude/` or `.codex/` already exist in your repo. It's never inferred from what's already there.
-- **Which profile do you want?** Only asked if the catalog has more than one profile and you haven't already named one. Defaults to `default` (12 skills, 6 agents) whenever there's just a single profile, or once you've named the one you want.
-
-Nothing gets written to disk until both are answered.
-
 ## 📦 What will you find here?
 
-- **12 skills** covering the full spec-driven workflow, from `/constitution` to `/clean-feature`
+- **11 skills** covering the full spec-driven workflow, from `/constitution` to `/clean-feature`
 - **6 subagents** for architecture, implementation, testing, UI, and review
 - **1 install method**: one URL or one pasted file, nothing to download
 - **2 AI coding agents** supported: Claude Code (native) and Codex CLI (best-effort)
@@ -80,9 +73,8 @@ And the catalog keeps growing as new skills and agents are added.
 | `/product-spec` | Generates or updates `specs/product-spec.md` by interviewing the user. |
 | `/tech-spec` | Generates or updates `specs/tech-spec.md` (the technical how) from the product-spec. |
 | `/roadmap` | Generates `specs/roadmap.md` from the product-spec and tech-spec. |
-| `/get-issues` | Fetches open GitHub issues and scaffolds a `requirements.md` per selected issue. |
 | `/new-issue` | Opens a bug or feature issue on GitHub, investigating or clarifying depending on type. |
-| `/specify-feature` | Detects features from various sources and scaffolds a `requirements.md` per feature. |
+| `/specify-feature` | Detects features from various sources (including open GitHub issues) and scaffolds a `requirements.md` per feature. |
 | `/clarify-feature` | Closes the pending decision gaps in one or more `requirements.md` files. |
 | `/grill-me` | Critical interrogation of a document to reduce gaps and inconsistencies. |
 | `/plan-feature` | Generates `plan.md` from a `requirements.md`, attributing tasks to subagents. |
@@ -111,7 +103,7 @@ Just the pieces that matter to a reader deciding whether to install:
 my-aisy-toolkit/
 ├── ai-toolkit/
 │   └── default/
-│       ├── commands/    # 12 skills
+│       ├── commands/    # 11 skills
 │       └── agents/      # 6 subagents
 ├── catalog.yaml
 ├── setup-ai.md

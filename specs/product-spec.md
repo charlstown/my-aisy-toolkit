@@ -94,9 +94,8 @@ Running either method above on a repo that already has the kit installed. Always
 | `/product-spec` | Generates or updates `specs/product-spec.md` by interviewing the user. |
 | `/tech-spec` | Generates or updates `specs/tech-spec.md` (the technical how) from the product-spec. |
 | `/roadmap` | Generates `specs/roadmap.md` from the product-spec and tech-spec. |
-| `/get-issues` | Fetches open GitHub issues and scaffolds a `requirements.md` per selected issue. |
 | `/new-issue` | Opens a bug or feature issue on GitHub, investigating or clarifying depending on type. |
-| `/specify-feature` | Detects features from various sources and scaffolds a `requirements.md` per feature. |
+| `/specify-feature` | Detects features from various sources (including open GitHub issues) and scaffolds a `requirements.md` per feature. |
 | `/clarify-feature` | Closes the pending decision gaps in one or more `requirements.md` files. |
 | `/grill-me` | Critical interrogation of a document to reduce gaps and inconsistencies. |
 | `/plan-feature` | Generates `plan.md` from a `requirements.md`, attributing tasks to subagents. |
@@ -144,7 +143,7 @@ Verifying the installation means checking that the expected files for the instal
 > │   └── agents/
 > ├── ai-toolkit/
 > │   └── default/         # Distributable catalog, profile "default"
-> │       ├── commands/    # Skill catalog (12 skills)
+> │       ├── commands/    # Skill catalog (11 skills)
 > │       └── agents/      # Subagent catalog (6 agents)
 > ├── specs/               # product-spec.md, tech-spec.md, roadmap.md for this repo itself
 > ├── setup-ai.md          # Plain-text installation instructions (root)

@@ -61,7 +61,7 @@ Single root index declaring, per profile, which skills and agents it includes an
 
 #### `ai-toolkit/default/commands/` — Skill catalog (`default` profile)
 
-Distributable source of truth for the 12 skills of the `default` profile in Claude Code's native format, self-documented in their own frontmatter, fetched by `setup-ai`.
+Distributable source of truth for the 11 skills of the `default` profile in Claude Code's native format, self-documented in their own frontmatter, fetched by `setup-ai`.
 
 #### `ai-toolkit/default/agents/` — Subagent catalog (`default` profile)
 

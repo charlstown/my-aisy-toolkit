@@ -263,7 +263,7 @@ Evidence collected:
 - Console errors: {n}
 - Failed requests: {n}
 
-To work on the fix: /get-issues → select #{number}
+To work on the fix: /specify-feature → select #{number}
 ```
 
 ---
@@ -404,5 +404,5 @@ EOF
 Issue created: #{number} — {title}
 URL: {url}
 
-To plan the implementation: /get-issues → select #{number}
+To plan the implementation: /specify-feature → select #{number}
 ```

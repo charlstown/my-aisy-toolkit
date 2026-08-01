@@ -78,7 +78,7 @@ listing every profile the catalog declares with its file counts:
 ```
 There's more than one profile in the catalog. Which one do you want?
 
-  1. default — 12 skills, 6 agents
+  1. default — 11 skills, 6 agents
   2. <other profile> — <n> skills, <n> agents
 ```
 

@@ -1,5 +1,5 @@
 ---
-description: Interrogates the user to close the gaps section of one or more requirements.md files (the `Decision gap` from get-issues or the `DEFINITION GAP` from specify-feature), then folds every decision into the document and deletes the section once fully resolved. Trigger when the user says "clarify-feature", "clarifica", "cierra los gaps", "resuelve los gaps", or invokes /clarify-feature.
+description: Interrogates the user to close the gaps section of one or more requirements.md files (the `DEFINITION GAP` from specify-feature), then folds every decision into the document and deletes the section once fully resolved. Trigger when the user says "clarify-feature", "clarifica", "cierra los gaps", "resuelve los gaps", or invokes /clarify-feature.
 ---
 
 ## Language
@@ -8,7 +8,7 @@ Detect the language of the user's initial (or most recent) message and conduct t
 
 ## Purpose
 
-Where `specify-feature` and `get-issues` **evidence** gaps without resolving them, `clarify-feature` is the skill that closes them: it interrogates the user about the exact open items already listed in a requirements.md's gap section, folds each decision into the right part of the document, and removes the section once nothing is left open. Unlike `grill-me` (which re-analyzes a whole document from scratch and can surface new gaps), `clarify-feature` only works the gaps that are already itemized — it does not go hunting for new ones.
+Where `specify-feature` **evidences** gaps without resolving them, `clarify-feature` is the skill that closes them: it interrogates the user about the exact open items already listed in a requirements.md's gap section, folds each decision into the right part of the document, and removes the section once nothing is left open. Unlike `grill-me` (which re-analyzes a whole document from scratch and can surface new gaps), `clarify-feature` only works the gaps that are already itemized — it does not go hunting for new ones.
 
 ## Instructions
 
@@ -29,7 +29,7 @@ If a target was resolved here, skip Step 1 and go straight to Step 2 for that si
 
 ### Step 1 — Discover requirements.md files with open gaps
 
-Use `Glob` to find all `specs/*/requirements.md`. Read each one and detect a gaps section by its heading — match case-insensitively on any `##` heading containing "gap" (covers `## Decision gap` from `get-issues`, `## DEFINITION GAP` from `specify-feature`, and equivalent variants). A section counts as open only if it has at least one unresolved item (`- [ ]`, not `- [x]`).
+Use `Glob` to find all `specs/*/requirements.md`. Read each one and detect a gaps section by its heading — match case-insensitively on any `##` heading containing "gap" (covers `## DEFINITION GAP` from `specify-feature` and equivalent variants). A section counts as open only if it has at least one unresolved item (`- [ ]`, not `- [x]`).
 
 Build **FOUND**: list of `{ folder, gap_heading, open_count }`.
 
