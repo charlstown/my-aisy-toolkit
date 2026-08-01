@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1-orange?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1-orange?style=for-the-badge" alt="Version">
 </p>
 
 <p align="center">
@@ -62,6 +62,14 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 - **2 AI coding agents** supported: Claude Code (native) and Codex CLI (best-effort)
 
 And the catalog keeps growing as new skills and agents are added.
+
+## 🔁 How it works
+
+Point your agent at the setup URL once — that's the only install step. `/constitution` bootstraps the specs (product-spec, tech-spec, roadmap), then every feature goes through the same closed loop: `/specify-feature` scopes it, `/clarify-feature` closes any decision gaps, `/plan-feature` breaks it down, `/implement-feature` builds it, and `/clean-feature` closes the loop by aligning the specs again before the next feature starts.
+
+<p align="center">
+  <img src="assets/skill-cycle.svg" alt="Setup feeds into a repeating cycle: constitution, specify-feature, plan-feature, implement-feature, clean-feature, back to constitution" width="720">
+</p>
 
 ## 📚 Catalog: default profile
 
