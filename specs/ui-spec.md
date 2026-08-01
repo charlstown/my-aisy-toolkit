@@ -4,7 +4,7 @@
 > | **Status** | 🟢 Locked for F1.4 |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-02 |
+> | **Updated** | 2026-08-01 |
 > | **Version** | v0.1 |
 
 ---
@@ -24,7 +24,6 @@ Referencia de estilo: [FlorianBruniaux/claude-code-ultimate-guide](https://githu
 ```
 ┌────────────────────────────────────────────────┐
 │ # My AIsy Toolkit                               │ ← H1
-│ [version] (dinámico, shields.io, for-the-badge) │ ← badge de versión, bloque separado
 │ [skills-12] [agents-6] [updated-YYYY-MM-DD]     │ ← badges shields.io, style=flat-square
 │ Pitch de 1 párrafo ("Keep it AIsy")             │
 ├────────────────────────────────────────────────┤
@@ -113,12 +112,6 @@ Se descartó tanto "sin badges" como "estilo `for-the-badge` grande". Se usan 3 
 
 - Son estáticos (no hay backend/API que los alimente); se actualizan a mano cuando cambia el conteo del catálogo o se toca el README.
 - Nada de Mermaid ni `<details>` en esta pantalla — ver Ronda 1 de decisiones más abajo.
-
-Además de estos 3 badges estáticos `flat-square`, el README incluye un cuarto badge de **versión**, en su propio bloque justo encima (línea 14), que sí usa el estilo `for-the-badge` explícitamente descartado para los otros tres — introducido por la feature de versionado del repo (`specs/002-versionado-del-repo-version-changelog-git-tags/`). A diferencia de los 3 anteriores, este badge **no es estático**: lo alimenta en vivo el endpoint `img.shields.io/github/v/tag/charlstown/my-aisy-toolkit` a partir del último git tag, y no requiere actualización manual.
-
-```
-<img src="https://img.shields.io/github/v/tag/charlstown/my-aisy-toolkit?style=for-the-badge&label=version&color=orange" alt="Version">
-```
 
 ---
 

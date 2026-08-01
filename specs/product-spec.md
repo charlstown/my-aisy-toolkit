@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-02 |
+> | **Updated** | 2026-08-01 |
 > | **Version** | v0.1 |
 
 ## 🎯 Vision
@@ -33,7 +33,7 @@
 - **Extensible profiles from day one** — today only the `default` profile exists, but the installation mechanism detects and asks about available profiles without needing a redesign when new ones are added.
 - **Multi-agent by adaptation, not lowest common denominator** — every supported agent (Claude Code, Codex CLI) receives the catalog translated into its native format (`.claude/commands` + `.claude/agents` vs. `.codex/skills`), not a degraded generic version.
 - **Direct, jargon-free tone** — installer messages, README, and skill names are clear, short, and have a light, easygoing touch ("Keep it AIsy"), never sounding corporate.
-- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself does carry a SemVer `VERSION`, a `CHANGELOG.md`, and git tags `vX.Y.Z` for maintainer visibility — see ADR-006 in tech-spec.md — but that versioning is decoupled from, and does not affect, how the catalog gets installed.) The global `/setup-ai` launcher obeys the distribution rule by carrying no embedded content at all: it is a pointer that re-fetches the live instructions on every run, so it cannot go stale and needs no update mechanism of its own.
+- **Always the latest version** — no semantic versioning or release tags for now; installing or re-installing always brings the current state of the catalog's main branch. The global `/setup-ai` launcher obeys the same rule by carrying no embedded content at all: it is a pointer that re-fetches the live instructions on every run, so it cannot go stale and needs no update mechanism of its own.
 
 ## 🏗️ Architecture
 
@@ -192,7 +192,7 @@ Verifying the installation means checking that the expected files for the instal
 ## ❓ Discovery
 
 - [x] ~~Is Codex CLI supported in v1?~~ → Yes, in best-effort mode (translated to `.codex/skills/`), documented as unverified in a real environment until it can be tested.
-- [x] ~~How is the catalog versioned?~~ → Catalog *distribution* always brings the latest of the main branch; no semantic versioning or version selection there. Separately, the repo itself is now SemVer-tagged (`VERSION`, `CHANGELOG.md`, git tags `vX.Y.Z`) purely for maintainer visibility — see ADR-006 in tech-spec.md. The two are independent: bumping the repo version never changes what `setup-ai` installs.
+- [x] ~~How is the catalog versioned?~~ → Always the latest version (latest of the main branch); no semantic versioning for now.
 - [x] ~~Tone for user-facing content?~~ → Direct, jargon-free, with a light easygoing touch ("Keep it AIsy").
 - [x] ~~Exact location of the `setup-ai` script/instructions within the repo?~~ → Repo root (`setup-ai.md`), per tech-spec.md.
 - [x] ~~Concrete mechanism for profile and active-agent selection?~~ → ADR-004: the agent is always asked explicitly (never inferred/detected from folders present); the profile is asked only if the catalog declares more than one.
