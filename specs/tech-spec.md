@@ -33,13 +33,18 @@ This document covers the technical installation mechanism (`setup-ai`) and the c
 
 ```mermaid
 flowchart LR
-    U[AI agent in the target repo] -->|1. reads| S[setup-ai.md]
+    U[AI agent in the target repo] -->|"1a. reads (one-liner or copy-paste)"| S[setup-ai.md]
+    U -->|"1b. runs /setup-ai · $setup-ai"| L["Global launcher<br/>(one pointer file, user level)"]
+    L -->|"re-fetches the live file on every run"| S
+    S -.->|"Step 6 — written once, only on explicit yes"| L
     S -.fetch HTTPS.-> RAW[(raw.githubusercontent.com)]
     RAW -->|catalog.yaml| U
     RAW -->|ai-toolkit/default/commands · ai-toolkit/default/agents files| U
     U -->|translates if target = Codex| U
     U -->|3. writes| DEST[(Target repo<br/>.claude/ or .codex/)]
 ```
+
+Both entry routes converge on the same `setup-ai.md` and run the exact same steps; the launcher only skips Step 6 (offering to save itself), because it *is* the launcher.
 
 ```mermaid
 flowchart TB
@@ -48,12 +53,25 @@ flowchart TB
     CAT --> AGT["ai-toolkit/default/agents/*.md<br/>(subagents, distributed)"]
     CMD --> RM[README.md]
     AGT --> RM
+    SA -.->|"Step 6: templates embedded verbatim in setup-ai.md"| GL["~/.claude/commands/setup-ai.md<br/>~/.codex/skills/setup-ai/SKILL.md<br/>(global launcher, outside any repo)"]
+    GL -.->|"points back, fetches on every run"| SA
     INT[".claude/<br/>(internal only, not distributed)"]
 ```
 
 #### `setup-ai.md` — Installation instructions
 
-Natural-language guide an AI agent follows step by step to ask for profile and target agent, fetch the manifest and each file, and write them translated into the correct format.
+Natural-language guide an AI agent follows step by step to ask for profile and target agent, fetch the manifest and each file, and write them translated into the correct format. It is also the only place the two global-launcher templates live: they are embedded verbatim inside Step 6, so the copy-paste route stays self-contained (no extra file to fetch).
+
+#### Global launcher — user-level command
+
+Optional shortcut, written outside any repo so the user can re-run the install from anywhere without going back to the README. It is a **pointer, not a copy**: its whole body is a frontmatter block plus "fetch this URL, follow it from Step 1 against the current repo", an explicit "don't run the save-the-launcher step again", and a fetch-failure rule (abort, write nothing). It embeds zero catalog content, which is what makes it consistent with the "always the latest version" principle in [[product-spec]] — there is nothing in it that can go stale.
+
+| Target agent | Path | Format | Invoked as |
+|---|---|---|---|
+| Claude Code | `~/.claude/commands/setup-ai.md` | Markdown + frontmatter (`description`, `argument-hint`), same shape as any user-level slash command | `/setup-ai` (optional `[profile]` argument) |
+| Codex CLI — best-effort | `~/.codex/skills/setup-ai/SKILL.md`, fallback `~/.agents/skills/setup-ai/SKILL.md` when `~/.codex/` doesn't exist but `~/.agents/` does | Folder with `SKILL.md` + frontmatter (`name`, `description`), mirroring the repo-level `.codex/skills/<name>/SKILL.md` convention | `$setup-ai` — a `$` skill, never a slash command |
+
+Written by Step 6 of `setup-ai.md`, and only when all of these hold: the run did not come from the launcher itself, the agent's user-level directory actually exists, no file already sits at the destination, and the user answered yes to a single explicit question. Existing files are never opened, compared, or overwritten. Unlike Step 5, the Codex template is written verbatim, not translated — the launcher never comes from the catalog.
 
 #### `catalog.yaml` — Catalog manifest
 
@@ -79,6 +97,7 @@ Presents the kit, documents both installation methods, and serves as the repo's 
 
 | Internal operation | Method | External service | Notes |
 |---------------------|--------|-------------------|-------|
+| Launcher invocation (`/setup-ai`, `$setup-ai`) | GET (agent's native fetch) | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/setup-ai.md` | The launcher holds no logic of its own: every run re-fetches the live instructions and follows them from Step 1. Same URL the README one-liner uses |
 | Fetch the manifest | GET (agent's native fetch) | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/catalog.yaml` | No authentication; fails if the repo becomes private or GitHub is unavailable |
 | Fetch each skill/agent | GET (agent's native fetch) | `raw.githubusercontent.com/.../main/ai-toolkit/default/commands\|agents/*.md` | One request per file; no caching, every installation re-fetches all content |
 | Translation to Codex format | Interpretation by the agent itself, no external service | — | The agent reads the Claude Code frontmatter and rewrites it as `SKILL.md`, following the instructions in `setup-ai.md` |
@@ -96,6 +115,8 @@ Presents the kit, documents both installation methods, and serves as the repo's 
 | Skill/agent file fetch | 404 / timeout | Retry once; if it persists, inform and skip that file | Must not block installing the rest of the profile |
 | Writing to target repo | File already exists with different content | Overwrite | Consistent with the "always the latest version" principle in [[product-spec]] |
 | Target agent detection | User doesn't confirm Claude or Codex | Ask again; write nothing until answered | Prevents installing in the wrong format |
+| Writing the global launcher (Step 6) | Permission denied, home directory missing or not creatable, disk full | Report the real reason in the wrap-up and continue; no retry, no alternative path | The catalog install already finished and is **not** reverted — the launcher is an opt-in extra, never a blocker (ADR-007) |
+| Fetching `setup-ai.md` from an invoked launcher | 404 / timeout / unreachable | Abort; write, overwrite, or delete nothing | Same policy as the manifest fetch: no cached or remembered copy, and never install the kit from memory (ADR-007) |
 
 **Propagation**
 
@@ -124,6 +145,11 @@ Not applicable: there is no executable code of its own, only Markdown/YAML conte
 **Integration Tests**
 
 Prerequisite: an empty scratch repo. Flow verified manually before merging relevant changes to `catalog.yaml`, `setup-ai.md`, or the catalog: run both installation methods (one-liner and copy-paste) against Claude Code and, when possible, against Codex CLI, and confirm the files land in the correct location and format.
+
+The global launcher (Step 6) is verified in the same run, checking three outcomes: it gets written on a yes, nothing is written on a no or a non-answer, and a second run neither asks again nor overwrites the existing file.
+
+> [!warning] Never verify the launcher against the real home directory
+> Testing Step 6 **must** be done with `HOME` pointed at a throwaway scratch directory, never against the maintainer's real `~/.claude/` or `~/.codex/`. There is already a legacy, unrelated `~/.claude/commands/setup-ai.md` on that machine, and nothing in this flow may write, overwrite, move, or delete anything there. A test that touches the real home is a failed test, whatever its result.
 
 **Tools**
 
@@ -242,6 +268,23 @@ None.
 2. **Add the version entry to `CHANGELOG.md`**: open a new `## [X.Y.Z] - YYYY-MM-DD` section directly under `## [Unreleased]`, move into it everything accumulated in `[Unreleased]`, and leave `[Unreleased]` empty again for the next cycle. The version number must match `VERSION` exactly.
 3. **Tag and push**: `git tag vX.Y.Z && git push --tags` (tag *with* the `v` prefix — the asymmetry with `VERSION` is deliberate, see **Decision** above). This is the step that feeds the README badge: shields.io reads the repo's tags, so until the tag is pushed both `README.md` and `README-ES.md` keep showing the previous version (or "no tags found" while no tag exists at all), no matter what `VERSION` and `CHANGELOG.md` say. It is also the easiest step to forget, because steps 1 and 2 are ordinary file edits that ride along with the release commit or PR, while this one is a separate write to the remote after merging.
 
+### ADR-007: Global launcher as a pointer, not a copy of `setup-ai.md`
+
+**Decision**: The entry point (`setup-ai.md` at the repo root, reached from the README one-liner or by copy-paste) and the optional global launcher (`~/.claude/commands/setup-ai.md`, or `~/.codex/skills/setup-ai/SKILL.md` with `~/.agents/` fallback) are **two different files with two different jobs**. The launcher contains no catalog content and no installation logic of its own — it only fetches the live `setup-ai.md` and follows it — and it is written only with the user's explicit yes, only for an agent whose user-level directory actually exists, only once, and never over an existing file.
+
+**Context**: Two alternatives were evaluated. (1) **Copying `setup-ai.md` verbatim** into the user-level command directory: it works on day one and then freezes — the copy stops matching the repo the moment the instructions change, which directly contradicts the "always the latest version" principle in [[product-spec]] and would force a launcher update mechanism that doesn't exist. (2) **Using Claude Code's native plugin/marketplace system**, raised and postponed in issue #8 itself: it would solve the same problem with less bespoke text, but it only exists for Claude Code, so Codex CLI would be left with no shortcut at all, and it would couple the product to a single agent's feature — against the "multi-agent by adaptation" principle. Writing the launcher unconditionally (no question) was also discarded outright: the user's home is outside the repo the user asked us to touch.
+
+**Consequences**:
+- (+) The launcher cannot go stale: it holds a URL and an instruction, so every run picks up the current `setup-ai.md` without any update mechanism.
+- (+) Same shortcut for both agents, each in its native shape, with no dependency on any agent-specific distribution feature.
+- (+) The only write outside the target repo is one file, opt-in, non-destructive, and never repeated.
+- (-) The kit now writes outside the target repo at all, which weakens the previously absolute "nothing outside `.claude/`/`.codex/`" promise stated in the README, [[product-spec]], and `setup-ai.md` itself.
+- Mitigation: the exception is spelled out in all of those places, is limited to those exact paths, requires an explicit yes (silence and ambiguity count as no), and never deletes, moves, or overwrites anything in the user's home.
+- (-) Every run pays one extra HTTPS round trip that a self-contained copy wouldn't need, and an offline launcher is useless.
+- Mitigation: the fetch failure path is explicit — abort and write nothing (see Error Handling) — so the failure mode is a clear message, never a half-installed repo.
+- (-) The Claude Code plugin/marketplace route stays on the table as a possible future duplicate of this mechanism.
+- Mitigation: revisit only if Claude-Code-only distribution ever becomes acceptable; until then this file-based launcher is the single mechanism for both agents.
+
 ## ⚠️ Known Limitations
 
 - No persistent automated tests or CI/CD: validation is normally manual, in a scratch repo, before publishing changes to main. A one-off automated verification script (`scripts/verify-install-temp.ps1`) was built and run once to confirm this manual process (see `specs/005-automated-install-verification-check/evidence.md`), then deleted by design — there is no repeatable automated tooling checked into the repo.
@@ -249,6 +292,8 @@ None.
 - The `ai-toolkit/default/` catalog has no automated sync with its canonical source (the maintainer's local skills vault at `D:\MisProyectos\0_TEMPLATES\SETUP-AI`); updates are copied over by hand.
 - Requests to `raw.githubusercontent.com` are anonymous and subject to GitHub's unauthenticated rate limit.
 - Correct installation depends on the target agent faithfully following the natural-language instructions in `setup-ai.md`; there's no deterministic behavior guarantee like with a script.
+- The global launcher's Codex CLI destination (`~/.codex/skills/setup-ai/SKILL.md`, fallback `~/.agents/skills/setup-ai/SKILL.md`) has **not** been verified against a real Codex CLI install — official docs point at `~/.agents/skills`, while the binary and community sources also use `~/.codex/skills`. If the choice is wrong, the file is inert (Codex simply won't list `$setup-ai`), not destructive. Best-effort like the rest of Codex support (ADR-002, ADR-007).
+- The global launcher has **no self-update mechanism**: once a file exists at the destination it is never opened, compared, or overwritten. By design it can't go stale (it carries no catalog content, ADR-007), but if the launcher's own format ever had to change, the only remedy is manual — the user deletes the file and runs the setup again to get the new one.
 
 ## ❓ Discovery
 

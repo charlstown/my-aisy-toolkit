@@ -28,18 +28,21 @@
 
 ## 💎 Design Principles
 
-- **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. Nothing to install globally, no package manager, no library.
+- **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. No package manager, no library, and nothing to install globally beyond a single optional pointer file (the `/setup-ai` launcher) that the user has to say yes to.
 - **README as product** — the README is the kit's "front": it must convince and allow installing in under 2 minutes. It is treated as the main piece, not an afterthought.
 - **Extensible profiles from day one** — today only the `default` profile exists, but the installation mechanism detects and asks about available profiles without needing a redesign when new ones are added.
 - **Multi-agent by adaptation, not lowest common denominator** — every supported agent (Claude Code, Codex CLI) receives the catalog translated into its native format (`.claude/commands` + `.claude/agents` vs. `.codex/skills`), not a degraded generic version.
 - **Direct, jargon-free tone** — installer messages, README, and skill names are clear, short, and have a light, easygoing touch ("Keep it AIsy"), never sounding corporate.
-- **Always the latest version** — no semantic versioning or release tags for now; installing or re-installing always brings the current state of the catalog's main branch.
+- **Always the latest version** — no semantic versioning or release tags for now; installing or re-installing always brings the current state of the catalog's main branch. The global `/setup-ai` launcher obeys the same rule by carrying no embedded content at all: it is a pointer that re-fetches the live instructions on every run, so it cannot go stale and needs no update mechanism of its own.
 
 ## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
-    U[User in a target repo] -->|pastes instructions or runs a one-liner| S[setup-ai]
+    U[User in a target repo] -->|"one-liner from the README, or pasted instructions"| S[setup-ai]
+    U -->|"/setup-ai — if the launcher was saved earlier"| L["Global launcher<br/>(one pointer file, user level)"]
+    L -->|"fetches the live setup-ai on every run"| S
+    S -.->|"offers to save it once, only if the user says yes"| L
     S -->|fetch| CAT[(my-aisy-toolkit<br/>profile catalog)]
     CAT -->|available profiles| S
     S -->|asks for profile if more than one| U
@@ -51,8 +54,9 @@ flowchart LR
     CX --> D
 ```
 
-- **User** — starts the installation from the repo where they want the kit; picks a profile if asked. Does not interact directly with the `my-aisy-toolkit` repo.
-- **setup-ai** — entry point (instructions/script) that fetches the catalog, always asks the user which AI agent to target (never inferred from the target repo's structure), asks for the profile only if the catalog declares more than one, and writes the corresponding files into the target repo. Does not modify target-repo application code or configuration unrelated to skills/agents.
+- **User** — starts the installation from the repo where they want the kit, by one of two routes: the one-liner from the README, or the global `/setup-ai` launcher if they saved it in an earlier install. Picks a profile if asked. Does not interact directly with the `my-aisy-toolkit` repo.
+- **setup-ai** — entry point (instructions/script) that fetches the catalog, always asks the user which AI agent to target (never inferred from the target repo's structure), asks for the profile only if the catalog declares more than one, and writes the corresponding files into the target repo. Both routes land here and run the exact same steps. Does not modify target-repo application code or configuration unrelated to skills/agents; the only thing it may write outside the target repo is the global launcher, and only with the user's explicit yes.
+- **Global launcher (`/setup-ai`)** — optional shortcut, saved once at user level and living outside any repo. It is a pointer with no logic and no catalog content of its own: all it does is fetch the live `setup-ai` and run it against whatever repo is open, skipping the offer to save itself. `setup-ai` offers it at the end of an install, only for agents already present on the machine, only once, and never overwrites a file that already sits at its destination.
 - **my-aisy-toolkit (catalog)** — single source of truth for profiles, skills, and agents, published under `/ai-toolkit/<profile>/` (e.g. `/ai-toolkit/default/`). Does not execute itself; it only serves as content for `setup-ai` to consume. This is decoupled from the repo's own internal `.claude/` folder, which is used only to develop this toolkit itself (dogfooding) and is never what gets installed into a target repo.
 - **Target repo** — receives the installed files and becomes operational for spec-driven development through the corresponding AI agent's skills. Each skill/agent's internal logic lives in its own self-documented file.
 
@@ -70,7 +74,7 @@ Single command the user pastes into their terminal (or asks their agent to run) 
 | `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly; never inferred from the target repo's structure (`.claude/`, `.codex/`). |
 
 > [!warning] Side effect
-> Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders.
+> Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders. **One opt-in exception:** at the end of the install, `setup-ai` may offer to save the global launcher — a **single** file in the agent's user-level command directory — and writes it only if the user explicitly says yes. Without that yes, nothing outside the target repo is touched, and nothing in the user's home is ever overwritten, moved, or deleted.
 
 #### Copy-paste (plain instructions)
 
@@ -80,9 +84,30 @@ Plain-text block the user pastes directly into the conversation of any AI coding
 |-------|------|---------|--------------|
 | `profile` | string | `default` | Same as the one-liner; the agent asks if it's not specified and several profiles exist. |
 
+#### Global launcher (`/setup-ai`)
+
+Optional shortcut so the user never has to go back to the README. It is **not** a copy of `setup-ai`: it is one small file whose entire body is "fetch the live `setup-ai` from GitHub and follow it against the current repo", plus an explicit instruction not to offer saving the launcher again — it is already installed.
+
+| Agent | Where it's saved | How it's invoked |
+|-------|------------------|------------------|
+| Claude Code | `~/.claude/commands/setup-ai.md` | `/setup-ai` (optional `[profile]` argument) |
+| Codex CLI — best-effort | `~/.codex/skills/setup-ai/SKILL.md` (fallback `~/.agents/skills/setup-ai/SKILL.md`) | `$setup-ai` — a `$` skill, not a slash command |
+
+> The Codex row is best-effort like the rest of Codex support: the user-level path has not been verified against a real Codex CLI install, and there the command is `$setup-ai`, never `/setup-ai`.
+
+How it gets there:
+
+- **Only with an explicit yes.** `setup-ai` asks once, at the very end, after the repo is already set up. A no, a silence, or an ambiguous answer are all treated as no, and nothing outside the repo is written.
+- **Only for agents that are actually there.** A user-level directory has to exist (`~/.claude/`, `~/.codex/` or `~/.agents/`) for that agent to even be offered. This environment check is only about the launcher — it never replaces the mandatory "which agent am I setting this up for?" question, which is always asked.
+- **Only once.** If a file already sits at the destination, it is not opened, not compared, and not overwritten; the question is not asked again either, and the install reports that it left the existing file alone. Replacing it is a manual job: delete it and run the setup again.
+- **Never blocking.** If the write fails (permissions, no home directory, disk), the catalog install already finished and is not reverted — the user just gets the reason in the wrap-up report.
+
+> [!warning] Side effect
+> This is the only file the kit ever writes outside the target repo, and only after the user says yes.
+
 #### Re-installation / update
 
-Running either method above on a repo that already has the kit installed. Always brings the latest version of the catalog (no semantic versioning), adds new skills/agents from the profile, and updates existing ones that changed.
+Running any of the methods above on a repo that already has the kit installed. Always brings the latest version of the catalog (no semantic versioning), adds new skills/agents from the profile, and updates existing ones that changed.
 
 ### Catalog — `default` profile
 

@@ -38,7 +38,7 @@ From inside the repo you want to set up, paste this into your agent's conversati
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo. Nothing else is touched.
+Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes.
 
 ---
 
@@ -129,7 +129,7 @@ my-aisy-toolkit/
 | `profile` | string | `default` | Catalog profile to install. If more than one is available and none is specified, your agent asks which one you want. |
 | `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly, never inferred from folders already in your repo. |
 
-Side effects stay contained to `.claude/` and/or `.codex/` in your repo. Application code and everything else is left alone.
+Side effects stay contained to `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes. Application code and everything else in your repo is left alone.
 
 ## 🤝 Code of Conduct
 
