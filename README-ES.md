@@ -38,7 +38,7 @@ Desde dentro del repositorio que quieres configurar, pega esto en la conversaci�
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-Tu agente descarga el archivo, sigue los pasos que contiene y te cuenta qué instaló. No hay nada que descargar, ningún gestor de paquetes y ningún script que ejecutar. Los efectos secundarios se limitan a los archivos escritos dentro de `.claude/` y/o `.codex/` en tu repositorio. Nada más se toca.
+Tu agente descarga el archivo, sigue los pasos que contiene y te cuenta qué instaló. No hay nada que descargar, ningún gestor de paquetes y ningún script que ejecutar. Los efectos secundarios se limitan a los archivos escritos dentro de `.claude/` y/o `.codex/` en tu repositorio, salvo un único archivo del launcher global que el instalador puede ofrecer guardar al final — solo si dices que sí.
 
 ---
 
@@ -129,7 +129,7 @@ my-aisy-toolkit/
 | `profile` | string | `default` | Perfil del catálogo a instalar. Si hay más de uno disponible y no se especifica ninguno, tu agente pregunta cuál quieres. |
 | `agent` | string | preguntado | Agente IA destino (`claude`, `codex`). Siempre se pregunta explícitamente, nunca se infiere de las carpetas que ya haya en tu repositorio. |
 
-Los efectos secundarios se limitan a `.claude/` y/o `.codex/` en tu repositorio. El código de la aplicación y todo lo demás se deja intacto.
+Los efectos secundarios se limitan a `.claude/` y/o `.codex/` en tu repositorio, salvo un único archivo del launcher global que el instalador puede ofrecer guardar al final — solo si dices que sí. El código de la aplicación y todo lo demás en tu repositorio se deja intacto.
 
 ## 🤝 Código de conducta
 
