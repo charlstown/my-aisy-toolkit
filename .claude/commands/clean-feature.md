@@ -74,7 +74,7 @@ Read the following root specs with `Read`:
 | `specs/security-spec.md` | The plan modified auth, validations, proxies or permissions |
 | `specs/roadmap.md` | Any completed plan (mark delivered items) |
 
-For `spec` ∈ `product-spec`, `tech-spec` only, track `spec_status_{spec}_{folder}` with these assignment rules: if the row above does not apply to this plan, set it to `not_applicable`; if the subagent responds "ALIGNED — no changes needed", set it to `aligned`; if the subagent finds one or more misalignments, set it to `pending` (resolved in Step 4). This tracking is scoped to `product-spec.md`/`tech-spec.md` only (FR-002); the other 5 specs (`css-spec`, `ui-spec`, `infra-spec`, `security-spec`, `roadmap`) keep today's behavior with no status variable.
+For `spec` ∈ `product-spec`, `tech-spec` only, track `spec_status_{spec}_{folder}` with these assignment rules: if the row above does not apply to this plan, or the spec file does not exist on disk (see the "Optional specs" note), set it to `not_applicable`; if the subagent responds "ALIGNED — no changes needed", set it to `aligned`; if the subagent finds one or more misalignments, set it to `pending` (resolved in Step 4). This tracking is scoped to `product-spec.md`/`tech-spec.md` only (FR-002); the other 5 specs (`css-spec`, `ui-spec`, `infra-spec`, `security-spec`, `roadmap`) keep today's behavior with no status variable.
 
 For each relevant spec, launch a `general-purpose` subagent with the following prompt:
 
@@ -194,7 +194,7 @@ Confirm with `Glob "specs/*/plan.md"` that the folders no longer exist.
 
 For each deleted folder where `issue_num_{folder}` is not `null`:
 
-0. **Alignment gate**: check `spec_status_product-spec_{folder}` and `spec_status_tech-spec_{folder}` for this folder. The issue may close only if **both** are in `{not_applicable, aligned, updated}`. If **either** is `failed`, skip steps 1-3 entirely for this folder, and instead append an entry to a new `pending_alignment_folders` list (for Step 8) with the folder path, `issue_num_{folder}`, and the name(s) of the failed spec(s) (`product-spec.md` and/or `tech-spec.md`). This gate is evaluated independently per folder — a `failed` status in one folder does not affect the gate outcome for any other folder. This gate does not affect Step 6's folder deletion, which already ran and was already confirmed in Step 5; it only controls whether the issue is closed in the steps below.
+0. **Alignment gate**: check `spec_status_product-spec_{folder}` and `spec_status_tech-spec_{folder}` for this folder. The issue may close only if **both** are in `{not_applicable, aligned, updated}`. If **either** is `failed`, skip steps 1-3 entirely for this folder, and instead append an entry to the `pending_alignment_folders` list (initialized empty once, before the per-folder loop) with the folder path, `issue_num_{folder}`, and the name(s) of the failed spec(s) (`product-spec.md` and/or `tech-spec.md`). This gate is evaluated independently per folder — a `failed` status in one folder does not affect the gate outcome for any other folder. This gate does not affect Step 6's folder deletion, which already ran and was already confirmed in Step 5; it only controls whether the issue is closed in the steps below. If no status was assigned for a spec, treat it as `not_applicable`.
 
 If the gate above passed for this folder, continue:
 
