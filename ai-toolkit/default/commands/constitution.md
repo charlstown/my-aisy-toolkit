@@ -53,6 +53,8 @@ Run the `tech-spec` skill now, in full. Its Phase 0 will read the `specs/product
 
 Unless Step 0 determined `specs/roadmap.md` already exists and should be kept as-is, run the `roadmap` skill now, in full — its own interview (its 3 questions), its own file write. Do not present any `AskUserQuestion` of your own (`constitution`'s) before or after invoking `roadmap` — the entire interview belongs to `roadmap`. Its Phase 0 will read the `specs/product-spec.md` and `specs/tech-spec.md` written (or already present) from Steps 1-2 on its own — do not pass them manually, and do not summarize their content into the roadmap prompt yourself. Wait for it to completely finish and confirm `specs/roadmap.md` was written before moving on.
 
+`roadmap`'s own Phase 4 ends with its own closing block and its own suggested next step. Do not show that block here — suppress it. `constitution`'s Step 4 below prints the single closing block for the entire run, and showing both would duplicate it.
+
 If the `roadmap` skill fails, is cancelled, or otherwise does not end up writing `specs/roadmap.md`, stop here: inform the user of the failure and do not continue to the summary.
 
 ### Step 4 — Summary
