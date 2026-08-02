@@ -94,7 +94,7 @@ if git rev-parse "refs/tags/$new_tag" >/dev/null 2>&1; then
   exit 1
 fi
 
-# 6) Crear el tag anotado y publicarlo. No se crea ningún GitHub Release.
+# 5) Crear el tag anotado y publicarlo. No se crea ningún GitHub Release.
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 

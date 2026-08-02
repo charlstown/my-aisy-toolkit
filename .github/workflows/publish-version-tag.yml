@@ -23,4 +23,6 @@ jobs:
           fetch-depth: 0
 
       - name: Compute and publish next semver tag
-        run: .github/scripts/compute-next-tag.sh "${{ github.event.pull_request.title }}"
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: .github/scripts/compute-next-tag.sh "$PR_TITLE"
