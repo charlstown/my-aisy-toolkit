@@ -24,7 +24,7 @@
 
 ## Batch 2 — Verify synchronization and scope
 
-- [ ] @tester · Diff both copies and confirm compliance: run a diff between `ai-toolkit/default/commands/new-issue.md` and `.claude/commands/new-issue.md` and confirm the only difference between them remains the pre-existing one (the `/specify-feature` vs `/get-issues` reference at the end of the Bug Flow, F6/B6 — unrelated to this change) and that the new mandatory block is byte-identical in both (FR-004). Confirm the block is positioned as the first block in the file, before `## Language` (FR-005), and confirm it explicitly names `Write`, `Edit`, `git commit`, and `git push` as forbidden (FR-003). Report any mismatch back to @code-developer instead of fixing it.
+- [x] @tester · Diff both copies and confirm compliance: run a diff between `ai-toolkit/default/commands/new-issue.md` and `.claude/commands/new-issue.md` and confirm the only difference between them remains the pre-existing one (the `/specify-feature` vs `/get-issues` reference at the end of the Bug Flow, F6/B6 — unrelated to this change) and that the new mandatory block is byte-identical in both (FR-004). Confirm the block is positioned as the first block in the file, before `## Language` (FR-005), and confirm it explicitly names `Write`, `Edit`, `git commit`, and `git push` as forbidden (FR-003). Report any mismatch back to @code-developer instead of fixing it.
 
 ## Batch 3 — Quality gate
 
