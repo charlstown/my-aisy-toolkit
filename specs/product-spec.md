@@ -122,7 +122,6 @@ Running any of the methods above on a repo that already has the kit installed. A
 | `/new-issue` | Opens a bug or feature issue on GitHub, investigating or clarifying depending on type. |
 | `/specify-feature` | Detects features from various sources (including open GitHub issues) and scaffolds a `requirements.md` per feature. |
 | `/clarify-feature` | Closes the pending decision gaps in one or more `requirements.md` files. |
-| `/grill-me` | Critical interrogation of a document to reduce gaps and inconsistencies. |
 | `/plan-feature` | Generates `plan.md` from a `requirements.md`, attributing tasks to subagents. |
 | `/implement-feature` | Orchestrates the execution of one or more `plan.md` files using git worktrees. |
 | `/clean-feature` | Aligns the root specs with completed work and closes the associated issue. |
@@ -168,7 +167,7 @@ Verifying the installation means checking that the expected files for the instal
 > │   └── agents/
 > ├── ai-toolkit/
 > │   └── default/         # Distributable catalog, profile "default"
-> │       ├── commands/    # Skill catalog (11 skills)
+> │       ├── commands/    # Skill catalog (10 skills)
 > │       └── agents/      # Subagent catalog (6 agents)
 > ├── specs/               # product-spec.md, tech-spec.md, roadmap.md for this repo itself
 > ├── setup-ai.md          # Plain-text installation instructions (root)

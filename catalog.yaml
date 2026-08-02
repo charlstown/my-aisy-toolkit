@@ -8,7 +8,6 @@ profiles:
       - ai-toolkit/default/commands/new-issue.md
       - ai-toolkit/default/commands/specify-feature.md
       - ai-toolkit/default/commands/clarify-feature.md
-      - ai-toolkit/default/commands/grill-me.md
       - ai-toolkit/default/commands/plan-feature.md
       - ai-toolkit/default/commands/implement-feature.md
       - ai-toolkit/default/commands/clean-feature.md

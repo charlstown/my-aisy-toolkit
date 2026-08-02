@@ -8,7 +8,7 @@ This document is internal technical reference, not part of the distributed catal
 
 ```
 ai-toolkit/default/
-├── commands/    # 11 skills (Claude Code's native "slash command" shape)
+├── commands/    # 10 skills (Claude Code's native "slash command" shape)
 │   └── *.md
 └── agents/      # 6 subagents (Claude Code subagent shape)
     └── *.md
@@ -23,7 +23,7 @@ Every file is self-documented: a skill is a Markdown file with YAML frontmatter 
 
 ## Skills (`commands/`)
 
-Nine of the eleven skills form one closed sequential workflow, each ending by suggesting the next one. The remaining two (`new-issue`, `grill-me`) are standalone utilities invoked on demand that never show a next-step suggestion.
+Nine of the ten skills form one closed sequential workflow, each ending by suggesting the next one. The remaining one (`new-issue`) is a standalone utility invoked on demand that never shows a next-step suggestion.
 
 ### The sequential workflow
 
@@ -47,7 +47,6 @@ Nine of the eleven skills form one closed sequential workflow, each ending by su
 | Skill | Produces | Notes |
 |---|---|---|
 | `/new-issue` | a GitHub issue (`gh issue create`) | Auto-detects bug vs. feature; the bug flow investigates the code and reproduces the failure in-browser before drafting the issue |
-| `/grill-me` | the input document rewritten in place (or printed) with its gaps closed | Generic — works on any document, not only specs; the user picks 4, 6, or 12 questions of depth |
 
 ---
 
@@ -107,14 +106,14 @@ Turns one or several already-existing feature descriptions — a file, a URL, a 
 
 - **Reads:** the input source (file/URL/issue/roadmap), existing `specs/*` folders (to avoid number collisions)
 - **Writes:** `specs/{NNN}-{slug}/requirements.md` per selected feature
-- Never resolves ambiguity itself — every open question goes into a `## DEFINITION GAP` section instead of being guessed at. This is the key difference from `/grill-me`.
+- Never resolves ambiguity itself — every open question goes into a `## DEFINITION GAP` section instead of being guessed at.
 
 ### `/clarify-feature`
 
 **File:** `commands/clarify-feature.md`
 **Trigger phrases:** "clarify-feature", "clarifica", "cierra los gaps", "resuelve los gaps"
 
-The counterpart to `/specify-feature`: it interrogates the user about the exact items already listed under a `requirements.md`'s gap heading, folds each decision back into the document, and deletes the gap section once nothing is left open. It only works gaps that are already itemized — finding *new* gaps is `/grill-me`'s job.
+The counterpart to `/specify-feature`: it interrogates the user about the exact items already listed under a `requirements.md`'s gap heading, folds each decision back into the document, and deletes the gap section once nothing is left open. It only works gaps that are already itemized.
 
 - **Reads:** one or more `specs/*/requirements.md` with an open `## DEFINITION GAP` (or equivalent) heading
 - **Writes:** the same `requirements.md`, edited in place

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `grill-me` skill removed from the `default` profile catalog (10 skills now,
+  down from 11); its source files (`ai-toolkit/default/commands/grill-me.md`,
+  `.claude/commands/grill-me.md`) were deleted. Existing installs that already
+  had `/grill-me` are unaffected — `setup-ai` never uninstalls skills a repo
+  already has.
+
 ## [0.1.0] - 2026-08-01
 
 ### Added
