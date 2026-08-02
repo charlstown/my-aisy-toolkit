@@ -66,10 +66,10 @@ Because for-dummies' behavior (FR-010–FR-010f) is more elaborate than a reused
 
 ### Batch 1 — Catalog and Utils pack content
 
-- [ ] @code-developer · Edit `catalog.yaml`: add the `packs.utils` block exactly as locked in Batch 0 (D-01), leaving the existing `profiles` key untouched (FR-001, SC-001).
-- [ ] @code-developer · Add `ai-toolkit/utils/commands/digest.md`: port the existing `.claude/commands/digest.md` content byte-for-byte into the new source-of-truth location (D-02), no behavioral changes — this becomes the canonical file `setup-ai.md` fetches from (FR-009, SC-006).
-- [ ] @code-developer · Add `ai-toolkit/utils/commands/grill-me.md`: restore the file exactly as it existed before removal (`git show 58242a6~1:ai-toolkit/default/commands/grill-me.md`) into the new `ai-toolkit/utils/commands/` location (D-02), unchanged content — this becomes the canonical file `setup-ai.md` fetches from (FR-009, SC-006).
-- [ ] @code-developer · Author `ai-toolkit/utils/commands/for-dummies.md` from scratch, following the outline locked in Batch 0's second task exactly: frontmatter (`description` in English per FR-004/D-07), `## Language` section matching every other skill in `ai-toolkit/default/commands/*.md`, and numbered steps implementing FR-010 through FR-010f in full.
+- [x] @code-developer · Edit `catalog.yaml`: add the `packs.utils` block exactly as locked in Batch 0 (D-01), leaving the existing `profiles` key untouched (FR-001, SC-001).
+- [x] @code-developer · Add `ai-toolkit/utils/commands/digest.md`: port the existing `.claude/commands/digest.md` content byte-for-byte into the new source-of-truth location (D-02), no behavioral changes — this becomes the canonical file `setup-ai.md` fetches from (FR-009, SC-006).
+- [x] @code-developer · Add `ai-toolkit/utils/commands/grill-me.md`: restore the file exactly as it existed before removal (`git show 58242a6~1:ai-toolkit/default/commands/grill-me.md`) into the new `ai-toolkit/utils/commands/` location (D-02), unchanged content — this becomes the canonical file `setup-ai.md` fetches from (FR-009, SC-006).
+- [x] @code-developer · Author `ai-toolkit/utils/commands/for-dummies.md` from scratch, following the outline locked in Batch 0's second task exactly: frontmatter (`description` in English per FR-004/D-07), `## Language` section matching every other skill in `ai-toolkit/default/commands/*.md`, and numbered steps implementing FR-010 through FR-010f in full.
 
 ### Batch 2 — Wire the Utils question and installation into setup-ai.md
 

@@ -18,3 +18,6 @@ profiles:
       - ai-toolkit/default/agents/tester.md
       - ai-toolkit/default/agents/ui-developer.md
       - ai-toolkit/default/agents/judge.md
+
+packs:
+  utils: [digest, grill-me, for-dummies]
