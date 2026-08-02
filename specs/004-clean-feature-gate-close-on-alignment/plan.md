@@ -38,7 +38,7 @@ FR-008 says "sincronizada" as an end state, not "apply only the new lines" — l
 
 ## Batch 2 — Sync the installed copy
 
-- [ ] @code-developer · Sync `.claude/commands/clean-feature.md`: After Batch 1 lands in `ai-toolkit/default/commands/clean-feature.md`, make `.claude/commands/clean-feature.md` byte-identical to it — apply the same Step 3/4/6.5/8/Notes edits **and** reconcile the pre-existing drift found during discovery (the installed copy is currently missing Step 8's closing "last step of the loop" sentence). Confirm with a direct diff (`Compare-Object` or `git diff --no-index`) that the two files are now identical, satisfying FR-008's "sincronizada" requirement for this feature; do not modify `catalog.yaml` (no skill added or removed).
+- [x] @code-developer · Sync `.claude/commands/clean-feature.md`: After Batch 1 lands in `ai-toolkit/default/commands/clean-feature.md`, make `.claude/commands/clean-feature.md` byte-identical to it — apply the same Step 3/4/6.5/8/Notes edits **and** reconcile the pre-existing drift found during discovery (the installed copy is currently missing Step 8's closing "last step of the loop" sentence). Confirm with a direct diff (`Compare-Object` or `git diff --no-index`) that the two files are now identical, satisfying FR-008's "sincronizada" requirement for this feature; do not modify `catalog.yaml` (no skill added or removed).
 
 ## Batch 3 — Verification
 
