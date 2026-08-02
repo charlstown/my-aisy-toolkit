@@ -33,7 +33,7 @@
 - **Extensible profiles from day one** — today only the `default` profile exists, but the installation mechanism detects and asks about available profiles without needing a redesign when new ones are added.
 - **Multi-agent by adaptation, not lowest common denominator** — every supported agent (Claude Code, Codex CLI) receives the catalog translated into its native format (`.claude/commands` + `.claude/agents` vs. `.codex/skills`), not a degraded generic version.
 - **Direct, jargon-free tone** — installer messages, README, and skill names are clear, short, and have a light, easygoing touch ("Keep it AIsy"), never sounding corporate.
-- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself does carry a SemVer `VERSION`, a `CHANGELOG.md`, and git tags `vX.Y.Z` for maintainer visibility — see ADR-006 in tech-spec.md — but that versioning is decoupled from, and does not affect, how the catalog gets installed.) The global `/setup-ai` launcher obeys the distribution rule by carrying no embedded content at all: it is a pointer that re-fetches the live instructions on every run, so it cannot go stale and needs no update mechanism of its own.
+- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself is SemVer-tagged via git tags `vX.Y.Z`, computed automatically from the PR title when a PR merges to `main` (`release:`/`feature:`/`fix:`/`chore:` prefixes) — see ADR-006 in tech-spec.md — but that versioning is decoupled from, and does not affect, how the catalog gets installed. There is no `VERSION` file: the latest git tag is the sole source of truth.) The global `/setup-ai` launcher obeys the distribution rule by carrying no embedded content at all: it is a pointer that re-fetches the live instructions on every run, so it cannot go stale and needs no update mechanism of its own.
 
 ## 🏗️ Architecture
 
@@ -115,7 +115,7 @@ Running any of the methods above on a repo that already has the kit installed. A
 
 | Skill | What it does |
 |-------|----------|
-| `/constitution` | Kicks off product-spec and tech-spec in sequence to bootstrap a project's root specs. |
+| `/constitution` | Kicks off product-spec, tech-spec, and roadmap in sequence to bootstrap a project's root specs. |
 | `/product-spec` | Generates or updates `specs/product-spec.md` by interviewing the user. |
 | `/tech-spec` | Generates or updates `specs/tech-spec.md` (the technical how) from the product-spec. |
 | `/roadmap` | Generates `specs/roadmap.md` from the product-spec and tech-spec. |
@@ -191,7 +191,7 @@ Verifying the installation means checking that the expected files for the instal
 ## ❓ Discovery
 
 - [x] ~~Is Codex CLI supported in v1?~~ → Yes, in best-effort mode (translated to `.codex/skills/`), documented as unverified in a real environment until it can be tested.
-- [x] ~~How is the catalog versioned?~~ → Catalog *distribution* always brings the latest of the main branch; no semantic versioning or version selection there. Separately, the repo itself is now SemVer-tagged (`VERSION`, `CHANGELOG.md`, git tags `vX.Y.Z`) purely for maintainer visibility — see ADR-006 in tech-spec.md. The two are independent: bumping the repo version never changes what `setup-ai` installs.
+- [x] ~~How is the catalog versioned?~~ → Catalog *distribution* always brings the latest of the main branch; no semantic versioning or version selection there. Separately, the repo itself is SemVer-tagged via git tags `vX.Y.Z`, published automatically by a GitHub Actions workflow when a correctly-prefixed PR (`release:`/`feature:`/`fix:`/`chore:`) merges to `main` — see ADR-006 in tech-spec.md. There is no `VERSION` file; the git tag is the only source of truth. The two are independent: the repo's tag never changes what `setup-ai` installs.
 - [x] ~~Tone for user-facing content?~~ → Direct, jargon-free, with a light easygoing touch ("Keep it AIsy").
 - [x] ~~Exact location of the `setup-ai` script/instructions within the repo?~~ → Repo root (`setup-ai.md`), per tech-spec.md.
 - [x] ~~Concrete mechanism for profile and active-agent selection?~~ → ADR-004: the agent is always asked explicitly (never inferred/detected from folders present); the profile is asked only if the catalog declares more than one.

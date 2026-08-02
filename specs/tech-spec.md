@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-01 |
+> | **Updated** | 2026-08-02 |
 > | **Version** | v0.1 |
 > | **ProductSpec** | [[product-spec]] |
 
@@ -246,27 +246,27 @@ None.
 - (+) Unambiguous single path (`ai-toolkit/default/`) for anything `setup-ai` may fetch; the internal `.claude/` can evolve freely.
 - (-) The `default` profile catalog must be kept manually in sync with its canonical source (the maintainer's local skills vault) instead of being read live from `.claude/`.
 
-### ADR-006: Repo-level SemVer via `VERSION`, `CHANGELOG.md`, and git tags, decoupled from catalog distribution
+### ADR-006: Repo-level SemVer via automated PR-title-driven git tags and `CHANGELOG.md`, decoupled from catalog distribution
 
-**Decision**: The repo adopts Semantic Versioning at the repository level: a plain-text `VERSION` file at the root, a `CHANGELOG.md` following [Keep a Changelog](https://keepachangelog.com/), and a git tag `vX.Y.Z` per release, surfaced by a dynamic shields.io badge (`img.shields.io/github/v/tag/...`) in both `README.md` and `README-ES.md`, replacing the previous hand-maintained static badge. `VERSION` holds the bare number (`0.1.0`, no `v` prefix) while the matching tag carries it (`v0.1.0`): a deliberate asymmetry so the file stays pure SemVer for any future script to read without stripping a prefix, and the tag keeps git's usual convention.
+**Decision**: The repo adopts Semantic Versioning at the repository level, automated end to end from PR titles: a required `pr-title-check.yml` status check validates that every PR title starts with `release:`, `feature:`, `fix:`, or `chore:` (case-insensitive), blocking the merge otherwise; on merge to `main`, `publish-version-tag.yml` (using `compute-next-tag.sh`) reads the merged PR title, computes the next `vX.Y.Z` accordingly, and pushes that git tag automatically, authenticating with the default `GITHUB_TOKEN` (no PAT needed). `chore:` PRs merge without publishing any tag. There is no `VERSION` file: the latest git tag is the sole source of truth for the repo's version, surfaced by a dynamic shields.io badge (`img.shields.io/github/v/tag/...`) in both `README.md` and `README-ES.md`, replacing the previous hand-maintained static badge. `CHANGELOG.md`, following [Keep a Changelog](https://keepachangelog.com/), is still hand-maintained: entries are added under `[Unreleased]` per change and promoted manually.
 
 **Context**: Two distinct things could be called "versioning" here, and only one of them changes. (a) *Catalog distribution versioning* — unchanged: `setup-ai` always fetches `main`, there is no version selection for the end user and no SemVer involved in installing or re-installing, exactly as [[product-spec]] states ("always the latest version"); change detection keeps comparing content directly, never version numbers. (b) *Repo versioning* — new, and its only purpose is maintainer visibility: knowing at a glance which state the catalog is in without reading the commit history. Two alternatives that would have collapsed that distinction were discarded: adding a `version` field to `catalog.yaml`, or to each skill's/agent's frontmatter. Both push version numbers into the distribution path, turn every catalog edit into a per-file bump, and invite `setup-ai` to compare versions instead of content — while ADR-003 keeps `catalog.yaml` as a pure "what's in each profile" manifest. Publishing GitHub Releases and pointing the badge at the `/github/v/release/` endpoint was also considered and discarded for now: it adds a publishing step to every release without adding information that plain tags don't already carry; it is left as a possible future improvement if releases ever need attached notes or assets.
 
 **Consequences**:
 - (+) The repo's version is visible on the front page and traceable in `CHANGELOG.md`, with no manual badge editing to keep in sync.
 - (+) The installation path is untouched: no `version` field enters `catalog.yaml` or any catalog file, so nothing about what users get changes.
-- (-) No automated check that `VERSION`, the topmost `CHANGELOG.md` entry, and the latest git tag agree; the repo has no CI to enforce it, so the three can silently drift apart.
-- Mitigation: the three release steps documented below must be executed as a single unit for every release, tag included.
+- (-) `pr-title-check.yml` and `publish-version-tag.yml` now enforce and automate the tag, so it can't drift from the merged PR title; the residual risk is only `CHANGELOG.md`'s topmost entry, which is still added/promoted by hand and can lag the auto-published tag.
+- Mitigation: keep `CHANGELOG.md`'s `[Unreleased]` section current per change — no manual step is needed for the tag itself anymore.
 - (-) Until the first tag exists in the repo, the badge renders as "version | no tags found" in red on both READMEs (verified against the shields.io API); it does not break the layout, but it does look like an error.
-- Mitigation: create and push the tag matching the current `VERSION` right after merging, which is exactly step 3 of the process below.
+- Mitigation: none needed manually — the first qualifying `feature:`/`fix:`/`release:` PR merged to `main` triggers `publish-version-tag.yml`, which creates the first tag (`v0.1.0` or `v1.0.0`) automatically.
 - (-) `github/v/tag` without `sort=semver` picks the most recently created tag, not the highest SemVer, so an out-of-order tag (e.g. a `v0.1.1` hotfix cut after `v0.2.0`) would show the wrong version.
-- Mitigation: harmless while releases stay strictly linear; revisit the badge query if maintenance branches ever appear.
+- Mitigation: since `publish-version-tag.yml` always computes the next tag from the last existing valid tag and only fires on merges to `main`, tags are created in monotonically increasing order under normal linear history, so the badge query still works correctly and needs no change for now; the residual risk is only a tag pushed manually/out-of-band or a non-linear (maintenance-branch) history.
 
-**Release process (manual, 3 steps)**: there is no CI to run or enforce this, so every release is cut by hand, in this order, and the three steps count as a single unit — a release is not done until step 3 is pushed.
+**Release process (automated)**: entries still accumulate in `CHANGELOG.md` by hand, but publishing the tag no longer is.
 
-1. **Bump `VERSION`** to the new `X.Y.Z`, as a bare number with no `v` prefix (e.g. `0.2.0`), choosing major/minor/patch per SemVer.
-2. **Add the version entry to `CHANGELOG.md`**: open a new `## [X.Y.Z] - YYYY-MM-DD` section directly under `## [Unreleased]`, move into it everything accumulated in `[Unreleased]`, and leave `[Unreleased]` empty again for the next cycle. The version number must match `VERSION` exactly.
-3. **Tag and push**: `git tag vX.Y.Z && git push --tags` (tag *with* the `v` prefix — the asymmetry with `VERSION` is deliberate, see **Decision** above). This is the step that feeds the README badge: shields.io reads the repo's tags, so until the tag is pushed both `README.md` and `README-ES.md` keep showing the previous version (or "no tags found" while no tag exists at all), no matter what `VERSION` and `CHANGELOG.md` say. It is also the easiest step to forget, because steps 1 and 2 are ordinary file edits that ride along with the release commit or PR, while this one is a separate write to the remote after merging.
+1. **Add entries to `CHANGELOG.md`** under `## [Unreleased]` by hand, per change, as before.
+2. **Title the PR** with one of the four required prefixes (`release:`, `feature:`, `fix:`, `chore:`); the required `Validate PR title prefix` check blocks the merge otherwise.
+3. **Merge to `main`**: `publish-version-tag.yml` computes the next `vX.Y.Z` from the PR title prefix and pushes it automatically (no GitHub Release, just the tag). No manual tagging, no `VERSION` bump — `chore:` merges publish no tag at all.
 
 ### ADR-007: Global launcher as a pointer, not a copy of `setup-ai.md`
 
