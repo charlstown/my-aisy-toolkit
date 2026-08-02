@@ -28,7 +28,7 @@ Requirements: specs/003-pr-title-auto-versioning/requirements.md
 
 ## Batch 3 — Limpieza del fichero VERSION
 
-- [ ] @code-developer · Eliminar el fichero VERSION: borrar `VERSION` de la raíz del repositorio (FR-014). Verificar con `grep` que ningún script o workflow del repo lo lee (confirmado en el discovery: solo se mencionaba en `CHANGELOG.md` como entrada histórica y en `tech-spec.md` ADR-006, ninguno de los cuales se reescribe en este plan). No tocar `CHANGELOG.md` ni `tech-spec.md`: su alineación con este cambio queda para el flujo `/clean-feature` posterior a este plan.
+- [x] @code-developer · Eliminar el fichero VERSION: borrar `VERSION` de la raíz del repositorio (FR-014). Verificar con `grep` que ningún script o workflow del repo lo lee (confirmado en el discovery: solo se mencionaba en `CHANGELOG.md` como entrada histórica y en `tech-spec.md` ADR-006, ninguno de los cuales se reescribe en este plan). No tocar `CHANGELOG.md` ni `tech-spec.md`: su alineación con este cambio queda para el flujo `/clean-feature` posterior a este plan.
 
 ## Batch 4 — Branch protection: required status check
 
