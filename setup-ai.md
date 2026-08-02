@@ -281,8 +281,8 @@ user hears it now, word for word, in the same message as the offer below and imm
 or, if no candidate is left at all, in the message that replaces it:
 
 ```
-Heads up — you told me this was for <confirmed agent>, and <path> already exists, so there's no
-shortcut left for me to offer you: I never overwrite that file. If it isn't this kit's launcher,
+Heads up — you told me this was for <confirmed agent>, and <path> already exists, so I won't be
+saving a global launcher for it — I never overwrite that file. If it isn't this kit's launcher,
 delete it and run the setup again to get the current one.
 ```
 
