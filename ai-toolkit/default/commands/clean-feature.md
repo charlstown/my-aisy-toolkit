@@ -74,6 +74,8 @@ Read the following root specs with `Read`:
 | `specs/security-spec.md` | The plan modified auth, validations, proxies or permissions |
 | `specs/roadmap.md` | Any completed plan (mark delivered items) |
 
+For `spec` ∈ `product-spec`, `tech-spec` only, track `spec_status_{spec}_{folder}` with these assignment rules: if the row above does not apply to this plan, set it to `not_applicable`; if the subagent responds "ALIGNED — no changes needed", set it to `aligned`; if the subagent finds one or more misalignments, set it to `pending` (resolved in Step 4). This tracking is scoped to `product-spec.md`/`tech-spec.md` only (FR-002); the other 5 specs (`css-spec`, `ui-spec`, `infra-spec`, `security-spec`, `roadmap`) keep today's behavior with no status variable.
+
 For each relevant spec, launch a `general-purpose` subagent with the following prompt:
 
 ```
@@ -139,6 +141,8 @@ Update the spec {spec_path} to align it with the changes introduced by the compl
 - At the end, confirm which lines you edited.
 ```
 
+For the two specs (`product-spec`, `tech-spec`) whose `spec_status_{spec}_{folder}` was `pending`, resolve it now: if the subagent confirms all listed changes were applied, with the edited lines enumerated and no reported errors, set it to `updated`; if the subagent reports it could not apply a change, hits an error, or its final response does not confirm the edits, set it to `failed`. This resolution feeds Step 6.5's gate (FR-004, FR-005) and does not apply to the other optional specs.
+
 If the spec has changes in `roadmap.md` (items to mark as delivered), apply the same criterion: minimal `Edit`, mark the item with `[x]` or add the delivery date if it fits the roadmap's format.
 
 ---
@@ -189,6 +193,10 @@ Confirm with `Glob "specs/*/plan.md"` that the folders no longer exist.
 ### Step 6.5 — Close issues on GitHub
 
 For each deleted folder where `issue_num_{folder}` is not `null`:
+
+0. **Alignment gate**: check `spec_status_product-spec_{folder}` and `spec_status_tech-spec_{folder}` for this folder. The issue may close only if **both** are in `{not_applicable, aligned, updated}`. If **either** is `failed`, skip steps 1-3 entirely for this folder, and instead append an entry to a new `pending_alignment_folders` list (for Step 8) with the folder path, `issue_num_{folder}`, and the name(s) of the failed spec(s) (`product-spec.md` and/or `tech-spec.md`). This gate is evaluated independently per folder — a `failed` status in one folder does not affect the gate outcome for any other folder. This gate does not affect Step 6's folder deletion, which already ran and was already confirmed in Step 5; it only controls whether the issue is closed in the steps below.
+
+If the gate above passed for this folder, continue:
 
 1. Check whether the issue is open:
    ```bash
@@ -286,9 +294,14 @@ Specs updated: {N} / {total audited}
 Issues closed: {N}
 {list: "#NNN — title — linked to branch: Yes/No"}
 
+Specs pending alignment: {N}
+{one line per entry: "specs/{folder}/ — issue #{issue_num} kept open — pending: {comma-separated failed spec names}"}
+
 Commit: {short hash} — {message}
 Push: ✅ dev updated
 ```
+
+The "Specs pending alignment" section is populated from the `pending_alignment_folders` list built in Step 6.5; omit the section entirely when that list is empty. The "Issues closed" count must exclude any folder listed in "Specs pending alignment".
 
 If the user chose not to delete in Step 5: omit the folders section and the commit.
 
@@ -305,3 +318,4 @@ This is the last step of the loop. Do not print a next-step suggestion block and
 - **One subagent per spec**: do not try to audit multiple specs in the same subagent.
 - **Issue not found**: if there is no `issue_num` for a folder, silently skip the closing step for that folder.
 - **`gh issue develop` optional**: if the `gh` version does not support the `develop` subcommand, skip it and note it in the final summary as "linked to branch: No (command not available)".
+- **Alignment gate scope**: the Step 6.5 gate only blocks issue closing on an explicit `failed` status for `product-spec.md`/`tech-spec.md` — it never blocks on `not_applicable` or `aligned`. It is scoped strictly to those two specs (FR-002) and never blocks folder deletion (Step 6), only issue closing (Step 6.5).
