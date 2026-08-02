@@ -46,7 +46,7 @@ FR-008 says "sincronizada" as an end state, not "apply only the new lines" — l
 
 ## Batch 4 — Quality gate
 
-- [ ] @judge · Review the complete diff against requirements.md: Read the final `ai-toolkit/default/commands/clean-feature.md`, `.claude/commands/clean-feature.md`, and `specs/004-clean-feature-gate-close-on-alignment/requirements.md`. Confirm every FR-001–FR-010 and SC-001–SC-003 is satisfied by the new Step 3/4/6.5/8/Notes text, that the gate is expressed unambiguously enough for an LLM agent to execute deterministically (no vague language like "if needed"), that the two files are identical (re-check Batch 3's diff claim), and that Steps 0-2/5-7 were left untouched. Issue PASS or CHANGES_REQUESTED with exact file and line for each concrete fix; if CHANGES_REQUESTED, hand back to @code-developer.
+- [x] @judge · Review the complete diff against requirements.md: Read the final `ai-toolkit/default/commands/clean-feature.md`, `.claude/commands/clean-feature.md`, and `specs/004-clean-feature-gate-close-on-alignment/requirements.md`. Confirm every FR-001–FR-010 and SC-001–SC-003 is satisfied by the new Step 3/4/6.5/8/Notes text, that the gate is expressed unambiguously enough for an LLM agent to execute deterministically (no vague language like "if needed"), that the two files are identical (re-check Batch 3's diff claim), and that Steps 0-2/5-7 were left untouched. Issue PASS or CHANGES_REQUESTED with exact file and line for each concrete fix; if CHANGES_REQUESTED, hand back to @code-developer.
 
 ### Critical Files for Implementation
 
