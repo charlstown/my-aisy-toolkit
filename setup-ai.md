@@ -230,6 +230,18 @@ best job you can, but don't claim it's an exact translation when you tell the us
 to the Wrap up — do nothing else in this step** (FR-005). That launcher already told you not to run
 this step when it pointed you here; treat that as settled and move on.
 
+**Start from the agent the user confirmed in Step 1.** Their answer to the target-agent question —
+Claude Code or Codex CLI — is the **confirmed agent** for this run. You already have it, so never ask
+it again and never re-derive it from folders on disk: carry it into this step as the first candidate
+for the global launcher.
+
+The two checks below still run exactly as written, on the confirmed agent and on the other one alike
+— they decide whether the confirmed agent's candidacy survives, and whether the other agent joins it
+as an additional candidate. None of that changes. What changes is that the confirmed agent may never
+drop out silently: if either check rules it out, you say so in plain language inside this same step,
+in the same message as the offer below — or in the message that replaces it, if nothing is left to
+offer.
+
 **Detect which agents are actually present in the user's environment.** Check whether `~/.claude/`
 exists (Claude Code) and whether `~/.codex/` or `~/.agents/` exists (Codex CLI). An agent only
 becomes a candidate for this step if its user-level directory exists — a missing directory means
@@ -239,6 +251,23 @@ never replaces, weakens, or stands in for the mandatory question in Step 1** —
 install the catalog for, in this repo, is always asked word for word, exactly as Step 1 describes,
 no matter what you detect here (ADR-004, D-03).
 
+**If that detection is what leaves the confirmed agent out — its user-level directory genuinely
+doesn't exist — say so in the moment.** This is a legitimate outcome, not an error: an ephemeral or
+freshly provisioned environment can be running an agent without that agent's user-level directory
+existing on disk. Drop the candidate exactly as the paragraph above says, then tell the user why,
+word for word, in the same message as the offer below and immediately above it — or, if no candidate
+is left at all, in the message that replaces it:
+
+```
+Heads up — you told me this was for <confirmed agent>, but there's no <directory> directory on
+this machine, so there's nowhere for me to save a global launcher for it. Everything in this repo
+installed fine; this only affects the optional shortcut.
+```
+
+Substitute `<confirmed agent>` with `Claude Code` or `Codex CLI`, and `<directory>` with what you
+actually looked for — `~/.claude/` for Claude Code, `~/.codex/` or `~/.agents/` for Codex CLI.
+Nothing else in that line changes. Make a note of it as well — you'll report it in the Wrap up too.
+
 **Discard any candidate whose launcher file already exists at its destination.** For Claude Code,
 check whether `~/.claude/commands/setup-ai.md` exists. For Codex CLI, check **both** possible
 paths — `~/.codex/skills/setup-ai/SKILL.md` and `~/.agents/skills/setup-ai/SKILL.md`. This is an
@@ -246,9 +275,37 @@ existence check only: do not open the file, do not read or compare its content, 
 overwrite it. If a candidate's file already exists, drop it from the list and make a note — you'll
 report it in the Wrap up (FR-006, FR-009, D-05).
 
+**If that check is what drops the confirmed agent — its launcher file is already there — say so in
+the moment too.** The note for the Wrap up still stands, but on its own it is no longer enough: the
+user hears it now, word for word, in the same message as the offer below and immediately above it —
+or, if no candidate is left at all, in the message that replaces it:
+
+```
+Heads up — you told me this was for <confirmed agent>, and <path> already exists, so there's no
+shortcut left for me to offer you: I never overwrite that file. If it isn't this kit's launcher,
+delete it and run the setup again to get the current one.
+```
+
+Substitute `<confirmed agent>` with `Claude Code` or `Codex CLI`, and `<path>` with the exact path
+you found — `~/.claude/commands/setup-ai.md`, `~/.codex/skills/setup-ai/SKILL.md`, or
+`~/.agents/skills/setup-ai/SKILL.md`. Nothing else in that line changes.
+
 **If no candidate is left after detection and this existing-file check, skip straight to the Wrap
 up — do not ask anything** (SC-004). There's no informational or partial version of the question
 below; either it gets asked in full, to at least one remaining candidate, or it isn't shown at all.
+
+Asking nothing, though, is not the same as saying nothing. Before you move on, send the line the
+paragraph above already gave you for whichever check ruled the confirmed agent out — one of the two
+always did, since the confirmed agent is always one of the agents you probed — and then this one,
+word for word:
+
+```
+So there's no shortcut for me to offer this time, and nothing was written outside this repo. The
+README one-liner still installs this kit in any other repo whenever you need it.
+```
+
+That is a statement, not a question: no options, no invitation to reply, nothing to answer. Say it,
+then continue to the Wrap up.
 
 **If at least one candidate remains, ask this once, word for word**, keeping only the lines for the
 agents you'd actually write for (drop the other agent's line entirely if it isn't a candidate; if
@@ -408,8 +465,8 @@ nothing to report.
   so it needs to stand out clearly as something written outside it. Unlike the repo files above,
   report the launcher whenever there's something to say about it — **including the case where it
   already existed and you left it alone.** Omit the section entirely only when there is truly
-  nothing to say: you skipped Step 6 because you arrived here from the already-installed launcher,
-  or no candidate agent was detected at all.
+  nothing to say — which now means one case and one case only: you skipped Step 6 because you
+  arrived here from the already-installed launcher.
 
   Cover whichever of these happened, one line per agent affected:
 
@@ -432,6 +489,16 @@ nothing to report.
   - **Write failed** — give the actual reason, never a generic "something went wrong":
     ```
     - Couldn't write ~/.claude/commands/setup-ai.md — <the actual reason>. Everything in this repo installed fine; you're just missing the shortcut. Use the README one-liner next time, or fix that and run the setup again.
+    ```
+  - **Confirmed in Step 1, never offered** — the agent the user confirmed in Step 1 never became a
+    candidate because its user-level directory doesn't exist on this machine. You already told them
+    in Step 6; say it again here so the log is complete. Name the agent and the directory you looked
+    for:
+    ```
+    - No global launcher for Claude Code — there's no ~/.claude/ directory on this machine, so there was nowhere to save it. Nothing outside this repo was touched.
+    ```
+    ```
+    - No global launcher for Codex CLI — there's no ~/.codex/ or ~/.agents/ directory on this machine, so there was nowhere to save it. Nothing outside this repo was touched.
     ```
 
 Something like this is enough:
