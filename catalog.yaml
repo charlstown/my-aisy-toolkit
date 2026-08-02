@@ -18,3 +18,24 @@ profiles:
       - ai-toolkit/default/agents/tester.md
       - ai-toolkit/default/agents/ui-developer.md
       - ai-toolkit/default/agents/judge.md
+  ui-ux:
+    commands:
+      - ai-toolkit/default/commands/constitution.md
+      - ai-toolkit/default/commands/product-spec.md
+      - ai-toolkit/default/commands/tech-spec.md
+      - ai-toolkit/default/commands/roadmap.md
+      - ai-toolkit/default/commands/new-issue.md
+      - ai-toolkit/default/commands/specify-feature.md
+      - ai-toolkit/default/commands/clarify-feature.md
+      - ai-toolkit/default/commands/plan-feature.md
+      - ai-toolkit/default/commands/implement-feature.md
+      - ai-toolkit/default/commands/clean-feature.md
+      - ai-toolkit/ui-ux/commands/ui-spec.md
+      - ai-toolkit/ui-ux/commands/clarify-uix.md
+    agents:
+      - ai-toolkit/default/agents/architect.md
+      - ai-toolkit/default/agents/code-developer.md
+      - ai-toolkit/default/agents/test-developer.md
+      - ai-toolkit/default/agents/tester.md
+      - ai-toolkit/default/agents/ui-developer.md
+      - ai-toolkit/default/agents/judge.md
