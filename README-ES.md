@@ -56,7 +56,7 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 ## 📦 ¿Qué vas a encontrar aquí?
 
-- **11 skills** que cubren todo el flujo dirigido por especificaciones, desde `/constitution` hasta `/clean-feature`
+- **10 skills** que cubren todo el flujo dirigido por especificaciones, desde `/constitution` hasta `/clean-feature`
 - **6 subagentes** para arquitectura, implementación, testing, UI y revisión
 - **1 método de instalación**: una URL o un archivo pegado, nada que descargar
 - **2 agentes de código IA** soportados: Claude Code (nativo) y Codex CLI (best-effort)
@@ -84,7 +84,6 @@ Apunta tu agente a la URL de instalación una sola vez, ese es el único paso de
 | `/new-issue` | Abre un issue de bug o feature en GitHub, investigando o clarificando según el tipo. |
 | `/specify-feature` | Detecta features a partir de varias fuentes (incluyendo issues abiertos de GitHub) y crea un `requirements.md` por cada una. |
 | `/clarify-feature` | Cierra los huecos de decisión pendientes en uno o varios `requirements.md`. |
-| `/grill-me` | Interrogatorio crítico de un documento para reducir huecos e inconsistencias. |
 | `/plan-feature` | Genera `plan.md` a partir de un `requirements.md`, asignando tareas a subagentes. |
 | `/implement-feature` | Orquesta la ejecución de uno o varios `plan.md` usando git worktrees. |
 | `/clean-feature` | Alinea las specs raíz con el trabajo completado y cierra el issue asociado. |
@@ -111,7 +110,7 @@ Solo las piezas que le importan a alguien decidiendo si instalar o no:
 my-aisy-toolkit/
 ├── ai-toolkit/
 │   └── default/
-│       ├── commands/    # 11 skills
+│       ├── commands/    # 10 skills
 │       └── agents/      # 6 subagentes
 ├── catalog.yaml
 ├── setup-ai.md
