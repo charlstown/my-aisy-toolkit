@@ -41,7 +41,7 @@ Requirements: specs/003-pr-title-auto-versioning/requirements.md
 
 ## Batch 6 — Revisión de calidad
 
-- [ ] @judge · Revisión final de los workflows: revisar `pr-title-check.yml`, `publish-version-tag.yml` y `compute-next-tag.sh` contra los 21 Functional Requirements y los 5 Success Criteria del `requirements.md`, verificando en particular: cobertura case-insensitive de los 4 prefijos, uso correcto de `github.event.pull_request.title` sin llamadas extra a la API, el `concurrency` group, el manejo de tags mal formados, el fallo explícito ante prefijo inválido o colisión de tag, la ausencia de creación de GitHub Release, y que `VERSION` ya no existe en el repo. Emitir PASS o CHANGES_REQUESTED con hallazgos concretos por fichero/línea.
+- [x] @judge · Revisión final de los workflows: revisar `pr-title-check.yml`, `publish-version-tag.yml` y `compute-next-tag.sh` contra los 21 Functional Requirements y los 5 Success Criteria del `requirements.md`, verificando en particular: cobertura case-insensitive de los 4 prefijos, uso correcto de `github.event.pull_request.title` sin llamadas extra a la API, el `concurrency` group, el manejo de tags mal formados, el fallo explícito ante prefijo inválido o colisión de tag, la ausencia de creación de GitHub Release, y que `VERSION` ya no existe en el repo. Emitir PASS o CHANGES_REQUESTED con hallazgos concretos por fichero/línea.
 
 ### Critical Files for Implementation
 - D:\00_WIP\2608_MyAIsyToolkit\my-aisy-toolkit\.github\workflows\pr-title-check.yml (nuevo)
