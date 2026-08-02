@@ -57,21 +57,21 @@ If the `roadmap` skill fails, is cancelled, or otherwise does not end up writing
 
 ### Step 4 — Summary
 
-Show this block only when the run finished successfully, meaning Steps 1 and 2 both ran and both spec files were confirmed written. If the run ended any other way (the user picked `Cancel` in Step 0, or Step 0 ended with nothing to bootstrap), show nothing: no block, no next step line.
+Show this block only when every Step that was due to run (per Step 0's decision) ran and each corresponding file — including `specs/roadmap.md` from Step 3 — was confirmed written. If the run ended any other way (the user picked `Cancel` in Step 0, Step 0 ended with nothing to bootstrap, or Step 3 failed), show nothing: no block, no next step line.
 
 Then close with:
 
 ```
 ✓ specs/product-spec.md
 ✓ specs/tech-spec.md
+✓ specs/roadmap.md
 
 ✅ Done. Suggested next step:
 
-🗺️ /roadmap (optional) to turn the specs into a phased plan. Skip it if you already know what comes first.
 🎯 /specify-feature to turn what you want to build next into a feature spec.
 ```
 
-Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill names (`/roadmap`, `/specify-feature`) and the emojis exactly as they are, only the words around them get translated.
+Write the block in the user's language, following the `## Language` section at the top of this file. Keep the skill name (`/specify-feature`) and the emojis exactly as they are, only the words around them get translated.
 
 This block only suggests. Do not run the suggested skill yourself and do not chain into it: stop here and wait for the user to invoke it.
 
