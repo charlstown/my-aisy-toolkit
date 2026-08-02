@@ -82,11 +82,13 @@ Use `AskUserQuestion` with **2–3 questions** focused on:
 | **States & microcopy** | What secondary states exist (empty, loading, error, filtered, edit mode), and what does each one actually *say* (empty-state copy, error messages, confirmation text)? |
 | **Contextual data** | Are there summaries, totals, indicators, or conditional banners? |
 
-Show the **updated concept** in the terminal, incorporating what was learned in Round 1, before launching these questions.
+Show the **updated concept** in the terminal — the revised content structure **and an updated ASCII mockup** reflecting Round 1's answers — before launching these questions.
 
 **Do not write any files yet.**
 
 ### 6. Round 3 — Devices, edge cases and accessibility
+
+Before launching these questions, show the ASCII mockup updated with Round 2's interaction/state decisions.
 
 Use `AskUserQuestion` with **up to 3 questions** focused on:
 
@@ -96,7 +98,7 @@ Use `AskUserQuestion` with **up to 3 questions** focused on:
 | **Empty / error state** | What does the user see when there's no data or something fails? |
 | **Accessibility** | Keyboard focus order and visible focus states, color contrast, `aria-*` labeling needs, and `prefers-reduced-motion` behavior for any animation |
 
-If the answers from previous rounds already cover these points, skip this round.
+If the answers from previous rounds already cover these points, skip this round (and its mockup update).
 
 ### 7. Self-critique pass (before writing anything)
 
@@ -238,6 +240,7 @@ Adapt each round's questions based on the detected type:
 - Do not invent colors, fonts, or components outside the design system already defined in `ui-spec.md`; if no prior system exists, note explicitly that none was found rather than inventing one
 - Keep wireframes deliberately low-fidelity and structural — do not over-specify pixel-level detail that should be left to implementation; more detail in the wireframe tends to produce worse output from whoever implements it afterward
 - Do not write any file before completing at least Round 1 and Round 2
+- Show an updated ASCII mockup before every round that runs, reflecting what was learned in the prior round
 - Run the self-critique pass (Step 7) before writing the final section, to catch designs that are generic rather than specific to the actual brief, and to confirm the draft is internally coherent with no key question left unanswered
 - Every state described (empty, loading, error, confirmation) must include the actual copy shown to the user, not a placeholder
 - Every screen must consider basic accessibility (keyboard focus order, contrast, `aria-*` labeling, reduced motion) before being marked complete
