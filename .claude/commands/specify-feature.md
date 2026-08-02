@@ -8,7 +8,7 @@ Detect the language of the user's initial (or most recent) message and conduct t
 
 ## Purpose
 
-Turn one or several already-existing feature descriptions (a file, a URL, a roadmap, GitHub issues, or a raw prompt) into `requirements.md` specs. Unlike `grill-me`, this skill never interrogates the user to resolve ambiguity: it writes down what it has and evidences everything unclear in a `DEFINITION GAP` section for the user to resolve later.
+Turn one or several already-existing feature descriptions (a file, a URL, a roadmap, GitHub issues, or a raw prompt) into `requirements.md` specs. This skill never interrogates the user to resolve ambiguity: it writes down what it has and evidences everything unclear in a `DEFINITION GAP` section for the user to resolve later.
 
 ## Instructions
 
@@ -159,7 +159,7 @@ Mark anything not resolvable from the source with the inline marker, e.g.:
 Rules for filling it:
 
 - **Never invent** what the source doesn't say. If a section has nothing to draw from (e.g., no data entities mentioned), state so briefly rather than fabricating content, or omit that subsection if the template marks it optional (`Key Entities`).
-- **Do not try to resolve ambiguity.** Every open question, missing decision, or unconfirmed dependency goes into `## DEFINITION GAP` instead of being guessed at. This is the key difference from `grill-me` (which interrogates the user) and from `get-issues`' `Decision gap` (which blocks planning) — `specify` just documents the gap and moves on.
+- **Do not try to resolve ambiguity.** Every open question, missing decision, or unconfirmed dependency goes into `## DEFINITION GAP` instead of being guessed at. This is the key difference from `get-issues`' `Decision gap` (which blocks planning) — `specify` just documents the gap and moves on.
 - `DEFINITION GAP` always has at least one bullet. If nothing is genuinely unclear, write a single bullet: `- [x] No blocking gaps detected — source material is self-contained.`
 - Split `DEFINITION GAP` bullets naturally into clarification questions and dependency callouts; do not label them as separate subsections, just keep each bullet self-explanatory.
 - `Created` uses today's date (`YYYY-MM-DD`).
