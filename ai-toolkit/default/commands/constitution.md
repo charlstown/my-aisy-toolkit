@@ -14,26 +14,32 @@ A project's "constitution" is its pair of root specs: `specs/product-spec.md` (t
 
 ### Step 0 — Check what already exists
 
-Use `Glob` to check for `specs/product-spec.md` and `specs/tech-spec.md`.
+Use `Glob` to check for `specs/product-spec.md`, `specs/tech-spec.md`, and `specs/roadmap.md`.
 
-| product-spec.md | tech-spec.md | Action |
-|---|---|---|
-| Missing | Missing | Go straight to Step 1 (run both, no question needed) |
-| Exists | Missing | Ask (see below) — likely just needs Step 2 |
-| Missing | Exists | Ask (see below) — unusual; likely tech-spec is stale or hand-written |
-| Exists | Exists | Ask (see below) — likely a re-run |
+| product-spec.md | tech-spec.md | roadmap.md | Action |
+|---|---|---|---|
+| Missing | Missing | Missing | Go straight to Step 1 (run all three, no question needed) |
+| Exists | Missing | Missing | Ask (see below) — likely just needs Step 2 |
+| Missing | Exists | Missing | Ask (see below) — unusual; likely tech-spec is stale or hand-written |
+| Missing | Missing | Exists | Ask (see below) — unusual; likely roadmap is stale or hand-written |
+| Exists | Exists | Missing | Ask (see below) — likely just needs Step 3 |
+| Exists | Missing | Exists | Ask (see below) — unusual; likely tech-spec is missing or stale while roadmap exists |
+| Missing | Exists | Exists | Ask (see below) — unusual; likely product-spec is missing or stale while the others exist |
+| Exists | Exists | Exists | Ask (see below) — likely a re-run |
 
-If **either file already exists**, use `AskUserQuestion`:
+If **any file already exists**, use `AskUserQuestion`:
 
-- Question: "product-spec.md and/or tech-spec.md already exist. What do you want to do?"
+- Question: "product-spec.md, tech-spec.md and/or roadmap.md already exist. What do you want to do?"
 - Options:
-  - `Regenerate both from scratch` — description: "Re-run product-spec and then tech-spec, updating both files"
-  - `Only run what's missing` — description: "Skip any spec that already exists and only generate the missing one(s)"
+  - `Regenerate all from scratch` — description: "Re-run product-spec, tech-spec, and roadmap in order, updating all three files"
+  - `Only run what's missing` — description: "Skip any of product-spec, tech-spec, or roadmap that already exists and only generate the missing one(s)"
   - `Cancel` — description: "Don't touch the existing specs"
 
 If the user cancels, stop here.
 
-If **only what's missing** was chosen and both files already exist, tell the user there is nothing to bootstrap and stop — point them to `/product-spec` or `/tech-spec` directly if they want to update an existing one, or to `/clean-feature` if the specs are just out of sync with completed work.
+If **only what's missing** was chosen and all three files already exist, tell the user there is nothing to bootstrap and stop — point them to `/product-spec`, `/tech-spec`, or `/roadmap` directly if they want to update an existing one, or to `/clean-feature` if the specs are just out of sync with completed work.
+
+When **only what's missing** is chosen and at least one file is missing, run only the Steps whose corresponding file is absent, in strict order (Step 1 → product-spec, Step 2 → tech-spec, Step 3 → roadmap), skipping any Step whose file already exists. For example, if only `specs/roadmap.md` is missing, skip straight to Step 3 without re-running Steps 1 or 2.
 
 ### Step 1 — Run `product-spec`
 
