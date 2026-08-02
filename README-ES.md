@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/skills-11-blue?style=flat-square" alt="Skills">
+  <img src="https://img.shields.io/badge/skills-10-blue?style=flat-square" alt="Skills">
   <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agentes">
   <img src="https://img.shields.io/badge/updated-2026--08--01-lightgrey?style=flat-square" alt="Actualizado">
 </p>
