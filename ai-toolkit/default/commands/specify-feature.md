@@ -25,7 +25,7 @@ Classify it:
 | Input looks like | Treat as |
 |---|---|
 | Path to an existing file (verify with `Glob`/`Read`) | **File.** If it structurally holds several features (a roadmap-style document with multiple phase/feature tables, or a list that clearly enumerates distinct features) → **multi-feature**. Otherwise → **single feature**. |
-| URL matching `github.com/{owner}/{repo}/issues/{n}` | **Single GitHub issue.** Fetch with `gh issue view {n} --json number,title,body,labels` (fallback: `WebFetch` the URL if `gh` fails). |
+| URL matching `github.com/{owner}/{repo}/issues/{n}` | **Single GitHub issue.** Fetch with `gh issue view {n} --json number,title,body,labels` (fallback: `WebFetch` the URL if `gh` fails). Keep the `{owner}`, `{repo}` and `{n}` captured from the URL and record `source_issue_url = https://github.com/{owner}/{repo}/issues/{n}` for this feature, in canonical form only: drop any query string, fragment, trailing slash or extra path segment. This applies even when the `gh` fetch fails and you fall back to `WebFetch`, because the values come from the URL itself, not from the fetch. |
 | URL matching `github.com/{owner}/{repo}` (no issue number) | **GitHub issues source** — go to the GitHub flow in 1c, scoped to that repo. |
 | Any other URL | Fetch with `WebFetch`. Apply the same single-vs-multi-feature detection as for files. |
 | Free text, not a path or URL | **Vague prompt.** One feature = the whole text, unless it plainly enumerates several distinct items (bullets, numbered list, clearly separate feature names) → treat each as its own candidate. |
@@ -40,6 +40,14 @@ Exclude features that are already marked as done: a checked box (`[x]`), a `✅`
 gh issue list --state open --json number,title,body,labels --limit 50
 ```
 
+Then resolve the repo slug, so every candidate taken from this list can carry its full issue URL:
+
+```
+gh repo view --json nameWithOwner
+```
+
+Combine the returned `{owner}/{repo}` with each issue's `number` and record `source_issue_url = https://github.com/{owner}/{repo}/issues/{number}` on that candidate, in the same canonical form as 1a (no query string, no fragment, no trailing slash). If you reached 1c from the repo-URL row of 1a, take `{owner}/{repo}` straight from that URL and skip this command. If the command fails or returns no `nameWithOwner`, leave `source_issue_url = null` for these candidates and carry on — do not rebuild the URL from the git remote, the folder name, or the issue title.
+
 **1d. Nothing above resolved it** — ask the user with `AskUserQuestion`:
 
 - Question: "Where are the features you want to specify?"
@@ -49,7 +57,9 @@ If the user still gives nothing usable, inform them and stop.
 
 ### Step 2 — Build the candidate list and confirm the selection
 
-Normalize every detected feature into `{ title, raw_description, source }`.
+Normalize every detected feature into `{ title, raw_description, source, source_issue_url }`.
+
+`source_issue_url` is set **only** when the feature comes from a real GitHub issue this run actually resolved: a single-issue URL in 1a, or an issue picked from the 1c list. It is `null` for every other source — files, `specs/roadmap.md` rows (even if a row mentions or links an issue), generic URLs, and free-text prompts — and it stays `null` when 1c could not resolve `{owner}/{repo}`. Never infer or reconstruct it from anything else.
 
 - **If Step 1 already resolved to exactly one unambiguous feature** (a single file, a single issue URL, a single-feature prompt) — treat it as selected automatically, no question needed. Tell the user which feature was detected and that you're proceeding with it.
 - **Otherwise** (roadmap with several pending features, open issues list, a multi-feature file/URL, or a prompt enumerating several items):
@@ -73,6 +83,7 @@ Features are independent of each other — dispatch **one subagent per feature i
 
 - The absolute path to write: `specs/{NNN}-{slug}/requirements.md`
 - The feature's `raw_description` (issue body, roadmap row + surrounding phase context, file excerpt, or the user's original prompt) — this is what `$ARGUMENTS` in the template stands for
+- The feature's `source_issue_url` when it is set — the subagent writes it verbatim into the `Source Issue:` line of the template. When it is `null`, state explicitly that there is no source issue and that the `Source Issue:` line must be deleted from the output
 - The exact template below and the instruction to fill it **using only the information available**, without inventing decisions or trying to resolve ambiguity
 
 Template (fill every bracketed placeholder; keep section order and headings exactly as shown):
@@ -80,6 +91,7 @@ Template (fill every bracketed placeholder; keep section order and headings exac
 ```markdown
 # [FEATURE NAME]
 Feature Branch: [NNN-feature-name]
+Source Issue: [full GitHub issue URL, e.g. https://github.com/{owner}/{repo}/issues/{n} — delete this entire line if the feature did not come from a GitHub issue]
 
 Created: [DATE]
 
@@ -164,6 +176,7 @@ Rules for filling it:
 - Split `DEFINITION GAP` bullets naturally into clarification questions and dependency callouts; do not label them as separate subsections, just keep each bullet self-explanatory.
 - `Created` uses today's date (`YYYY-MM-DD`).
 - `Priority` P1/P2/P3 is inferred from how the source material orders or emphasizes journeys; if the source only describes one journey, write a single User Story and drop the rest.
+- `Source Issue:` is written **only** when the feature carries a non-null `source_issue_url` (Step 2) — paste that exact URL, unchanged. If there is no `source_issue_url`, delete the whole line: no `Source Issue: N/A`, no empty label, no leftover placeholder, and never reconstruct a link from the issue number, the repo name, the branch name or the wording of the source — a guessed link is worse than no link. Keep the label in English (`Source Issue:`), like `Feature Branch:`, `Created:`, `Status:` and `Input:`, whatever the user's language.
 
 ### Step 5 — Summary
 
