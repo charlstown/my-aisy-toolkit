@@ -1,0 +1,23 @@
+name: PR Title Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate-title:
+    name: "Validate PR title prefix"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title prefix
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          shopt -s nocasematch
+          if [[ "$PR_TITLE" =~ ^(release|feature|fix|chore): ]]; then
+            echo "PR title prefix is valid: $PR_TITLE"
+            exit 0
+          else
+            echo "::error::PR title \"$PR_TITLE\" does not start with a valid prefix. Valid prefixes are: release:, feature:, fix:, chore: (case-insensitive)."
+            exit 1
+          fi
