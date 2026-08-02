@@ -160,13 +160,17 @@ For every file fetched in Step 3, map its source path to a destination in the ta
 repo the user is installing into, not this one:
 
 ```
-ai-toolkit/default/commands/<name>.md → .claude/commands/<name>.md
-ai-toolkit/default/agents/<name>.md   → .claude/agents/<name>.md
+ai-toolkit/<profile folder>/commands/<name>.md → .claude/commands/<name>.md
+ai-toolkit/<profile folder>/agents/<name>.md   → .claude/agents/<name>.md
 ```
 
+The destination is derived from the last two segments of the catalog's source path (the
+`commands`/`agents` folder plus the file name), regardless of which folder under `ai-toolkit/` the
+file lives in — `default`, `ui-ux`, or any future profile.
+
 Write the content exactly as fetched — byte-for-byte, no reformatting, no reflowing, no touching
-front matter or whitespace. What you write must match the `ai-toolkit/default/` source in this
-repo exactly (FR-008).
+front matter or whitespace. What you write must match the `ai-toolkit/` source path listed in the
+catalog exactly (FR-008).
 
 For each destination path:
 
@@ -196,8 +200,11 @@ it has nothing to translate into.
 For every `commands` file fetched in Step 3, translate it yourself, at install time, into:
 
 ```
-ai-toolkit/default/commands/<name>.md → .codex/skills/<name>/SKILL.md
+ai-toolkit/<profile folder>/commands/<name>.md → .codex/skills/<name>/SKILL.md
 ```
+
+As in Step 4, the destination is derived from the last two segments of the catalog's source path,
+regardless of which folder under `ai-toolkit/` the file lives in.
 
 There is no pre-generated Codex-format catalog anywhere in this repo, and no external translation
 service to call — you are the translator (ADR-002, FR-009). "Translate" means reading the fetched

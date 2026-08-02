@@ -93,7 +93,7 @@ For each stage, phrase questions top-down and ground them in the target `require
 
 #### 1e. Launch the interrogation in rounds — gated like `ui-spec`
 
-Split the N questions into rounds of **at most 4 per `AskUserQuestion` call**, following stage order. Before the first round, tell the user briefly: how many questions will run for this feature (N) and that you're starting.
+Split the N questions into rounds of **at most 4 per `AskUserQuestion` call**, following stage order. Round boundaries must coincide with stage boundaries: issue **one `AskUserQuestion` call per stage, never mixing questions from two different stages in the same call**. The ≤4 cap only comes into play to split a single stage into two rounds if that stage were to have more than 4 questions — which does not happen with the 1/2/3 questions per stage produced by the current 4/8/12 splits. Before the first round, tell the user briefly: how many questions will run for this feature (N) and that you're starting.
 
 **Gate between rounds, the same way `ui-spec` gates between Round 1 and Round 2:** never move to a later stage while an earlier stage's answer leaves a structural ambiguity open. If, while preparing a later round, an earlier stage's answer turns out ambiguous, stop and ask one more targeted follow-up for that earlier stage instead of moving on. Because the total must stay exactly N, that follow-up replaces the least essential remaining question in a later stage rather than adding to the count.
 
