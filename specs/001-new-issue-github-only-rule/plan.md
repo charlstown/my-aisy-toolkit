@@ -28,7 +28,7 @@
 
 ## Batch 3 — Quality gate
 
-- [ ] @judge · Review against acceptance criteria: read both updated files plus `specs/001-new-issue-github-only-rule/requirements.md` and confirm SC-001 (an unambiguous mandatory block restricting writes to GitHub is identifiable in `ai-toolkit/default/commands/new-issue.md`), SC-002 (the same block, with equivalent content, is identifiable in `.claude/commands/new-issue.md`), and SC-003 (the three acceptance criteria of GitHub issue #21 are satisfied: explicit mandatory block in both files; explicit prohibition of `Write`/`Edit`/`git commit`/`git push`; both copies synchronized). Emit PASS or CHANGES_REQUESTED; if CHANGES_REQUESTED, route the specific gap back to @architect (wording) or @code-developer (placement/sync) as appropriate.
+- [x] @judge · Review against acceptance criteria: read both updated files plus `specs/001-new-issue-github-only-rule/requirements.md` and confirm SC-001 (an unambiguous mandatory block restricting writes to GitHub is identifiable in `ai-toolkit/default/commands/new-issue.md`), SC-002 (the same block, with equivalent content, is identifiable in `.claude/commands/new-issue.md`), and SC-003 (the three acceptance criteria of GitHub issue #21 are satisfied: explicit mandatory block in both files; explicit prohibition of `Write`/`Edit`/`git commit`/`git push`; both copies synchronized). Emit PASS or CHANGES_REQUESTED; if CHANGES_REQUESTED, route the specific gap back to @architect (wording) or @code-developer (placement/sync) as appropriate.
 
 ### Critical Files for Implementation
 - D:\00_WIP\2608_MyAIsyToolkit\my-aisy-toolkit\ai-toolkit\default\commands\new-issue.md
