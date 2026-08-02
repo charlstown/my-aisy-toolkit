@@ -2,6 +2,8 @@
 description: Opens a bug or a feature request on GitHub. Automatically detects the type; if it is not clear, it asks. Bug → investigate, reproduce and document. Feature → clarify in up to 3 questions and open the issue. Trigger with /new-issue.
 ---
 
+> **GitHub-only write scope (mandatory):** this skill's only write permission is GitHub — creating issues via `gh issue create`. It must never create, edit, or delete files in the repository, and it must never run `git commit` or `git push`. Using `Write`, `Edit`, `git commit`, or `git push` on repository files is explicitly forbidden at any point during this skill's execution, in both the Bug Flow and the Feature Flow.
+
 ## Language
 
 Detect the language of the user's initial (or most recent) message and conduct the ENTIRE interaction in that language — every `AskUserQuestion` prompt, header, option label and description, and every message, summary, and generated file or output. Mirror the user's language exactly and never switch to another language. These instructions are written in English, but that must NOT force the interaction into English: if the user wrote in Spanish, ask and write in Spanish; if they wrote in another language, use that one. The language of the inputs determines the language of the outputs.
