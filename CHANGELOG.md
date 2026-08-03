@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-03
+
+### Added
+
+- `ui-ux` profile, an alternative catalog adding `ui-spec` and `clarify-uix`
+  to the `default` skill set for teams that want a dedicated UI/UX design
+  pass.
+- Optional `utils` skill pack (`digest`, `grill-me`, `for-dummies`),
+  installable on top of any profile via `catalog.yaml`'s `packs` section.
+
 ### Removed
 
 - `grill-me` skill removed from the `default` profile catalog (10 skills now,
