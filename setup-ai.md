@@ -304,7 +304,7 @@ ai-toolkit/utils/commands/<name>.md → .codex/skills/aisy.<name>/SKILL.md
 That prefix keeps these optional extras from colliding with the user's own skills, or with another
 toolkit's, and it applies to util files only: the profile's own `commands` files map exactly as
 above, unprefixed. Everything else in this step — the translation you do yourself, the create /
-overwrite / leave-alone rules below, and the best-effort caveat — applies to util files the same.
+overwrite / leave-alone rules below, and the quality caveat below — applies to util files the same.
 
 There is no pre-generated Codex-format catalog anywhere in this repo, and no external translation
 service to call — you are the translator (ADR-002, FR-009). "Translate" means reading the fetched
@@ -325,11 +325,11 @@ For each destination path, apply the same rules as Step 4, scoped to `.codex/ski
 As with every step, your writes here are limited to `.codex/` — never application code, never
 `.claude/`, never any other folder in the target repo (FR-010).
 
-**A note on quality:** this translation is best-effort. You're producing your own live
-interpretation of the source content, not applying a verified mapping, so the result may vary
-between runs and there's no guarantee it's a perfect equivalent of the Claude Code original. This
-is a documented, known limitation of Codex support (see Edge Cases and Known Limitations) — do the
-best job you can, but don't claim it's an exact translation when you tell the user what happened.
+**A note on quality:** You're producing your own live interpretation of the source content, not
+applying a verified mapping, so the result may vary between runs and there's no guarantee it's a
+perfect equivalent of the Claude Code original. This is a documented, known limitation of Codex
+support (see Edge Cases and Known Limitations) — do the best job you can, but don't claim it's an
+exact translation when you tell the user what happened.
 
 ### Step 6 — Offer to save the global launcher
 
@@ -543,8 +543,7 @@ to install the kit from memory.
 ```
 
 In Codex CLI this command is invoked as `$setup-ai`, not a slash command. As with the rest of Codex
-support, this path is best-effort (ADR-002) — including the path itself, it hasn't been verified
-against a real Codex CLI installation (U-01).
+support, this path hasn't been verified against a real Codex CLI installation (ADR-002, U-01).
 
 If the write itself fails — permission denied, `~/.codex/` (or `~/.agents/`) can't be created, disk
 full, whatever the reason — do not retry, do not look for an alternative path, and do not abort or
