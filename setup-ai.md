@@ -236,9 +236,13 @@ For every file fetched in Step 3, map its source path to a destination in the ta
 repo the user is installing into, not this one:
 
 ```
-ai-toolkit/default/commands/<name>.md → .claude/commands/<name>.md
-ai-toolkit/default/agents/<name>.md   → .claude/agents/<name>.md
+ai-toolkit/<profile folder>/commands/<name>.md → .claude/commands/<name>.md
+ai-toolkit/<profile folder>/agents/<name>.md   → .claude/agents/<name>.md
 ```
+
+The destination is derived from the last two segments of the catalog's source path (the
+`commands`/`agents` folder plus the file name), regardless of which folder under `ai-toolkit/` the
+file lives in — `default`, `ui-ux`, or any future profile.
 
 Any util the user selected in Step 2 was fetched in Step 3 too, and maps the same way, with one
 difference — the `aisy.` prefix on the filename:
@@ -284,8 +288,11 @@ it has nothing to translate into.
 For every `commands` file fetched in Step 3, translate it yourself, at install time, into:
 
 ```
-ai-toolkit/default/commands/<name>.md → .codex/skills/<name>/SKILL.md
+ai-toolkit/<profile folder>/commands/<name>.md → .codex/skills/<name>/SKILL.md
 ```
+
+As in Step 4, the destination is derived from the last two segments of the catalog's source path,
+regardless of which folder under `ai-toolkit/` the file lives in.
 
 Any util the user selected in Step 2 is a command file too, so it translates here as well, with one
 difference — the `aisy.` prefix on the skill folder:
