@@ -4,13 +4,13 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-02 |
+> | **Updated** | 2026-08-03 |
 > | **Version** | v0.1 |
 > | **ProductSpec** | [[product-spec]] |
 
 ## 📌 Scope
 
-This document covers the technical installation mechanism (`setup-ai`) and the catalog format (skills and agents of the `default` profile) for Claude Code and, in best-effort mode, Codex CLI. The product's what and why are already defined in [[product-spec]]; this document only answers the how.
+This document covers the technical installation mechanism (`setup-ai`) and the catalog format (skills and agents, currently spanning the `default` and `ui-ux` profiles, plus optional non-profile packs such as `utils`) for Claude Code and, in best-effort mode, Codex CLI. The product's what and why are already defined in [[product-spec]]; this document only answers the how.
 
 ## 🧱 Tech Stack
 
@@ -27,7 +27,7 @@ This document covers the technical installation mechanism (`setup-ai`) and the c
 > There are no npm packages, gems, or binaries to install. The whole mechanism relies on the native fetch, read, and write tools of the AI agent running `setup-ai`.
 
 > [!tip] Internal vs. distributed catalog
-> This repo's own `.claude/commands` and `.claude/agents` are used only to develop my-aisy-toolkit itself (dogfooding the skills while building them) and are never fetched by `setup-ai`. The distributable catalog lives under `ai-toolkit/default/`, mirroring Claude Code's native file shape so it can be dropped as-is into a target repo's `.claude/`. Its content is populated from the maintainer's local skills vault (`D:\MisProyectos\0_TEMPLATES\SETUP-AI`), not authored from scratch in this repo.
+> This repo's own `.claude/commands` and `.claude/agents` are used only to develop my-aisy-toolkit itself (dogfooding the skills while building them) and are never fetched by `setup-ai`. The distributable catalog lives under `ai-toolkit/<profile>/` (currently `ai-toolkit/default/` and `ai-toolkit/ui-ux/`), mirroring Claude Code's native file shape so it can be dropped as-is into a target repo's `.claude/`. Its content is populated from the maintainer's local skills vault (`D:\MisProyectos\0_TEMPLATES\SETUP-AI`), not authored from scratch in this repo.
 
 ## 🏗️ Module Design
 
@@ -39,7 +39,7 @@ flowchart LR
     S -.->|"Step 6 — written once, only on explicit yes"| L
     S -.fetch HTTPS.-> RAW[(raw.githubusercontent.com)]
     RAW -->|catalog.yaml| U
-    RAW -->|ai-toolkit/default/commands · ai-toolkit/default/agents files| U
+    RAW -->|ai-toolkit/default/commands · ai-toolkit/default/agents · ai-toolkit/utils/commands files| U
     U -->|translates if target = Codex| U
     U -->|3. writes| DEST[(Target repo<br/>.claude/ or .codex/)]
 ```
@@ -51,8 +51,10 @@ flowchart TB
     SA["setup-ai.md<br/>(instructions, root)"] --> CAT["catalog.yaml<br/>(manifest)"]
     CAT --> CMD["ai-toolkit/default/commands/*.md<br/>(skills, distributed)"]
     CAT --> AGT["ai-toolkit/default/agents/*.md<br/>(subagents, distributed)"]
+    CAT --> UTL["ai-toolkit/utils/commands/*.md<br/>(optional pack skills, distributed)"]
     CMD --> RM[README.md]
     AGT --> RM
+    UTL --> RM
     SA -.->|"Step 6: templates embedded verbatim in setup-ai.md"| GL["~/.claude/commands/setup-ai.md<br/>~/.codex/skills/setup-ai/SKILL.md<br/>(global launcher, outside any repo)"]
     GL -.->|"points back, fetches on every run"| SA
     INT[".claude/<br/>(internal only, not distributed)"]
@@ -75,11 +77,15 @@ Written by Step 6 of `setup-ai.md`. Step 6 starts from the agent the user alread
 
 #### `catalog.yaml` — Catalog manifest
 
-Single root index declaring, per profile, which skills and agents it includes and their source path in this repo.
+Single root index declaring (a) per profile, which skills and agents it includes and their source path in this repo, and (b) optional non-profile packs (`packs.<pack-name>`, e.g. `packs.utils: [digest, grill-me, for-dummies]`) as flat lists of skill names, resolved to source paths by a fixed per-pack folder convention (`ai-toolkit/<pack-name>/commands/<name>.md`).
 
 #### `ai-toolkit/default/commands/` — Skill catalog (`default` profile)
 
-Distributable source of truth for the 10 skills of the `default` profile in Claude Code's native format, self-documented in their own frontmatter, fetched by `setup-ai`.
+Distributable source of truth for the 10 skills of the `default` profile in Claude Code's native format, self-documented in their own frontmatter, fetched by `setup-ai`. `ai-toolkit/ui-ux/commands/` holds the 2 additional skills exclusive to the `ui-ux` profile (`ui-spec.md`, `clarify-uix.md`), layered on top of `default`'s 10.
+
+#### `ai-toolkit/utils/commands/` — Optional Utils pack
+
+Distributable source of truth for the optional, non-profile "Utils" skills (`digest`, `grill-me`, `for-dummies`) declared under `packs.utils` in `catalog.yaml`. Fetched by `setup-ai` only when the user opts in (Utils question), and installed with an `aisy.` filename/folder prefix to avoid collisions with profile skills.
 
 #### `ai-toolkit/default/agents/` — Subagent catalog (`default` profile)
 
@@ -99,7 +105,7 @@ Presents the kit, documents both installation methods, and serves as the repo's 
 |---------------------|--------|-------------------|-------|
 | Launcher invocation (`/setup-ai`, `$setup-ai`) | GET (agent's native fetch) | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/setup-ai.md` | The launcher holds no logic of its own: every run re-fetches the live instructions and follows them from Step 1. Same URL the README one-liner uses |
 | Fetch the manifest | GET (agent's native fetch) | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/catalog.yaml` | No authentication; fails if the repo becomes private or GitHub is unavailable |
-| Fetch each skill/agent | GET (agent's native fetch) | `raw.githubusercontent.com/.../main/ai-toolkit/default/commands\|agents/*.md` | One request per file; no caching, every installation re-fetches all content |
+| Fetch each skill/agent | GET (agent's native fetch) | `raw.githubusercontent.com/.../main/ai-toolkit/<profile>/commands\|agents/*.md and ai-toolkit/<pack>/commands/*.md (e.g. ai-toolkit/utils/commands/*.md)` | One request per file; no caching, every installation re-fetches all content. Pack files are additionally written with an `aisy.` filename/folder prefix; profile files are not |
 | Translation to Codex format | Interpretation by the agent itself, no external service | — | The agent reads the Claude Code frontmatter and rewrites it as `SKILL.md`, following the instructions in `setup-ai.md` |
 
 > [!warning] Anonymous GitHub rate limit
@@ -124,7 +130,7 @@ There is no server or real HTTP status codes to propagate: the agent reports eac
 
 ## 🩺 Healthcheck
 
-Manual verification: compare the files present in `.claude/commands/` + `.claude/agents/` (or `.codex/skills/`) of the *target* repo against the list of skills/agents for the installed profile declared in `catalog.yaml` (which points at `ai-toolkit/default/` in this repo). There is no running process or endpoint to query.
+Manual verification: compare the files present in `.claude/commands/` + `.claude/agents/` (or `.codex/skills/`) of the *target* repo against the list of skills/agents for the installed profile declared in `catalog.yaml` (which points at `ai-toolkit/<profile>/` in this repo, e.g. `ai-toolkit/default/` or `ai-toolkit/ui-ux/`). There is no running process or endpoint to query.
 
 ## 📋 Logging
 
@@ -218,7 +224,7 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 
 ### ADR-003: `catalog.yaml` as an explicit catalog manifest
 
-**Decision**: A single `catalog.yaml` at the repo root declares, per profile, which skills/agents it includes and their source path, instead of `setup-ai` dynamically listing remote directories.
+**Decision**: A single `catalog.yaml` at the repo root declares, per profile, which skills/agents it includes and their source path — and, independently, optional non-profile packs (`packs.<pack-name>`, e.g. `packs.utils`) as flat lists of skill names — instead of `setup-ai` dynamically listing remote directories.
 
 **Context**: Having the agent list `.claude/commands/` and `.claude/agents/` directly via the GitHub API was considered. It was discarded because it depends on the agent having a tool to list remote directories (not all do), and because an explicit manifest lets profiles be defined independently of the repo's folder structure.
 
@@ -238,14 +244,14 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 - (+) Zero ambiguity: the wrong format is never written due to a failed detection.
 - (-) One extra question even on re-installs where the context was already obvious.
 
-### ADR-005: Distributable catalog lives under `ai-toolkit/default/`, decoupled from this repo's own `.claude/`
+### ADR-005: Distributable catalog lives under `ai-toolkit/<profile>/` (currently `default` and `ui-ux`), decoupled from this repo's own `.claude/`
 
-**Decision**: The catalog that `setup-ai` fetches lives at `ai-toolkit/default/commands/` and `ai-toolkit/default/agents/`. This repo's own `.claude/commands` and `.claude/agents` (used to develop the toolkit itself with its own skills) are a separate, internal-only copy, never read by `setup-ai`.
+**Decision**: The catalog that `setup-ai` fetches lives at `ai-toolkit/<profile>/commands/` and `ai-toolkit/<profile>/agents/` (currently `default` and `ui-ux`). This repo's own `.claude/commands` and `.claude/agents` (used to develop the toolkit itself with its own skills) are a separate, internal-only copy, never read by `setup-ai`.
 
 **Context**: Reusing this repo's own `.claude/` directly as the fetched catalog was considered, since its content currently matches the `default` profile. It was discarded because it would couple what the maintainer uses to work on this repo to what gets shipped to end users, making it ambiguous (for both humans and fetching agents) which files are "the product" versus internal tooling, and blocking the internal setup from diverging later without breaking installs.
 
 **Consequences**:
-- (+) Unambiguous single path (`ai-toolkit/default/`) for anything `setup-ai` may fetch; the internal `.claude/` can evolve freely.
+- (+) Unambiguous, per-profile path convention (`ai-toolkit/<profile>/`) for anything `setup-ai` may fetch; the internal `.claude/` can evolve freely.
 - (-) The `default` profile catalog must be kept manually in sync with its canonical source (the maintainer's local skills vault) instead of being read live from `.claude/`.
 
 ### ADR-006: Repo-level SemVer via PR-title-driven GitHub Actions and git tags, decoupled from catalog distribution

@@ -4,7 +4,7 @@
 > | **Status** | 🟢 Done |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-01 |
+> | **Updated** | 2026-08-03 |
 > | **Version** | v0.1 |
 > | **Parent specs** | [[product-spec]] · [[tech-spec]] |
 > | **Scope** | Single feature phase: populate the distributable catalog, ship the `setup-ai` installer, and finish the README |
@@ -71,7 +71,7 @@ flowchart LR
 
 ## 🚫 Out of Roadmap
 
-- **Additional profiles beyond `default`** — Future ([[product-spec]]).
+- **Additional profiles beyond `default`** — First one delivered: the `ui-ux` profile (superset of `default`, plus `ui-spec`/`clarify-uix` skills) shipped via specs/001-add-ui-ux-profile-with-new-ui-spec-and-clarify-uix. Further profiles beyond `ui-ux` remain Future ([[product-spec]]).
 - **Verified Codex CLI support** (beyond best-effort) — Future ([[product-spec]]).
 - **Support for other AI agents** (Devin, Cursor, Windsurf, etc.) — Out of scope / Future ([[product-spec]]).
 - **Per-skill granular versioning or rollback** — Out of scope ([[product-spec]]).
