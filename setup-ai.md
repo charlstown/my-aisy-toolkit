@@ -68,7 +68,7 @@ Everything above this line is for the human reading the repo. You do not need it
 One thing before I touch anything — which agent am I setting this up for?
 
   1. Claude Code
-  2. Codex CLI (best-effort support)
+  2. Codex CLI
 ```
 
 If the user doesn't answer, or the answer is ambiguous, ask again and write nothing:
