@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/skills-10-blue?style=flat-square" alt="Skills">
+  <img src="https://img.shields.io/badge/skills-15-blue?style=flat-square" alt="Skills">
   <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agentes">
   <img src="https://img.shields.io/badge/updated-2026--08--03-lightgrey?style=flat-square" alt="Actualizado">
 </p>
@@ -56,9 +56,9 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 ## 📦 ¿Qué vas a encontrar aquí?
 
-- **10 skills** que cubren todo el flujo dirigido por especificaciones, desde `/constitution` hasta `/clean-feature` (perfil `default`)
+- **15 skills** en total: 10 que cubren todo el flujo dirigido por especificaciones (perfil `default`), +2 para una pasada dedicada de UI/UX (perfil `ui-ux`), +3 opcionales independientes (pack `utils`)
 - **6 subagentes** para arquitectura, implementación, testing, UI y revisión
-- **2 perfiles de catálogo**: `default` y `ui-ux` (añade `/ui-spec` y `/clarify-uix` para una pasada dedicada de UI/UX)
+- **2 perfiles de catálogo**: `default` y `ui-ux` (añade `/ui-spec` y `/clarify-uix`)
 - **1 pack de skills opcional**: `utils` (`/digest`, `/grill-me`, `/for-dummies`), instalable sobre cualquier perfil
 - **1 método de instalación**: una URL o un archivo pegado, nada que descargar
 - **2 agentes de código IA** soportados: Claude Code (nativo) y Codex CLI (best-effort)
