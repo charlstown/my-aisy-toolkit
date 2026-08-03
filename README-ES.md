@@ -17,7 +17,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/skills-10-blue?style=flat-square" alt="Skills">
   <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agentes">
-  <img src="https://img.shields.io/badge/updated-2026--08--01-lightgrey?style=flat-square" alt="Actualizado">
+  <img src="https://img.shields.io/badge/updated-2026--08--03-lightgrey?style=flat-square" alt="Actualizado">
 </p>
 
 <p align="center">
@@ -56,8 +56,10 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 ## 📦 ¿Qué vas a encontrar aquí?
 
-- **10 skills** que cubren todo el flujo dirigido por especificaciones, desde `/constitution` hasta `/clean-feature`
+- **10 skills** que cubren todo el flujo dirigido por especificaciones, desde `/constitution` hasta `/clean-feature` (perfil `default`)
 - **6 subagentes** para arquitectura, implementación, testing, UI y revisión
+- **2 perfiles de catálogo**: `default` y `ui-ux` (añade `/ui-spec` y `/clarify-uix` para una pasada dedicada de UI/UX)
+- **1 pack de skills opcional**: `utils` (`/digest`, `/grill-me`, `/for-dummies`), instalable sobre cualquier perfil
 - **1 método de instalación**: una URL o un archivo pegado, nada que descargar
 - **2 agentes de código IA** soportados: Claude Code (nativo) y Codex CLI (best-effort)
 
@@ -102,6 +104,25 @@ Apunta tu agente a la URL de instalación una sola vez, ese es el único paso de
 > [!note] Codex CLI
 > Codex CLI no tiene un equivalente nativo a los subagentes; en modo best-effort solo se traduce el catálogo de **skills** a `.codex/skills/`.
 
+## 🎨 Catálogo: perfil `ui-ux`
+
+Todo lo del perfil `default`, más dos skills para una pasada dedicada de UI/UX (12 skills en total, los mismos 6 agentes):
+
+| Skill | Qué hace |
+|-------|----------|
+| `/ui-spec` | Entrevista de arriba a abajo (estructura de contenido → layout → interacción/estados → dispositivos/accesibilidad) para diseñar una pantalla, con mockups del concepto y una pasada de autocrítica, y escribe `specs/ui-spec.md`. |
+| `/clarify-uix` | La contraparte de UI/UX de `/clarify-feature`: lanza una ronda de arriba a abajo de preguntas de UI/UX (4, 8 o 12) y vuelca las respuestas en `requirements.md`. |
+
+## 🧰 Pack opcional: `utils`
+
+Skills independientes que no pertenecen a ningún perfil — instalables sobre `default` o `ui-ux`:
+
+| Skill | Qué hace |
+|-------|----------|
+| `/digest` | Convierte una duda vaga en un interrogatorio corto, una investigación web breve y una recomendación con una alternativa. |
+| `/grill-me` | Interroga críticamente un documento para cerrar huecos e inconsistencias, y luego lo reescribe con lo aprendido. |
+| `/for-dummies` | Explica uno o varios conceptos a partir de un prompt, enlace o documento como un profesor experto, con ejemplos y recursos opcionales. |
+
 ## 🗂️ Estructura del proyecto
 
 Solo las piezas que le importan a alguien decidiendo si instalar o no:
@@ -109,9 +130,13 @@ Solo las piezas que le importan a alguien decidiendo si instalar o no:
 ```
 my-aisy-toolkit/
 ├── ai-toolkit/
-│   └── default/
-│       ├── commands/    # 10 skills
-│       └── agents/      # 6 subagentes
+│   ├── default/
+│   │   ├── commands/    # 10 skills
+│   │   └── agents/      # 6 subagentes
+│   ├── ui-ux/
+│   │   └── commands/    # +2 skills (ui-spec, clarify-uix)
+│   └── utils/
+│       └── commands/    # +3 skills opcionales (digest, grill-me, for-dummies)
 ├── catalog.yaml
 ├── setup-ai.md
 └── README.md
@@ -127,6 +152,7 @@ my-aisy-toolkit/
 |-------|------|---------|--------------|
 | `profile` | string | `default` | Perfil del catálogo a instalar. Si hay más de uno disponible y no se especifica ninguno, tu agente pregunta cuál quieres. |
 | `agent` | string | preguntado | Agente IA destino (`claude`, `codex`). Siempre se pregunta explícitamente, nunca se infiere de las carpetas que ya haya en tu repositorio. |
+| pack utils | boolean | preguntado | Si añadir las skills opcionales de `utils` sobre el perfil elegido. Solo se pregunta cuando el catálogo declara una sección `packs.utils`. |
 
 Los efectos secundarios se limitan a `.claude/` y/o `.codex/` en tu repositorio, salvo un único archivo del launcher global que el instalador puede ofrecer guardar al final — solo si dices que sí. El código de la aplicación y todo lo demás en tu repositorio se deja intacto.
 

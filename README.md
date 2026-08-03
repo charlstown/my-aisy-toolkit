@@ -17,7 +17,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/skills-10-blue?style=flat-square" alt="Skills">
   <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agents">
-  <img src="https://img.shields.io/badge/updated-2026--08--01-lightgrey?style=flat-square" alt="Updated">
+  <img src="https://img.shields.io/badge/updated-2026--08--03-lightgrey?style=flat-square" alt="Updated">
 </p>
 
 <p align="center">
@@ -56,8 +56,10 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 ## 📦 What will you find here?
 
-- **10 skills** covering the full spec-driven workflow, from `/constitution` to `/clean-feature`
+- **10 skills** covering the full spec-driven workflow, from `/constitution` to `/clean-feature` (`default` profile)
 - **6 subagents** for architecture, implementation, testing, UI, and review
+- **2 catalog profiles**: `default` and `ui-ux` (adds `/ui-spec` and `/clarify-uix` for a dedicated UI/UX pass)
+- **1 optional skill pack**: `utils` (`/digest`, `/grill-me`, `/for-dummies`), installable on top of any profile
 - **1 install method**: one URL or one pasted file, nothing to download
 - **2 AI coding agents** supported: Claude Code (native) and Codex CLI (best-effort)
 
@@ -102,6 +104,25 @@ Point your agent at the setup URL once — that's the only install step. `/const
 > [!note] Codex CLI
 > Codex CLI has no native equivalent to subagents; in best-effort mode only the **skills** catalog is translated to `.codex/skills/`.
 
+## 🎨 Catalog: `ui-ux` profile
+
+Everything in `default`, plus two skills for a dedicated UI/UX pass (12 skills total, same 6 agents):
+
+| Skill | What it does |
+|-------|----------|
+| `/ui-spec` | Interviews top-down (content structure → layout → interaction/states → devices/accessibility) to design a UI screen, with concept mockups and a self-critique pass, and writes `specs/ui-spec.md`. |
+| `/clarify-uix` | The UI/UX counterpart to `/clarify-feature`: runs a top-down round of UI/UX questions (4, 8, or 12) and folds the answers into `requirements.md`. |
+
+## 🧰 Optional pack: `utils`
+
+Standalone skills that don't belong to any profile — installable on top of `default` or `ui-ux`:
+
+| Skill | What it does |
+|-------|----------|
+| `/digest` | Turns a vague doubt into a short interrogation, a brief web research pass, and a recommendation with an alternative. |
+| `/grill-me` | Critically interrogates a document to close gaps and inconsistencies, then rewrites it with what it learned. |
+| `/for-dummies` | Explains one or more concepts from a prompt, link, or document like an expert teacher, with examples and optional resources. |
+
 ## 🗂️ Project structure
 
 Just the pieces that matter to a reader deciding whether to install:
@@ -109,9 +130,13 @@ Just the pieces that matter to a reader deciding whether to install:
 ```
 my-aisy-toolkit/
 ├── ai-toolkit/
-│   └── default/
-│       ├── commands/    # 10 skills
-│       └── agents/      # 6 subagents
+│   ├── default/
+│   │   ├── commands/    # 10 skills
+│   │   └── agents/      # 6 subagents
+│   ├── ui-ux/
+│   │   └── commands/    # +2 skills (ui-spec, clarify-uix)
+│   └── utils/
+│       └── commands/    # +3 optional skills (digest, grill-me, for-dummies)
 ├── catalog.yaml
 ├── setup-ai.md
 └── README.md
@@ -127,6 +152,7 @@ my-aisy-toolkit/
 |-------|------|---------|--------------|
 | `profile` | string | `default` | Catalog profile to install. If more than one is available and none is specified, your agent asks which one you want. |
 | `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly, never inferred from folders already in your repo. |
+| utils pack | boolean | asked | Whether to add the optional `utils` skills on top of the chosen profile. Only asked when the catalog declares a `packs.utils` section. |
 
 Side effects stay contained to `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes. Application code and everything else in your repo is left alone.
 
