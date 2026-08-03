@@ -92,6 +92,36 @@ If the user already named a profile in their original request, use it and skip t
 
 Do not write any file until both questions are answered.
 
+**Utils — only ask when the catalog declares a `packs.utils` section** (see Step 2). If it doesn't,
+this question never happens: don't ask it, don't mention it, don't warn about it. When it does, ask
+like this, listing every util the catalog declares, numbered, each with its one-line description:
+
+```
+Utils
+
+A few optional extras that don't belong to any profile — standalone skills you can install
+alongside it. Want any of them?
+
+  1. digest — From a vague user prompt (a doubt, a fear, or a reflection), runs a short
+     interrogation (max 3 questions) to narrow down what and how to research, does brief internet
+     research on trends, articles, or documents related to the topic, and always closes with at
+     least 1 recommendation and 1 alternative (option B), justifying the reasoning behind the
+     recommended decision.
+  2. grill-me — Critical interrogation of a document to reduce gaps, clarify decisions, and detect
+     inconsistencies. When finished, rewrites the document with everything learned. Requires an
+     input document.
+  3. for-dummies — Explains one or more concepts from a vague prompt, link, or document like an
+     expert teacher, with examples and up to 3 optional free resources per concept.
+
+Reply with the numbers you want (for example: 1,3), "all" to take every one of them, or leave it
+blank to skip. Whatever you answer, I'll only ask this once.
+```
+
+Unlike the two questions above, this one blocks nothing: a blank or unclear answer just means no
+utils, and the installation carries on. Step 2 is where it actually gets asked — you can't know
+whether the catalog declares any utils until you've fetched it — and it holds the exact rules for
+reading the reply.
+
 ### Step 2 — Fetch and read the catalog
 
 GET this URL to get the catalog:
@@ -107,11 +137,18 @@ profiles:
   <profile>:
     commands: [<source path>, <source path>, ...]
     agents: [<source path>, <source path>, ...]
+packs:
+  utils: [<name>, <name>, ...]
 ```
 
 Each entry under `commands` and `agents` is a flat string — the source path of a file in this
 repo. There's nothing else to parse: no per-item objects, no destination paths. Where each file
 ends up on the user's machine gets worked out later, in Step 4 or Step 5.
+
+`packs` is optional and separate from `profiles`: it declares extras that no profile installs by
+itself. Its entries are not paths — each one is a bare skill name that resolves to a source path by
+a fixed convention, `ai-toolkit/utils/commands/<name>.md`. A catalog with no `packs` key, or no
+`utils` key under it, is perfectly valid and just means there are no utils to offer.
 
 This is the point where you find out how many profiles the catalog declares. If there's more than
 one and the user hasn't already named one, this is where you ask the profile question from Step 1
@@ -121,6 +158,35 @@ use it and move on without asking.
 Once you know the profile, `profiles.<profile>.commands` and `profiles.<profile>.agents` together
 give you the full list of files to fetch in Step 3.
 
+Once the profile is resolved, check whether the catalog declares a `packs.utils` section. If it
+does, this is where you ask the Utils question from Step 1 — go back and ask it now, word for word,
+listing every name under `packs.utils` in the order the catalog lists them, numbered from 1, each
+with the one-line description Step 1 gives for it. If the catalog declares a name Step 1 has no
+description for, list it by name alone; if it doesn't declare one of Step 1's three, drop that line
+and renumber. If there is no `packs` key, or no `utils` under it, skip the question entirely: no
+question, no error, no warning, and no mention of utils to the user anywhere in this run.
+
+Read the reply once, and only once:
+
+- `all` — case-insensitive, on its own, spaces around it don't matter — selects every util you
+  listed.
+- Otherwise, split the reply on commas and trim each piece. If every piece is a whole number
+  between 1 and N (N being how many utils you listed), select the utils at those positions.
+  Repeated numbers count once; the order they come in doesn't matter.
+- Anything else is an unclear reply: a blank answer, a piece that isn't a whole number, or any
+  number outside `1..N` — even when other numbers in the same reply are valid. With three utils
+  listed, `1,9` selects nothing at all, not `digest`.
+
+An unclear or missing reply selects zero utils, and that is not an error. Don't repeat the
+question, don't ask a follow-up, don't warn — carry on with the rest of the installation exactly as
+if the catalog had declared no utils. This is the same non-blocking treatment Step 6 gives its
+launcher offer, and the opposite of Step 1's target-agent question, which does block.
+
+Every selected name resolves to `ai-toolkit/utils/commands/<name>.md` — `digest` becomes
+`ai-toolkit/utils/commands/digest.md`, and so on. Those paths join the profile's `commands` and
+`agents` paths as the full list of files to fetch in Step 3. Select nothing and the list is exactly
+the profile's own files.
+
 **If the GET returns a 404, times out, or the catalog is otherwise unreachable: stop here.** Abort
 the whole installation — don't fall back to a cached or partial catalog, don't guess at file
 paths. Tell the user plainly, in the conversation, that you couldn't reach the catalog and nothing
@@ -129,8 +195,8 @@ was installed. Write nothing to disk.
 ### Step 3 — Fetch every file in the profile
 
 For every source path collected in Step 2 — every entry under `commands` and `agents` for the
-chosen profile — issue one GET. Build the URL by concatenating the raw base with the path exactly
-as it appears in the catalog:
+chosen profile, plus the resolved path of every util the user selected — issue one GET. Build the
+URL by concatenating the raw base with the path exactly as it appears in the catalog:
 
 ```
 https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/<source path>
@@ -141,6 +207,16 @@ For example, `ai-toolkit/default/commands/constitution.md` becomes:
 ```
 https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/ai-toolkit/default/commands/constitution.md
 ```
+
+A selected util's resolved path is built the same way, even though the catalog spelled it as a bare
+name — `ai-toolkit/utils/commands/digest.md` becomes:
+
+```
+https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/ai-toolkit/utils/commands/digest.md
+```
+
+From here on, util files are ordinary entries in this list — fetched fresh like the rest, and
+covered by the same retry-once-then-skip-only-that-file rule below.
 
 Fetch every file fresh, every time — no caching (FR-007). Even on a re-install where you already
 wrote these files locally last time, GET them again; never reuse a previous response or assume a
@@ -167,6 +243,18 @@ ai-toolkit/<profile folder>/agents/<name>.md   → .claude/agents/<name>.md
 The destination is derived from the last two segments of the catalog's source path (the
 `commands`/`agents` folder plus the file name), regardless of which folder under `ai-toolkit/` the
 file lives in — `default`, `ui-ux`, or any future profile.
+
+Any util the user selected in Step 2 was fetched in Step 3 too, and maps the same way, with one
+difference — the `aisy.` prefix on the filename:
+
+```
+ai-toolkit/utils/commands/<name>.md → .claude/commands/aisy.<name>.md
+```
+
+That prefix keeps these optional extras from colliding with the user's own commands, or with
+another toolkit's, and it applies to util files only: the profile's own `commands` and `agents`
+files map exactly as above, unprefixed. Everything else in this step — writing byte-for-byte, and
+the create / overwrite / leave-alone rules below — applies to util files identically.
 
 Write the content exactly as fetched — byte-for-byte, no reformatting, no reflowing, no touching
 front matter or whitespace. What you write must match the `ai-toolkit/` source path listed in the
@@ -205,6 +293,18 @@ ai-toolkit/<profile folder>/commands/<name>.md → .codex/skills/<name>/SKILL.md
 
 As in Step 4, the destination is derived from the last two segments of the catalog's source path,
 regardless of which folder under `ai-toolkit/` the file lives in.
+
+Any util the user selected in Step 2 is a command file too, so it translates here as well, with one
+difference — the `aisy.` prefix on the skill folder:
+
+```
+ai-toolkit/utils/commands/<name>.md → .codex/skills/aisy.<name>/SKILL.md
+```
+
+That prefix keeps these optional extras from colliding with the user's own skills, or with another
+toolkit's, and it applies to util files only: the profile's own `commands` files map exactly as
+above, unprefixed. Everything else in this step — the translation you do yourself, the create /
+overwrite / leave-alone rules below, and the best-effort caveat — applies to util files the same.
 
 There is no pre-generated Codex-format catalog anywhere in this repo, and no external translation
 service to call — you are the translator (ADR-002, FR-009). "Translate" means reading the fetched
@@ -467,6 +567,24 @@ file you touched or tried to touch:
 Files that already matched what you were about to write don't need a mention — nothing changed,
 nothing to report.
 
+- **Utils** — the optional skills the user picked in Step 2 get their own `Utils:` section,
+  separate from Installed/Updated/Skipped above. They're what the user opted into on top of the
+  profile, so they're reported on their own rather than folded in with the profile's core files.
+  List one line per util file that is now in place because of this run — created, overwritten, or
+  already identical to what you'd have written — giving its destination path and nothing more:
+  ```
+  Utils:
+  - .claude/commands/aisy.digest.md
+  - .claude/commands/aisy.for-dummies.md
+  ```
+  This section is the one exception to the rule just above: a util file that already matched still
+  gets listed here, because what it reports is what the user ended up with, not what changed. A
+  file listed here is never listed again under Installed or Updated — report it once, here. A util
+  whose fetch failed in Step 3 didn't get installed at all: it belongs under Skipped, with its
+  reason, like any other file that failed. Omit the section entirely when no util file ended up in
+  place — the user picked none, replied unclearly, or the catalog declared no `packs.utils` — and
+  in that case say nothing about utils anywhere in the report.
+
 - **Global launcher** — everything Step 6 did or didn't do gets its own `Global launcher:` section,
   separate from Installed/Updated/Skipped above. It's the one thing that isn't a file in this repo,
   so it needs to stand out clearly as something written outside it. Unlike the repo files above,
@@ -522,6 +640,10 @@ Updated:
 
 Skipped:
 - .claude/agents/legacy-reviewer.md — fetch failed twice (404), gave up after the retry
+
+Utils:
+- .claude/commands/aisy.digest.md
+- .claude/commands/aisy.for-dummies.md
 
 Global launcher:
 - Saved ~/.claude/commands/setup-ai.md — from now on, just run /setup-ai in any repo.
