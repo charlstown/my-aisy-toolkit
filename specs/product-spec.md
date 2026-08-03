@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-02 |
+> | **Updated** | 2026-08-03 |
 > | **Version** | v0.1 |
 
 ## 🎯 Vision
@@ -30,7 +30,7 @@
 
 - **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. No package manager, no library, and nothing to install globally beyond a single optional pointer file (the `/setup-ai` launcher) that the user has to say yes to.
 - **README as product** — the README is the kit's "front": it must convince and allow installing in under 2 minutes. It is treated as the main piece, not an afterthought.
-- **Extensible profiles from day one** — today only the `default` profile exists, but the installation mechanism detects and asks about available profiles without needing a redesign when new ones are added.
+- **Extensible profiles from day one** — the catalog now ships two profiles, `default` and `ui-ux` (a superset of `default`'s catalog plus the `ui-spec` and `clarify-uix` skills), and the installation mechanism detects and asks about available profiles without needing a redesign when more are added.
 - **Multi-agent by adaptation, not lowest common denominator** — every supported agent (Claude Code, Codex CLI) receives the catalog translated into its native format (`.claude/commands` + `.claude/agents` vs. `.codex/skills`), not a degraded generic version.
 - **Deliberately vendor-agnostic delivery** — the kit is distributed as plain-text instructions fetched over plain HTTPS, never published to a single vendor's proprietary channel (e.g. the Claude Code plugin/marketplace system, see ADR-007 in tech-spec.md). This is a conscious tradeoff, not an oversight: it keeps the same one-liner/copy-paste mechanism usable by any AI agent capable of fetching and following instructions, so support can extend to more providers over time (today Claude Code and Codex CLI) without being tied to, or gated by, any one agent's ecosystem.
 - **Direct, jargon-free tone** — installer messages, README, and skill names are clear, short, and have a light, easygoing touch ("Keep it AIsy"), never sounding corporate.
@@ -75,7 +75,7 @@ Single command the user pastes into their terminal (or asks their agent to run) 
 | `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly; never inferred from the target repo's structure (`.claude/`, `.codex/`). |
 
 > [!warning] Side effect
-> Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders. **One opt-in exception:** at the end of the install, `setup-ai` may offer to save the global launcher — a **single** file in the agent's user-level command directory — and writes it only if the user explicitly says yes. Without that yes, nothing outside the target repo is touched, and nothing in the user's home is ever overwritten, moved, or deleted.
+> Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders. **One opt-in exception:** at the end of the install, `setup-ai` may offer to save the global launcher — a **single** file in the agent's user-level command directory — and writes it only if the user explicitly says yes. Without that yes, nothing outside the target repo is touched, and nothing in the user's home is ever overwritten, moved, or deleted. **Also:** if the catalog declares `packs.utils`, `setup-ai` additionally asks a non-blocking Utils question (reply by number(s), "all", or blank) to optionally install additional `aisy.`-prefixed skills, independent of the chosen profile.
 
 #### Copy-paste (plain instructions)
 
@@ -110,7 +110,9 @@ How it gets there:
 
 Running any of the methods above on a repo that already has the kit installed. Always brings the latest version of the catalog (no semantic versioning), adds new skills/agents from the profile, and updates existing ones that changed.
 
-### Catalog — `default` profile
+### Catalog — profiles
+
+#### `default` profile
 
 **Skills**
 
@@ -140,6 +142,27 @@ Running any of the methods above on a repo that already has the kit installed. A
 
 > Codex CLI has no native equivalent to subagents; in best-effort mode only the **skills** catalog is translated to `.codex/skills/`.
 
+#### `ui-ux` profile
+
+Superset of `default`'s 10 skills and 6 agents, plus:
+
+| Skill | What it does |
+|-------|----------|
+| `/ui-spec` | Interviews the user top-down about a UI screen (content structure → layout → interaction/states → devices/accessibility) and writes/updates `specs/ui-spec.md` in the target repo. |
+| `/clarify-uix` | UI/UX counterpart to `/clarify-feature`; lets the user pick 4/8/12 questions (one marked "recommended") before running the interrogation in the same staged style as `/ui-spec`. |
+
+Agents: identical to `default`'s 6 agents — no new agent introduced.
+
+### Catalog — Utils pack (optional)
+
+`packs.utils` is an optional, non-profile group of skills, independent of the chosen profile. It is asked as a single non-blocking question during install only if the catalog declares a `packs.utils` section; installed files get an `aisy.` prefix (`aisy.<skill>.md` for Claude Code, `aisy.<skill>/SKILL.md` for Codex CLI) to avoid collisions with the user's own skills.
+
+| Skill | What it does |
+|-------|----------|
+| `digest` | From a vague user prompt (a doubt, a fear, or a reflection), runs a short interrogation (max 3 questions) to narrow down what and how to research, does brief internet research on trends, articles, or documents related to the topic, and always closes with at least 1 recommendation and 1 alternative (option B), justifying the reasoning behind the recommended decision. |
+| `grill-me` | Critical interrogation of a document to reduce gaps, clarify decisions, and detect inconsistencies. When finished, rewrites the document with everything learned. Requires an input document. |
+| `for-dummies` | Explains one or more concepts from a vague prompt, link, or document like an expert teacher, with examples and up to 3 optional free resources per concept. |
+
 ## 🩺 Operations
 
 **Healthcheck**
@@ -154,7 +177,7 @@ Verifying the installation means checking that the expected files for the instal
 
 | Deliverable | Description |
 |:-----------:|-------------|
-| 💻 **Catalog (source code)** | `/ai-toolkit/default/commands/` (skills) and `/ai-toolkit/default/agents/` (subagents), the canonical version `setup-ai` fetches from. Populated from the maintainer's local skills vault, not authored from scratch in this repo. |
+| 💻 **Catalog (source code)** | `/ai-toolkit/<profile>/commands/` (skills) and `/ai-toolkit/<profile>/agents/` (subagents) per profile — today `default` and `ui-ux` (a superset of `default` plus `ui-spec`/`clarify-uix`, reusing `default`'s agents) — plus `/ai-toolkit/utils/commands/` (optional Utils pack: `digest`, `grill-me`, `for-dummies`), the canonical versions `setup-ai` fetches from. Populated from the maintainer's local skills vault, not authored from scratch in this repo. |
 | 🛠️ **setup-ai** | Installation instructions/script: one-liner method and copy-paste method. |
 | 📚 **README** | Presents the kit, installation instructions (both methods), the `default` profile catalog, and a quick usage guide. |
 
@@ -167,9 +190,13 @@ Verifying the installation means checking that the expected files for the instal
 > │   ├── commands/
 > │   └── agents/
 > ├── ai-toolkit/
-> │   └── default/         # Distributable catalog, profile "default"
-> │       ├── commands/    # Skill catalog (10 skills)
-> │       └── agents/      # Subagent catalog (6 agents)
+> │   ├── default/         # Distributable catalog, profile "default"
+> │   │   ├── commands/    # Skill catalog (10 skills)
+> │   │   └── agents/      # Subagent catalog (6 agents)
+> │   ├── ui-ux/           # Distributable catalog, profile "ui-ux" (superset of default + 2 skills)
+> │   │   └── commands/    # ui-spec.md, clarify-uix.md (agents reused from default/agents/)
+> │   └── utils/           # Optional Utils pack (non-profile), installed with the "aisy." prefix
+> │       └── commands/    # digest, grill-me, for-dummies
 > ├── specs/               # product-spec.md, tech-spec.md, roadmap.md for this repo itself
 > ├── setup-ai.md          # Plain-text installation instructions (root)
 > └── README.md            # Project front: installation, catalog, usage
@@ -180,11 +207,11 @@ Verifying the installation means checking that the expected files for the instal
 - **Exhaustive documentation of each skill/agent's internal behavior** — this ProductSpec lists the catalog, but each skill's detailed behavior lives in its own self-documented file.
 - **Support for AI agents other than Claude Code and Codex CLI** (Devin, Cursor, Windsurf, etc.) — a conscious decision by the user; a possible future extension.
 - **Granular version management or rollback per individual skill** — the installer always brings the latest version of the full profile; there is no selective install or reverting to previous versions.
-- **Additional profiles beyond `default`** — the mechanism must support them, but their concrete content is not defined in this ProductSpec.
+- **Additional profiles beyond `default` and `ui-ux`** — the mechanism must support them, but their concrete content is not defined in this ProductSpec.
 
 ## 🔮 Future
 
-- **Additional profiles** — profiles beyond `default` (e.g. `minimal`, `frontend-only`) for different project types or team preferences.
+- **Additional profiles** — profiles beyond `default` and `ui-ux` (e.g. `minimal`, `frontend-only`) for different project types or team preferences.
 - **Verified Codex CLI support** — move from best-effort to tested support in a real Codex environment.
 - **Support for other AI agents** — evaluate Devin, Cursor, Windsurf or others under the same adaptation layer.
 - **Catalog version notifications** — notify when the target repo has an outdated version of the installed catalog.
