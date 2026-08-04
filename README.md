@@ -25,6 +25,10 @@
 </p>
 
 <p align="center">
+  <img src="assets/my-aisy-toolkit-flow.png" alt="My AIsy Toolkit flow" width="720">
+</p>
+
+<p align="center">
   My AIsy Toolkit brings together skills and subagents ready to install in your repo, so you can start building with Spec-Driven Development and agentic loops, compatible with Claude Code and Codex CLI in best-effort mode. Point your agent at one URL (or paste one file), and any repo gets the same catalog of commands and subagents, ready to use, no libraries, no package managers, nothing to install globally.
 </p>
 
