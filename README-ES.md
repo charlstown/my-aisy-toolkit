@@ -25,6 +25,10 @@
 </p>
 
 <p align="center">
+  <img src="assets/my-aisy-toolkit-flow.png" alt="Flujo de My AIsy Toolkit" width="720">
+</p>
+
+<p align="center">
   My AIsy Toolkit reúne skills y subagentes listos para instalar en tu repositorio y empezar a desarrollar con Spec-Driven Development y bucles agénticos, compatible con Claude Code y Codex CLI en modo best-effort. Apunta tu agente a una URL (o pega un archivo), y cualquier repositorio obtiene el mismo catálogo de comandos y subagentes, listo para usar, sin librerías, sin gestores de paquetes, sin nada que instalar globalmente.
 </p>
 
@@ -68,10 +72,6 @@ Y el catálogo sigue creciendo a medida que se añaden nuevas skills y agentes.
 ## 🔁 Cómo funciona
 
 Apunta tu agente a la URL de instalación una sola vez, ese es el único paso de instalación. `/constitution` arranca las specs (product-spec, tech-spec, roadmap) y a partir de ahí cada feature pasa por el mismo ciclo cerrado: `/specify-feature` la acota, `/clarify-feature` cierra los huecos de decisión pendientes, `/plan-feature` la descompone, `/implement-feature` la construye y `/clean-feature` cierra el ciclo alineando de nuevo las specs antes de que empiece la siguiente feature.
-
-<p align="center">
-  <img src="assets/skill-cycle.svg" alt="La instalación alimenta un ciclo que se repite: constitution, specify-feature, plan-feature, implement-feature, clean-feature, y vuelta a constitution" width="720">
-</p>
 
 ## 📚 Catálogo: perfil default
 
