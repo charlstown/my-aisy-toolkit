@@ -2,6 +2,14 @@
 description: Opens a bug or a feature request on GitHub. Automatically detects the type; if it is not clear, it asks. Bug → investigate, reproduce and document. Feature → clarify in up to 3 questions and open the issue. Trigger with /aisy.new-issue.
 ---
 
+## Codex question fallback
+
+When running in Codex, use `ask_user_question` when it is available. Otherwise ask conversationally.
+
+Present exactly one pending question at a time, with identifiable options and an explicit instruction that the user may choose an option or provide their own answer. Wait for and process that answer before asking another question or executing a dependent step. Treat free-form answers as valid. When the user says they do not know yet (or equivalent), record a gap and continue only with independent questions or steps.
+
+Do not change Claude Code's existing question mechanism or behavior.
+
 > **GitHub-only write scope (mandatory):** this skill's only write permission is GitHub — creating issues via `gh issue create`. It must never create, edit, or delete files in the repository, and it must never run `git commit` or `git push`. Using `Write`, `Edit`, `git commit`, or `git push` on repository files is explicitly forbidden at any point during this skill's execution, in both the Bug Flow and the Feature Flow.
 
 ## Language
