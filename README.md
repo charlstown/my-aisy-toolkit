@@ -44,6 +44,8 @@ Fetch and follow the setup instructions at https://raw.githubusercontent.com/cha
 
 Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes.
 
+`setup-ai` is the installer: it asks which platform and profile you want, reads the declared catalog, and copies the selected skills and native agents into your repository. See the [detailed catalog](ai-toolkit/README.md) to compare the `default`, `ui-ux`, and optional `utils` selections before installing.
+
 ---
 
 ### Terminal setup
@@ -65,7 +67,7 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 - **2 catalog profiles**: `default` and `ui-ux` (adds `/ui-spec` and `/clarify-uix`)
 - **1 optional skill pack**: `utils` (`/digest`, `/grill-me`, `/for-dummies`), installable on top of any profile
 - **1 install method**: one URL or one pasted file, nothing to download
-- **2 AI coding agents** supported: Claude Code (native) and Codex CLI (best-effort)
+- **2 AI coding agents** supported: Claude Code and Codex CLI, each with its native agent artifacts
 
 And the catalog keeps growing as new skills and agents are added.
 
@@ -106,7 +108,7 @@ Point your agent at the setup URL once — that's the only install step. `/const
 | `judge` | Reviews other agents' work and issues a PASS / CHANGES_REQUESTED verdict. |
 
 > [!note] Codex CLI
-> Codex CLI has no native equivalent to subagents; in best-effort mode only the **skills** catalog is translated to `.codex/skills/`.
+> Skills are shared and copied literally to `.agents/skills/`; Codex agents are installed from native `.toml` artifacts in `.codex/agents/`.
 
 ## 🎨 Catalog: `ui-ux` profile
 

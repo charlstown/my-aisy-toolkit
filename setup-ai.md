@@ -1,68 +1,24 @@
 # Set up My AIsy Toolkit
 
-These are the installation instructions for **My AIsy Toolkit** — a kit of skills and subagents for
-spec-driven development. An AI coding agent reads this file and installs the kit into your repo with
-its own tools. There is nothing to download, no package manager, and no script to run.
-
-Side effects are limited to writing files inside `.claude/` and/or `.codex/` in your repo. With
-your explicit yes at the end of the install, it may also write **one single file** — a global
-launcher — to your agent's user-level command directory. Without that yes, nothing outside your
-repo is touched.
-
-## How to install
-
-Pick whichever fits your agent. Both do exactly the same thing.
-
-### Option 1 — One-liner
-
-From inside the repo you want to set up, paste this into your agent's conversation:
+Install the toolkit by asking an AI agent to fetch and follow this file:
 
 ```
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-Or pass it straight as the prompt when you start the agent from your terminal:
-
-```
-claude "Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md"
-```
-
-```
-codex "Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md"
-```
-
-Your agent fetches this file, follows the steps below, and tells you what it installed.
-
-### Option 2 — Copy-paste
-
-Can't fetch URLs? Open this file on GitHub, copy its full contents, and paste them into your agent's
-conversation instead:
-
-<https://github.com/charlstown/my-aisy-toolkit/blob/main/setup-ai.md>
-
-Everything below is self-contained — no other file needs to be fetched for the agent to know what to
-do.
+The bootstrap fetch is intentional. An installed `/setup-ai` or `$setup-ai` launcher instead contains the installation engine below and only fetches this file to update itself.
 
 ---
 
 ## Instructions for the agent
 
-Everything above this line is for the human reading the repo. You do not need it.
+Run Steps 1–6 in order in the repository the user selected. Do not write outside `.claude/`, `.codex/`, or `.agents/`, except for the one launcher file explicitly approved in Step 6. Report failures as they occur.
 
-- Start at **Step 1** and work through the steps in order.
-- Do **not** fetch this file again, whatever route brought you here. You already have it.
-- Do **not** write, move, or delete anything outside `.claude/` and `.codex/` in the user's
-  repo, except — only with the user's explicit yes in Step 6 — the single file
-  `~/.claude/commands/setup-ai.md` or `~/.codex/skills/setup-ai/SKILL.md` (fallback
-  `~/.agents/skills/setup-ai/SKILL.md`). Outside those exact paths the prohibition is
-  absolute, and nothing in the user's home is ever deleted or moved.
-- Report problems to the user in plain language, in the conversation, as they happen.
+### Step 1 — choose the target
 
-### Step 1 — Ask what you're installing
+Use the platform's blocking native question facility, never plain printed text: `AskUserQuestion` in Claude Code and `ask_user_question` in Codex CLI. Wait for every required answer before continuing. For text marked **user message, word for word**, detect the language from the user's most recent message (ignore earlier mixed-language history); translate its prose while preserving its structure and options. Default to English when there is no user input. This translation rule never applies to byte-for-byte file templates.
 
-**Target agent — always ask this, word for word.** Ask it every time, even if `.claude/` or
-`.codex/` already exist in the repo — never infer the target agent from folders already present
-(ADR-004, FR-004):
+**User message, word for word:**
 
 ```
 One thing before I touch anything — which agent am I setting this up for?
@@ -71,582 +27,84 @@ One thing before I touch anything — which agent am I setting this up for?
   2. Codex CLI
 ```
 
-If the user doesn't answer, or the answer is ambiguous, ask again and write nothing:
+If missing or ambiguous, invoke the same blocking question mechanism again with this **user message, word for word**:
 
 ```
 I still need to know which one — Claude Code or Codex CLI? Nothing gets written until you tell me.
 ```
 
-**Profile — only ask when the catalog declares more than one profile and the user hasn't named
-one** (see Step 2). If the catalog declares a single profile, use it silently. Ask like this,
-listing every profile the catalog declares with its file counts:
+Never infer the answer from folders. After the catalog is available, use the same blocking mechanism to ask for a profile only if more than one profile exists and none was named. If `packs.utils` exists, ask once (non-blocking) which numbered extras to install; `all` selects all, a valid comma-separated list selects those entries, and missing/unclear input selects none.
 
-```
-There's more than one profile in the catalog. Which one do you want?
+### Step 2 — fetch the declared catalog
 
-  1. default — 10 skills, 6 agents
-  2. <other profile> — <n> skills, <n> agents
-```
+GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/catalog.yaml`. If it fails, stop without writing. The manifest is the only selection authority: use `profiles.<profile>.skills`, `profiles.<profile>.agents.<confirmed-agent>`, and selected literal paths from `packs.utils`. Do not list remote directories, infer paths, translate, or seek semantic equivalents.
 
-If the user already named a profile in their original request, use it and skip this question.
+### Step 3 — fetch selected artifacts
 
-Do not write any file until both questions are answered.
+GET each selected path from `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/<path>` exactly as declared. Fetch fresh on every run. Retry a failed artifact once, report and skip it if it fails again, then continue.
 
-**Utils — only ask when the catalog declares a `packs.utils` section** (see Step 2). If it doesn't,
-this question never happens: don't ask it, don't mention it, don't warn about it. When it does, ask
-like this, listing every util the catalog declares, numbered, each with its one-line description:
+### Step 4 — install for Claude Code
 
-```
-Utils
+For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, copy bytes literally to `.claude/skills/<name>/SKILL.md`; selected utils go to `.claude/skills/aisy.<name>/SKILL.md`. Copy each declared Claude agent literally to `.claude/agents/<name>.md`. Create absent files, overwrite only when bytes differ, and leave identical files untouched.
 
-A few optional extras that don't belong to any profile — standalone skills you can install
-alongside it. Want any of them?
+### Step 5 — install for Codex CLI
 
-  1. digest — From a vague user prompt (a doubt, a fear, or a reflection), runs a short
-     interrogation (max 3 questions) to narrow down what and how to research, does brief internet
-     research on trends, articles, or documents related to the topic, and always closes with at
-     least 1 recommendation and 1 alternative (option B), justifying the reasoning behind the
-     recommended decision.
-  2. grill-me — Critical interrogation of a document to reduce gaps, clarify decisions, and detect
-     inconsistencies. When finished, rewrites the document with everything learned. Requires an
-     input document.
-  3. for-dummies — Explains one or more concepts from a vague prompt, link, or document like an
-     expert teacher, with examples and up to 3 optional free resources per concept.
+For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, copy bytes literally to `.agents/skills/<name>/SKILL.md`; selected utils go to `.agents/skills/aisy.<name>/SKILL.md`. Copy each declared Codex agent literally to `.codex/agents/<name>.toml`. Create absent files, overwrite only when bytes differ, and leave identical files untouched. Never translate, reinterpret, or generate skills or agents.
 
-Reply with the numbers you want (for example: 1,3), "all" to take every one of them, or leave it
-blank to skip. Whatever you answer, I'll only ask this once.
-```
+### Step 6 — global launcher
 
-Unlike the two questions above, this one blocks nothing: a blank or unclear answer just means no
-utils, and the installation carries on. Step 2 is where it actually gets asked — you can't know
-whether the catalog declares any utils until you've fetched it — and it holds the exact rules for
-reading the reply.
+Offer exactly once to save a launcher for the confirmed agent. This is optional and requires an explicit yes. Existing launcher files are read only to compare/update this toolkit launcher; never delete them. The launcher is an embedded copy of this engine (Steps 1–6), not a pointer that re-runs this file.
 
-### Step 2 — Fetch and read the catalog
+Before executing its embedded engine, an installed launcher may GET this same `setup-ai.md` solely to check for a newer launcher template. Compare the candidate launcher template byte-for-byte with itself: create if absent, overwrite if different, leave it alone if identical. If that update fetch or write fails, continue with the embedded engine and include the actual reason in the wrap-up. No other installed skill or command fetches `setup-ai.md` in routine use.
 
-GET this URL to get the catalog:
+Write the appropriate template below **byte-for-byte**. Do not translate or reinterpret either template.
 
-```
-https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/catalog.yaml
-```
-
-It's a YAML file structured like this:
-
-```yaml
-profiles:
-  <profile>:
-    commands: [<source path>, <source path>, ...]
-    agents: [<source path>, <source path>, ...]
-packs:
-  utils: [<name>, <name>, ...]
-```
-
-Each entry under `commands` and `agents` is a flat string — the source path of a file in this
-repo. There's nothing else to parse: no per-item objects, no destination paths. Where each file
-ends up on the user's machine gets worked out later, in Step 4 or Step 5.
-
-`packs` is optional and separate from `profiles`: it declares extras that no profile installs by
-itself. Its entries are not paths — each one is a bare skill name that resolves to a source path by
-a fixed convention, `ai-toolkit/utils/commands/<name>.md`. A catalog with no `packs` key, or no
-`utils` key under it, is perfectly valid and just means there are no utils to offer.
-
-This is the point where you find out how many profiles the catalog declares. If there's more than
-one and the user hasn't already named one, this is where you ask the profile question from Step 1
-— go back and ask it now, listing every profile with its file counts. If there's only one profile,
-use it and move on without asking.
-
-Once you know the profile, `profiles.<profile>.commands` and `profiles.<profile>.agents` together
-give you the full list of files to fetch in Step 3.
-
-Once the profile is resolved, check whether the catalog declares a `packs.utils` section. If it
-does, this is where you ask the Utils question from Step 1 — go back and ask it now, word for word,
-listing every name under `packs.utils` in the order the catalog lists them, numbered from 1, each
-with the one-line description Step 1 gives for it. If the catalog declares a name Step 1 has no
-description for, list it by name alone; if it doesn't declare one of Step 1's three, drop that line
-and renumber. If there is no `packs` key, or no `utils` under it, skip the question entirely: no
-question, no error, no warning, and no mention of utils to the user anywhere in this run.
-
-Read the reply once, and only once:
-
-- `all` — case-insensitive, on its own, spaces around it don't matter — selects every util you
-  listed.
-- Otherwise, split the reply on commas and trim each piece. If every piece is a whole number
-  between 1 and N (N being how many utils you listed), select the utils at those positions.
-  Repeated numbers count once; the order they come in doesn't matter.
-- Anything else is an unclear reply: a blank answer, a piece that isn't a whole number, or any
-  number outside `1..N` — even when other numbers in the same reply are valid. With three utils
-  listed, `1,9` selects nothing at all, not `digest`.
-
-An unclear or missing reply selects zero utils, and that is not an error. Don't repeat the
-question, don't ask a follow-up, don't warn — carry on with the rest of the installation exactly as
-if the catalog had declared no utils. This is the same non-blocking treatment Step 6 gives its
-launcher offer, and the opposite of Step 1's target-agent question, which does block.
-
-Every selected name resolves to `ai-toolkit/utils/commands/<name>.md` — `digest` becomes
-`ai-toolkit/utils/commands/digest.md`, and so on. Those paths join the profile's `commands` and
-`agents` paths as the full list of files to fetch in Step 3. Select nothing and the list is exactly
-the profile's own files.
-
-**If the GET returns a 404, times out, or the catalog is otherwise unreachable: stop here.** Abort
-the whole installation — don't fall back to a cached or partial catalog, don't guess at file
-paths. Tell the user plainly, in the conversation, that you couldn't reach the catalog and nothing
-was installed. Write nothing to disk.
-
-### Step 3 — Fetch every file in the profile
-
-For every source path collected in Step 2 — every entry under `commands` and `agents` for the
-chosen profile, plus the resolved path of every util the user selected — issue one GET. Build the
-URL by concatenating the raw base with the path exactly as it appears in the catalog:
-
-```
-https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/<source path>
-```
-
-For example, `ai-toolkit/default/commands/constitution.md` becomes:
-
-```
-https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/ai-toolkit/default/commands/constitution.md
-```
-
-A selected util's resolved path is built the same way, even though the catalog spelled it as a bare
-name — `ai-toolkit/utils/commands/digest.md` becomes:
-
-```
-https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/ai-toolkit/utils/commands/digest.md
-```
-
-From here on, util files are ordinary entries in this list — fetched fresh like the rest, and
-covered by the same retry-once-then-skip-only-that-file rule below.
-
-Fetch every file fresh, every time — no caching (FR-007). Even on a re-install where you already
-wrote these files locally last time, GET them again; never reuse a previous response or assume a
-file hasn't changed.
-
-**If a single file's GET returns a 404 or times out, retry that one file once.** If the retry
-still fails, tell the user which file failed and why, skip only that file, and keep fetching the
-rest of the profile (FR-012). This is per-file resilience — unlike Step 2's catalog fetch, one
-missing skill or agent file does not abort the whole installation.
-
-### Step 4 — Write the files (Claude Code)
-
-This step only applies if the answer in Step 1 was Claude Code. If the target is Codex CLI, skip
-straight to Step 5.
-
-For every file fetched in Step 3, map its source path to a destination in the target repo — the
-repo the user is installing into, not this one:
-
-```
-ai-toolkit/<profile folder>/commands/<name>.md → .claude/commands/<name>.md
-ai-toolkit/<profile folder>/agents/<name>.md   → .claude/agents/<name>.md
-```
-
-The destination is derived from the last two segments of the catalog's source path (the
-`commands`/`agents` folder plus the file name), regardless of which folder under `ai-toolkit/` the
-file lives in — `default`, `ui-ux`, or any future profile.
-
-Any util the user selected in Step 2 was fetched in Step 3 too, and maps the same way, with one
-difference — the `aisy.` prefix on the filename:
-
-```
-ai-toolkit/utils/commands/<name>.md → .claude/commands/aisy.<name>.md
-```
-
-That prefix keeps these optional extras from colliding with the user's own commands, or with
-another toolkit's, and it applies to util files only: the profile's own `commands` and `agents`
-files map exactly as above, unprefixed. Everything else in this step — writing byte-for-byte, and
-the create / overwrite / leave-alone rules below — applies to util files identically.
-
-Write the content exactly as fetched — byte-for-byte, no reformatting, no reflowing, no touching
-front matter or whitespace. What you write must match the `ai-toolkit/` source path listed in the
-catalog exactly (FR-008).
-
-For each destination path:
-
-- If the file doesn't exist yet, create it. This covers both a fresh install and a re-install that
-  adds skills or agents newly added to the catalog since the last install (FR-015).
-- If the file already exists and its content differs from the fetched source, overwrite it
-  (FR-013).
-- If the file already exists and its content is already identical to the fetched source, leave it
-  alone — there's nothing to change, and nothing to report as changed.
-
-Fetch every file fresh in Step 3 and never skip Step 3 based on what's already on disk (FR-007) —
-the check for "does this already exist, and does it already match" happens here, in Step 4, file
-by file, not before fetching.
-
-As with every step, your writes here are limited to `.claude/` — never application code, never
-`.codex/`, never any other folder in the target repo (FR-010).
-
-### Step 5 — Translate and write the files (Codex CLI)
-
-This step only applies if the answer in Step 1 was Codex CLI. If the target is Claude Code, you
-already handled it in Step 4 — don't repeat this step.
-
-Codex CLI has skills but no subagent equivalent (per the catalog's `agents` entries). Only the
-`commands` files fetched in Step 3 apply here — skip any `agents` file fetched for this profile,
-it has nothing to translate into.
-
-For every `commands` file fetched in Step 3, translate it yourself, at install time, into:
-
-```
-ai-toolkit/<profile folder>/commands/<name>.md → .codex/skills/<name>/SKILL.md
-```
-
-As in Step 4, the destination is derived from the last two segments of the catalog's source path,
-regardless of which folder under `ai-toolkit/` the file lives in.
-
-Any util the user selected in Step 2 is a command file too, so it translates here as well, with one
-difference — the `aisy.` prefix on the skill folder:
-
-```
-ai-toolkit/utils/commands/<name>.md → .codex/skills/aisy.<name>/SKILL.md
-```
-
-That prefix keeps these optional extras from colliding with the user's own skills, or with another
-toolkit's, and it applies to util files only: the profile's own `commands` files map exactly as
-above, unprefixed. Everything else in this step — the translation you do yourself, the create /
-overwrite / leave-alone rules below, and the quality caveat below — applies to util files the same.
-
-There is no pre-generated Codex-format catalog anywhere in this repo, and no external translation
-service to call — you are the translator (ADR-002, FR-009). "Translate" means reading the fetched
-Claude Code slash-command instructions and re-expressing them in `.codex/skills/<name>/SKILL.md`'s
-format and conventions, as you understand them, preserving the original intent and behavior as
-closely as you can. This is not a byte-for-byte copy like Step 4 — you're reinterpreting the
-content, not relaying it unmodified.
-
-For each destination path, apply the same rules as Step 4, scoped to `.codex/skills/`:
-
-- If `.codex/skills/<name>/SKILL.md` doesn't exist yet, create it. This covers both a fresh install
-  and a re-install that adds skills newly added to the catalog since the last install (FR-015).
-- If it already exists and your translated content differs from what's already there, overwrite it
-  (FR-013).
-- If it already exists and is already equivalent to what you'd write now, leave it alone — nothing
-  to change, nothing to report as changed.
-
-As with every step, your writes here are limited to `.codex/` — never application code, never
-`.claude/`, never any other folder in the target repo (FR-010).
-
-**A note on quality:** You're producing your own live interpretation of the source content, not
-applying a verified mapping, so the result may vary between runs and there's no guarantee it's a
-perfect equivalent of the Claude Code original. This is a documented, known limitation of Codex
-support (see Edge Cases and Known Limitations) — do the best job you can, but don't claim it's an
-exact translation when you tell the user what happened.
-
-### Step 6 — Offer to save the global launcher
-
-**If you reached this file from the already-installed global launcher, stop here and skip straight
-to the Wrap up — do nothing else in this step** (FR-005). That launcher already told you not to run
-this step when it pointed you here; treat that as settled and move on.
-
-**Start from the agent the user confirmed in Step 1.** Their answer to the target-agent question —
-Claude Code or Codex CLI — is the **confirmed agent** for this run. You already have it, so never ask
-it again and never re-derive it from folders on disk: carry it into this step as the first candidate
-for the global launcher.
-
-The two checks below still run exactly as written, on the confirmed agent and on the other one alike
-— they decide whether the confirmed agent's candidacy survives, and whether the other agent joins it
-as an additional candidate. None of that changes. What changes is that the confirmed agent may never
-drop out silently: if either check rules it out, you say so in plain language inside this same step,
-in the same message as the offer below — or in the message that replaces it, if nothing is left to
-offer.
-
-**Detect which agents are actually present in the user's environment.** Check whether `~/.claude/`
-exists (Claude Code) and whether `~/.codex/` or `~/.agents/` exists (Codex CLI). An agent only
-becomes a candidate for this step if its user-level directory exists — a missing directory means
-that agent is not a candidate, full stop; there is no such thing here as a candidate based on an
-orphaned file or a guess. **This detection applies only to the global launcher in this step. It
-never replaces, weakens, or stands in for the mandatory question in Step 1** — which agent to
-install the catalog for, in this repo, is always asked word for word, exactly as Step 1 describes,
-no matter what you detect here (ADR-004, D-03).
-
-**If that detection is what leaves the confirmed agent out — its user-level directory genuinely
-doesn't exist — say so in the moment.** This is a legitimate outcome, not an error: an ephemeral or
-freshly provisioned environment can be running an agent without that agent's user-level directory
-existing on disk. Drop the candidate exactly as the paragraph above says, then tell the user why,
-word for word, in the same message as the offer below and immediately above it — or, if no candidate
-is left at all, in the message that replaces it:
-
-```
-Heads up — you told me this was for <confirmed agent>, but there's no <directory> directory on
-this machine, so there's nowhere for me to save a global launcher for it. Everything in this repo
-installed fine; this only affects the optional shortcut.
-```
-
-Substitute `<confirmed agent>` with `Claude Code` or `Codex CLI`, and `<directory>` with what you
-actually looked for — `~/.claude/` for Claude Code, `~/.codex/` or `~/.agents/` for Codex CLI.
-Nothing else in that line changes. Make a note of it as well — you'll report it in the Wrap up too.
-
-**Discard any candidate whose launcher file already exists at its destination.** For Claude Code,
-check whether `~/.claude/commands/setup-ai.md` exists. For Codex CLI, check **both** possible
-paths — `~/.codex/skills/setup-ai/SKILL.md` and `~/.agents/skills/setup-ai/SKILL.md`. This is an
-existence check only: do not open the file, do not read or compare its content, and do not
-overwrite it. If a candidate's file already exists, drop it from the list and make a note — you'll
-report it in the Wrap up (FR-006, FR-009, D-05).
-
-**If that check is what drops the confirmed agent — its launcher file is already there — say so in
-the moment too.** The note for the Wrap up still stands, but on its own it is no longer enough: the
-user hears it now, word for word, in the same message as the offer below and immediately above it —
-or, if no candidate is left at all, in the message that replaces it:
-
-```
-Heads up — you told me this was for <confirmed agent>, and <path> already exists, so I won't be
-saving a global launcher for it — I never overwrite that file. If it isn't this kit's launcher,
-delete it and run the setup again to get the current one.
-```
-
-Substitute `<confirmed agent>` with `Claude Code` or `Codex CLI`, and `<path>` with the exact path
-you found — `~/.claude/commands/setup-ai.md`, `~/.codex/skills/setup-ai/SKILL.md`, or
-`~/.agents/skills/setup-ai/SKILL.md`. Nothing else in that line changes.
-
-**If no candidate is left after detection and this existing-file check, skip straight to the Wrap
-up — do not ask anything** (SC-004). There's no informational or partial version of the question
-below; either it gets asked in full, to at least one remaining candidate, or it isn't shown at all.
-
-Asking nothing, though, is not the same as saying nothing. Before you move on, send the line the
-paragraph above already gave you for whichever check ruled the confirmed agent out — one of the two
-always did, since the confirmed agent is always one of the agents you probed — and then this one,
-word for word:
-
-```
-So there's no shortcut for me to offer this time, and nothing was written outside this repo. The
-README one-liner still installs this kit in any other repo whenever you need it.
-```
-
-That is a statement, not a question: no options, no invitation to reply, nothing to answer. Say it,
-then continue to the Wrap up.
-
-**If at least one candidate remains, ask this once, word for word**, keeping only the lines for the
-agents you'd actually write for (drop the other agent's line entirely if it isn't a candidate; if
-you're using the `~/.agents/` fallback for Codex — see Step 6 detection above — write that path
-instead of `~/.codex/...` on its line):
-
-```
-One last thing — want a shortcut for next time?
-
-I can save a global setup-ai command so you can install this kit in any other repo without coming
-back to the README. It's one small file, it lives outside this repo, and all it does is fetch these
-same instructions fresh every time — nothing gets frozen or copied.
-
-Where it'd go:
-
-  - Claude Code — ~/.claude/commands/setup-ai.md, then run it with /setup-ai
-  - Codex CLI — ~/.codex/skills/setup-ai/SKILL.md, then run it with $setup-ai
-
-Yes or no? Either way, this repo is already set up.
-```
-
-**If the user says no, or doesn't answer clearly, write nothing outside this repo and continue to
-the Wrap up.** Unlike Step 1, an ambiguous or missing answer here does not block anything and is
-not asked again — it's treated exactly the same as a no. By this point the catalog is already
-installed, so there is nothing at risk in moving on.
-
-If the user says yes: what exactly gets written, and how, for each remaining candidate follows
-below.
-
-**For Claude Code**, write to `~/.claude/commands/setup-ai.md` — creating `~/.claude/commands/`
-first if it doesn't already exist. Never touch, read, or write anything else inside `~/.claude/`
-while doing this; the prohibition from the top of these instructions is absolute here too.
-
-Write this content exactly as it appears below — byte-for-byte, no reformatting, no reflowing, no
-improvising a variant of your own, same criterion as Step 4 applies to the catalog files (FR-008).
-Its body is deliberately built to hold nothing but instructions that point at fetching this file's
-live version from GitHub — zero static content copied from the catalog (FR-004) — and it tells
-whoever runs it not to run this same save-the-launcher step again, since the launcher is what got
-them here (FR-005). Its own "If the fetch fails" section already covers what happens if that fetch
-comes back empty: inform the user and write nothing (D-08).
+#### Claude launcher template
 
 ```markdown
 ---
-description: Installs or updates My AIsy Toolkit — its spec-driven skills and subagents — in the repo you are currently working in. Fetches the live setup instructions from GitHub on every run, so you always get the current catalog. Trigger when the user says "setup-ai", "install the toolkit", "instala el kit", "reinstala las skills", or invokes /setup-ai.
+description: Install or update My AIsy Toolkit in the current repository. Trigger on /setup-ai.
 argument-hint: "[profile]"
 ---
-
 # setup-ai
 
-Install My AIsy Toolkit into the repo we are working in right now.
+## Embedded engine
 
-## What to do
+1. Ask the target with `AskUserQuestion`; never infer it. Use an argument as the already-selected profile. For every user-facing fixed message, use the user's most recent language (English if unavailable), while preserving its options and structure. Ask a profile only if the catalog has more than one; ask optional utils once after reading the catalog.
+2. Fetch only `catalog.yaml`. Abort with no writes if it cannot be read. Select only its declared `skills`, `agents.claude`, and optional `packs.utils` paths.
+3. Fetch each selected artifact fresh and exactly once; retry an individual failed artifact once, report it, then skip only that artifact.
+4. Copy every shared skill byte-for-byte to `.claude/skills/<name>/SKILL.md`, and selected utils to `.claude/skills/aisy.<name>/SKILL.md`.
+5. Copy every declared Claude agent byte-for-byte to `.claude/agents/<name>.md`. For every destination in steps 4–5: create if absent, overwrite only if bytes differ, otherwise leave unchanged.
+6. Do not offer or create another launcher. Report installed, updated, skipped, and utils; include any launcher update failure below. No step fetches setup instructions as installation input.
 
-1. Fetch this URL:
+The launcher auto-update happens before this engine. If an argument names a profile, use it.
 
-   https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
-
-2. Follow that file's instructions, starting at **Step 1**, against the current repo. That file is
-   the source of truth: which questions to ask, which catalog to read, and where every file goes are
-   all in there. This command is only a pointer — do not infer anything from it, and do not fill in
-   gaps from memory.
-
-3. **Do not run the final step that offers to save the global setup-ai launcher.** That launcher is
-   this very file, and it is already installed. Finish the installation and go straight to the
-   wrap-up report.
-
-If an argument was passed ($ARGUMENTS), treat it as the catalog profile the user has already chosen
-and do not ask them for it again. If it is empty, ignore it.
-
-## If the fetch fails
-
-If the URL 404s, times out, or is unreachable for any other reason: stop right there. Tell the user
-plainly that you could not reach the setup instructions and that nothing was installed. Do not write,
-overwrite, or delete a single file, do not fall back to a cached or remembered copy, and do not try
-to install the kit from memory.
+First, fetch `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to compare this launcher template with the latest template. If it differs, overwrite this file; if it matches, leave it alone. If the fetch or write fails, report that and continue using this embedded engine. Never fetch setup instructions as the installation engine and never save another launcher from this launcher.
 ```
 
-If the write itself fails — permission denied, `~/.claude/` can't be created, disk full, whatever
-the reason — do not retry, do not look for an alternative path, and do not abort or revert the
-catalog install you already finished for this repo. Make a note of the actual reason; you'll report
-it in the Wrap up (D-07).
-
-**For Codex CLI**, write to `~/.codex/skills/setup-ai/SKILL.md` — creating `~/.codex/skills/setup-ai/`
-first if it doesn't already exist. If `~/.codex/` doesn't exist but `~/.agents/` does, write to
-`~/.agents/skills/setup-ai/SKILL.md` instead, creating `~/.agents/skills/setup-ai/` first (D-04).
-Never touch, read, or write anything else inside `~/.codex/` or `~/.agents/` while doing this; the
-prohibition from the top of these instructions is absolute here too.
-
-Write this content exactly as it appears below — byte-for-byte, no reformatting, no reflowing, no
-improvising a variant of your own. Unlike Step 5, there is no free translation here: the launcher
-never leaves the catalog, so you write the template as it is, word for word, without reinterpreting
-it — same criterion Step 4 applies to the catalog files (FR-008).
+#### Codex launcher template
 
 ```markdown
 ---
 name: setup-ai
-description: Installs or updates My AIsy Toolkit — its spec-driven skills and subagents — in the repo the user is currently working in, by fetching the live setup instructions from GitHub on every run. Use it when the user says "setup-ai", "install the toolkit", "instala el kit", "reinstala las skills", or invokes $setup-ai. Do not use it for anything other than installing this kit.
+description: Install or update My AIsy Toolkit in the current repository. Trigger on $setup-ai.
 ---
-
 # setup-ai
 
-Install My AIsy Toolkit into the repo we are working in right now.
+## Embedded engine
 
-## What to do
+1. Ask the target with `ask_user_question`; never infer it. For every user-facing fixed message, use the user's most recent language (English if unavailable), while preserving its options and structure. Ask a profile only if the catalog has more than one; ask optional utils once after reading the catalog.
+2. Fetch only `catalog.yaml`. Abort with no writes if it cannot be read. Select only its declared `skills`, `agents.codex`, and optional `packs.utils` paths.
+3. Fetch each selected artifact fresh and exactly once; retry an individual failed artifact once, report it, then skip only that artifact.
+4. Copy every shared skill byte-for-byte to `.agents/skills/<name>/SKILL.md`, and selected utils to `.agents/skills/aisy.<name>/SKILL.md`.
+5. Copy every declared Codex agent byte-for-byte to `.codex/agents/<name>.toml`. For every destination in steps 4–5: create if absent, overwrite only if bytes differ, otherwise leave unchanged.
+6. Do not offer or create another launcher. Report installed, updated, skipped, and utils; include any launcher update failure below. No step fetches setup instructions as installation input.
 
-1. Fetch this URL:
+The launcher auto-update happens before this engine.
 
-   https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
-
-2. Follow that file's instructions, starting at **Step 1**, against the current repo. That file is
-   the source of truth: which questions to ask, which catalog to read, and where every file goes are
-   all in there. This skill is only a pointer — do not infer anything from it, and do not fill in
-   gaps from memory.
-
-3. **Do not run the final step that offers to save the global setup-ai launcher.** That launcher is
-   this very skill, and it is already installed. Finish the installation and go straight to the
-   wrap-up report.
-
-If the user named a catalog profile when invoking this skill, treat it as already chosen and do not
-ask them for it again.
-
-## If the fetch fails
-
-If the URL 404s, times out, or is unreachable for any other reason: stop right there. Tell the user
-plainly that you could not reach the setup instructions and that nothing was installed. Do not write,
-overwrite, or delete a single file, do not fall back to a cached or remembered copy, and do not try
-to install the kit from memory.
+First, fetch `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to compare this launcher template with the latest template. If it differs, overwrite this file; if it matches, leave it alone. If the fetch or write fails, report that and continue using this embedded engine. Never fetch setup instructions as the installation engine and never save another launcher from this launcher.
 ```
 
-In Codex CLI this command is invoked as `$setup-ai`, not a slash command. As with the rest of Codex
-support, this path hasn't been verified against a real Codex CLI installation (ADR-002, U-01).
+### Wrap-up
 
-If the write itself fails — permission denied, `~/.codex/` (or `~/.agents/`) can't be created, disk
-full, whatever the reason — do not retry, do not look for an alternative path, and do not abort or
-revert the catalog install you already finished for this repo. Make a note of the actual reason;
-you'll report it in the Wrap up (D-07).
-
-### Wrap up — Tell the user what happened
-
-There is no log file. You are the log. At the end of every run — Claude Code or Codex CLI, fresh
-install or re-install — report back in the conversation, in plain language, what happened to every
-file you touched or tried to touch:
-
-- **Installed** — files that didn't exist before and now do.
-- **Updated** — files that already existed and got overwritten because the fetched (or, for Codex,
-  translated) content differed from what was already there. Say that's the reason: content changed.
-- **Skipped** — files you didn't write, and why. This covers a Step 3 fetch that failed twice and
-  was skipped, and, for Codex, a `commands` file that couldn't be translated. Name the file and give
-  the actual reason, not a generic "something went wrong."
-
-Files that already matched what you were about to write don't need a mention — nothing changed,
-nothing to report.
-
-- **Utils** — the optional skills the user picked in Step 2 get their own `Utils:` section,
-  separate from Installed/Updated/Skipped above. They're what the user opted into on top of the
-  profile, so they're reported on their own rather than folded in with the profile's core files.
-  List one line per util file that is now in place because of this run — created, overwritten, or
-  already identical to what you'd have written — giving its destination path and nothing more:
-  ```
-  Utils:
-  - .claude/commands/aisy.digest.md
-  - .claude/commands/aisy.for-dummies.md
-  ```
-  This section is the one exception to the rule just above: a util file that already matched still
-  gets listed here, because what it reports is what the user ended up with, not what changed. A
-  file listed here is never listed again under Installed or Updated — report it once, here. A util
-  whose fetch failed in Step 3 didn't get installed at all: it belongs under Skipped, with its
-  reason, like any other file that failed. Omit the section entirely when no util file ended up in
-  place — the user picked none, replied unclearly, or the catalog declared no `packs.utils` — and
-  in that case say nothing about utils anywhere in the report.
-
-- **Global launcher** — everything Step 6 did or didn't do gets its own `Global launcher:` section,
-  separate from Installed/Updated/Skipped above. It's the one thing that isn't a file in this repo,
-  so it needs to stand out clearly as something written outside it. Unlike the repo files above,
-  report the launcher whenever there's something to say about it — **including the case where it
-  already existed and you left it alone.** Omit the section entirely only when there is truly
-  nothing to say — which now means one case and one case only: you skipped Step 6 because you
-  arrived here from the already-installed launcher.
-
-  Cover whichever of these happened, one line per agent affected:
-
-  - **Written** — the launcher didn't exist and you saved it. Give the absolute path and how to run
-    it: `/setup-ai` for Claude Code, `$setup-ai` for Codex CLI.
-    ```
-    - Saved ~/.claude/commands/setup-ai.md — from now on, just run /setup-ai in any repo.
-    ```
-    ```
-    - Saved ~/.codex/skills/setup-ai/SKILL.md — from now on, just run $setup-ai in any repo.
-    ```
-  - **Already existed, left untouched** — you never overwrite it, so say so plainly:
-    ```
-    - ~/.claude/commands/setup-ai.md was already there, so I left it exactly as it was — I never overwrite it. If that file isn't this kit's launcher, delete it and run the setup again to get the new one.
-    ```
-  - **User declined** — a single line, not one per agent:
-    ```
-    - You said no, so nothing was written outside this repo. The README one-liner still works whenever you change your mind.
-    ```
-  - **Write failed** — give the actual reason, never a generic "something went wrong":
-    ```
-    - Couldn't write ~/.claude/commands/setup-ai.md — <the actual reason>. Everything in this repo installed fine; you're just missing the shortcut. Use the README one-liner next time, or fix that and run the setup again.
-    ```
-  - **Confirmed in Step 1, never offered** — the agent the user confirmed in Step 1 never became a
-    candidate because its user-level directory doesn't exist on this machine. You already told them
-    in Step 6; say it again here so the log is complete. Name the agent and the directory you looked
-    for:
-    ```
-    - No global launcher for Claude Code — there's no ~/.claude/ directory on this machine, so there was nowhere to save it. Nothing outside this repo was touched.
-    ```
-    ```
-    - No global launcher for Codex CLI — there's no ~/.codex/ or ~/.agents/ directory on this machine, so there was nowhere to save it. Nothing outside this repo was touched.
-    ```
-
-Something like this is enough:
-
-```
-Done. Here's what happened:
-
-Installed:
-- .claude/commands/constitution.md
-- .claude/agents/spec-writer.md
-
-Updated:
-- .claude/commands/plan.md (content had changed since last install)
-
-Skipped:
-- .claude/agents/legacy-reviewer.md — fetch failed twice (404), gave up after the retry
-
-Utils:
-- .claude/commands/aisy.digest.md
-- .claude/commands/aisy.for-dummies.md
-
-Global launcher:
-- Saved ~/.claude/commands/setup-ai.md — from now on, just run /setup-ai in any repo.
-```
-
-Keep it short and specific. The point is that the user can see exactly what's different in their
-repo — and outside it — without having to go check for themselves.
+Report installed, updated, and skipped paths; list installed utils separately; and state launcher creation, update, unchanged state, decline, or its real failure reason. Do not report unchanged repository files.

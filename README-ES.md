@@ -65,7 +65,7 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 - **2 perfiles de catálogo**: `default` y `ui-ux` (añade `/ui-spec` y `/clarify-uix`)
 - **1 pack de skills opcional**: `utils` (`/digest`, `/grill-me`, `/for-dummies`), instalable sobre cualquier perfil
 - **1 método de instalación**: una URL o un archivo pegado, nada que descargar
-- **2 agentes de código IA** soportados: Claude Code (nativo) y Codex CLI (best-effort)
+- **2 agentes de código IA** soportados: Claude Code y Codex CLI, cada uno con sus artefactos nativos
 
 Y el catálogo sigue creciendo a medida que se añaden nuevas skills y agentes.
 
@@ -102,7 +102,7 @@ Apunta tu agente a la URL de instalación una sola vez, ese es el único paso de
 | `judge` | Revisa el trabajo de otros agentes y emite un veredicto PASS / CHANGES_REQUESTED. |
 
 > [!note] Codex CLI
-> Codex CLI no tiene un equivalente nativo a los subagentes; en modo best-effort solo se traduce el catálogo de **skills** a `.codex/skills/`.
+> Las skills son compartidas y se copian literalmente a `.agents/skills/`; los agentes Codex se instalan desde artefactos `.toml` nativos en `.codex/agents/`.
 
 ## 🎨 Catálogo: perfil `ui-ux`
 

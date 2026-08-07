@@ -1,44 +1,63 @@
 profiles:
   default:
-    commands:
-      - ai-toolkit/default/commands/constitution.md
-      - ai-toolkit/default/commands/product-spec.md
-      - ai-toolkit/default/commands/tech-spec.md
-      - ai-toolkit/default/commands/roadmap.md
-      - ai-toolkit/default/commands/new-issue.md
-      - ai-toolkit/default/commands/specify-feature.md
-      - ai-toolkit/default/commands/clarify-feature.md
-      - ai-toolkit/default/commands/plan-feature.md
-      - ai-toolkit/default/commands/implement-feature.md
-      - ai-toolkit/default/commands/clean-feature.md
+    skills:
+      - ai-toolkit/skills/constitution/SKILL.md
+      - ai-toolkit/skills/product-spec/SKILL.md
+      - ai-toolkit/skills/tech-spec/SKILL.md
+      - ai-toolkit/skills/roadmap/SKILL.md
+      - ai-toolkit/skills/new-issue/SKILL.md
+      - ai-toolkit/skills/specify-feature/SKILL.md
+      - ai-toolkit/skills/clarify-feature/SKILL.md
+      - ai-toolkit/skills/plan-feature/SKILL.md
+      - ai-toolkit/skills/implement-feature/SKILL.md
+      - ai-toolkit/skills/clean-feature/SKILL.md
     agents:
-      - ai-toolkit/default/agents/architect.md
-      - ai-toolkit/default/agents/code-developer.md
-      - ai-toolkit/default/agents/test-developer.md
-      - ai-toolkit/default/agents/tester.md
-      - ai-toolkit/default/agents/ui-developer.md
-      - ai-toolkit/default/agents/judge.md
+      claude:
+        - ai-toolkit/agents/claude/architect.md
+        - ai-toolkit/agents/claude/code-developer.md
+        - ai-toolkit/agents/claude/test-developer.md
+        - ai-toolkit/agents/claude/tester.md
+        - ai-toolkit/agents/claude/ui-developer.md
+        - ai-toolkit/agents/claude/judge.md
+      codex:
+        - ai-toolkit/agents/codex/architect.toml
+        - ai-toolkit/agents/codex/code-developer.toml
+        - ai-toolkit/agents/codex/test-developer.toml
+        - ai-toolkit/agents/codex/tester.toml
+        - ai-toolkit/agents/codex/ui-developer.toml
+        - ai-toolkit/agents/codex/judge.toml
   ui-ux:
-    commands:
-      - ai-toolkit/default/commands/constitution.md
-      - ai-toolkit/default/commands/product-spec.md
-      - ai-toolkit/default/commands/tech-spec.md
-      - ai-toolkit/default/commands/roadmap.md
-      - ai-toolkit/default/commands/new-issue.md
-      - ai-toolkit/default/commands/specify-feature.md
-      - ai-toolkit/default/commands/clarify-feature.md
-      - ai-toolkit/default/commands/plan-feature.md
-      - ai-toolkit/default/commands/implement-feature.md
-      - ai-toolkit/default/commands/clean-feature.md
-      - ai-toolkit/ui-ux/commands/ui-spec.md
-      - ai-toolkit/ui-ux/commands/clarify-uix.md
+    skills:
+      - ai-toolkit/skills/constitution/SKILL.md
+      - ai-toolkit/skills/product-spec/SKILL.md
+      - ai-toolkit/skills/tech-spec/SKILL.md
+      - ai-toolkit/skills/roadmap/SKILL.md
+      - ai-toolkit/skills/new-issue/SKILL.md
+      - ai-toolkit/skills/specify-feature/SKILL.md
+      - ai-toolkit/skills/clarify-feature/SKILL.md
+      - ai-toolkit/skills/plan-feature/SKILL.md
+      - ai-toolkit/skills/implement-feature/SKILL.md
+      - ai-toolkit/skills/clean-feature/SKILL.md
+      - ai-toolkit/skills/ui-spec/SKILL.md
+      - ai-toolkit/skills/clarify-uix/SKILL.md
     agents:
-      - ai-toolkit/default/agents/architect.md
-      - ai-toolkit/default/agents/code-developer.md
-      - ai-toolkit/default/agents/test-developer.md
-      - ai-toolkit/default/agents/tester.md
-      - ai-toolkit/default/agents/ui-developer.md
-      - ai-toolkit/default/agents/judge.md
+      claude:
+        - ai-toolkit/agents/claude/architect.md
+        - ai-toolkit/agents/claude/code-developer.md
+        - ai-toolkit/agents/claude/test-developer.md
+        - ai-toolkit/agents/claude/tester.md
+        - ai-toolkit/agents/claude/ui-developer.md
+        - ai-toolkit/agents/claude/judge.md
+      codex:
+        - ai-toolkit/agents/codex/architect.toml
+        - ai-toolkit/agents/codex/code-developer.toml
+        - ai-toolkit/agents/codex/test-developer.toml
+        - ai-toolkit/agents/codex/tester.toml
+        - ai-toolkit/agents/codex/ui-developer.toml
+        - ai-toolkit/agents/codex/judge.toml
 
 packs:
-  utils: [digest, grill-me, for-dummies]
+  utils:
+    - ai-toolkit/skills/digest/SKILL.md
+    - ai-toolkit/skills/grill-me/SKILL.md
+    - ai-toolkit/skills/for-dummies/SKILL.md
