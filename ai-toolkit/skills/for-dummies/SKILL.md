@@ -2,6 +2,14 @@
 description: Explains one or more concepts from a vague prompt, link, or document like an expert teacher, with examples and up to 3 optional free resources per concept. Trigger when the user says "for dummies", "explícamelo para dummies", "explain it like I'm five", "explícamelo como si no supiera nada", "no entiendo este concepto", "I don't get this concept", or invokes /aisy.for-dummies.
 ---
 
+## Codex question fallback
+
+When running in Codex, use `ask_user_question` when it is available. Otherwise ask conversationally.
+
+Present exactly one pending question at a time, with identifiable options and an explicit instruction that the user may choose an option or provide their own answer. Wait for and process that answer before asking another question or executing a dependent step. Treat free-form answers as valid. When the user says they do not know yet (or equivalent), record a gap and continue only with independent questions or steps.
+
+Do not change Claude Code's existing question mechanism or behavior.
+
 ## Language
 
 Detect the language of the user's initial (or most recent) message and conduct the ENTIRE interaction in that language — every `AskUserQuestion` prompt, header, option label and description, and every message, summary, and generated file or output. Mirror the user's language exactly and never switch to another language. These instructions are written in English, but that must NOT force the interaction into English: if the user wrote in Spanish, ask and write in Spanish; if they wrote in another language, use that one. The language of the inputs determines the language of the outputs.

@@ -3,6 +3,14 @@ name: digest
 description: "A partir de un prompt vago del usuario (una duda, un temor o una reflexión), lanza un interrogatorio corto (máximo 3 preguntas) para acotar qué y cómo investigar, hace una investigación breve en internet sobre tendencias, artículos o documentos relacionados con el tema, y cierra siempre con al menos 1 recomendación y 1 alternativa (opción B), justificando el porqué de la decisión recomendada. Trigger cuando el usuario diga 'digest', 'digiere esto', 'tengo una duda sobre...', 'no sé si debería...', o invoque /aisy.digest."
 ---
 
+## Codex question fallback
+
+When running in Codex, use `ask_user_question` when it is available. Otherwise ask conversationally.
+
+Present exactly one pending question at a time, with identifiable options and an explicit instruction that the user may choose an option or provide their own answer. Wait for and process that answer before asking another question or executing a dependent step. Treat free-form answers as valid. When the user says they do not know yet (or equivalent), record a gap and continue only with independent questions or steps.
+
+Do not change Claude Code's existing question mechanism or behavior.
+
 ## Language
 
 Detecta el idioma del mensaje inicial (o más reciente) del usuario y conduce TODA la interacción en ese idioma — cada pregunta de `AskUserQuestion`, cabecera, etiqueta y descripción de opción, y cada mensaje, síntesis o fichero generado. Estas instrucciones están escritas en español, pero eso no debe forzar la interacción a ese idioma: si el usuario escribe en inglés, pregunta y responde en inglés.
