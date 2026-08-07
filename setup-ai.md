@@ -55,7 +55,7 @@ For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, copy bytes l
 
 Offer exactly once to save a launcher for the confirmed agent. This is optional and requires an explicit yes. Existing launcher files are read only to compare/update this toolkit launcher; never delete them. The launcher is an embedded copy of this engine (Steps 1–6), not a pointer that re-runs this file.
 
-Before executing its embedded engine, an installed launcher may GET this same `setup-ai.md` solely to check for a newer launcher template. Compare the candidate launcher template byte-for-byte with itself: create if absent, overwrite if different, leave it alone if identical. If that update fetch or write fails, continue with the embedded engine and include the actual reason in the wrap-up. No other installed skill or command fetches `setup-ai.md` in routine use.
+Before executing its embedded engine, an installed launcher may GET this same `setup-ai.md` solely to check for a newer launcher template. From that response, extract only the literal template for its own platform, then compare those bytes with its own file: overwrite only if different and leave it alone if identical. If that fetch, extraction, comparison, or write fails, continue with the embedded engine and include the actual reason in the wrap-up. No other installed skill or command fetches `setup-ai.md` in routine use.
 
 Write the appropriate template below **byte-for-byte**. Do not translate or reinterpret either template.
 
@@ -79,7 +79,7 @@ argument-hint: "[profile]"
 
 The launcher auto-update happens before this engine. If an argument names a profile, use it.
 
-First, fetch `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to compare this launcher template with the latest template. If it differs, overwrite this file; if it matches, leave it alone. If the fetch or write fails, report that and continue using this embedded engine. Never fetch setup instructions as the installation engine and never save another launcher from this launcher.
+Before Step 1, GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to extract the literal **Claude launcher template**. Compare that complete candidate file byte-for-byte with this file: overwrite this exact path only if different, otherwise leave it alone. If the GET fails, the template is absent/malformed, comparison fails, or writing fails, record the actual reason and continue with this embedded engine. Never use the fetched file as installation instructions and never save another launcher from this launcher.
 ```
 
 #### Codex launcher template
@@ -102,7 +102,7 @@ description: Install or update My AIsy Toolkit in the current repository. Trigge
 
 The launcher auto-update happens before this engine.
 
-First, fetch `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to compare this launcher template with the latest template. If it differs, overwrite this file; if it matches, leave it alone. If the fetch or write fails, report that and continue using this embedded engine. Never fetch setup instructions as the installation engine and never save another launcher from this launcher.
+Before Step 1, GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to extract the literal **Codex launcher template**. Compare that complete candidate file byte-for-byte with this file: overwrite this exact path only if different, otherwise leave it alone. If the GET fails, the template is absent/malformed, comparison fails, or writing fails, record the actual reason and continue with this embedded engine. Never use the fetched file as installation instructions and never save another launcher from this launcher.
 ```
 
 ### Wrap-up
