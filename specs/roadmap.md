@@ -4,23 +4,23 @@
 > | **Status** | 🟢 Done |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-03 |
+> | **Updated** | 2026-08-07 |
 > | **Version** | v0.1 |
 > | **Parent specs** | [[product-spec]] · [[tech-spec]] |
-> | **Scope** | Single feature phase: populate the distributable catalog, ship the `setup-ai` installer, and finish the README |
+> | **Scope** | Completed evolution: local self-updating launcher, declarative remote catalog, shared `ai-toolkit/skills/`, native agents in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`, literal copying, and sequential Codex prompts |
 
 ## 🎯 Vision
 
-This roadmap covers a single feature phase: populate the distributable `ai-toolkit/default/` catalog, ship `setup-ai.md` supporting both installation methods for Claude Code and Codex CLI (best-effort), and finish the README as the project's front door. There are no prior PoCs blocking the start. The milestone closes when an automated check confirms a dummy-repo install lands every catalog file unmodified.
+This roadmap records the completed evolution from the initial distributable catalog into a local self-updating launcher backed by a declarative remote catalog. Skills now have one shared source in `ai-toolkit/skills/`; agents remain native in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`. Installation fetches the catalog and artifacts, copies them literally, and asks Codex questions sequentially. There are no prior PoCs blocking the start. The milestone closes when an automated check confirms a dummy-repo install lands every declared source byte-for-byte.
 
 ## 📊 Overview
 
 ```mermaid
 flowchart LR
     subgraph Phase1["Phase 1 — Installable default profile"]
-        F1[F1.1 Populate ai-toolkit/default/]
+        F1[F1.1 Shared skills and native agents]
         F2[F1.2 catalog.yaml manifest]
-        F3[F1.3 setup-ai.md installer]
+        F3[F1.3 Self-updating launcher]
         F4[F1.4 README as product front]
         F5[F1.5 Automated install verification]
     end
@@ -35,25 +35,25 @@ flowchart LR
 
 ## 🚀 Phase 1 — Installable default profile
 
-This phase delivers the whole product as scoped for v1: a populated `default` profile catalog, the `setup-ai` installer (Claude Code native, Codex CLI best-effort), and a README that lets someone else install the kit unassisted.
+This phase delivers the completed product evolution: a declarative remote catalog, shared skills with native agent artifacts, and a local self-updating launcher that installs the selected profile and agent unassisted.
 
 | # | Feature | Depends on | Status | Notes |
 |---|---|---|---|---|
-| F1.1 | Populate `ai-toolkit/default/commands/` + `ai-toolkit/default/agents/` | — | ✅ Done | Copied from the maintainer's local skills vault (`D:\MisProyectos\0_TEMPLATES\SETUP-AI`), not authored from scratch (ADR-005) |
+| F1.1 | Populate shared `ai-toolkit/skills/` + native `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/` | — | ✅ Done | Skills have one distributable source; each agent keeps its native artifact and catalog routes (ADR-005) |
 | F1.2 | `catalog.yaml` manifest | F1.1 | ✅ Done | Declares the `default` profile: skill/agent list and source paths (ADR-003) |
-| F1.3 | `setup-ai.md` installer | F1.2 | ✅ Done | One-liner + copy-paste methods; always asks profile and target agent (ADR-004); fetches and writes, translating to Codex format at install time when needed (ADR-002) |
+| F1.3 | Local self-updating launcher and embedded installer engine | F1.2 | ✅ Done | Explicit auto-update; fetches the remote catalog and artifacts, bootstraps the selected profile/agent, copies sources literally, and asks Codex decisions one at a time (ADR-004) |
 | F1.4 | README as product front | F1.3 | ✅ Done | Presents the kit, both install methods, and the `default` profile catalog |
 | F1.5 | Automated install verification check | F1.3 | ✅ Done | Installs into a dummy/scratch folder and confirms every catalog file was copied unmodified |
 
-**Phase 1 closing criterion** — F1.5's automated check runs against a dummy folder using both install methods with Claude Code as the target, and confirms every file declared in `catalog.yaml` for the `default` profile was installed and matches its `ai-toolkit/default/` source unmodified. The same check is attempted against Codex CLI at least once and its result documented, without blocking the gate if it fails (best-effort per ADR-002).
+**Phase 1 closing criterion** — F1.5's automated check runs against a dummy folder and confirms every source declared by the selected profile and agent in `catalog.yaml` was installed as a byte-for-byte copy. The same check is attempted against Codex CLI at least once and its result documented; additional runtime validation remains future work.
 
 ## 🔗 Dependency Graph
 
 ```mermaid
 flowchart LR
-    VAULT[(Local skills vault<br/>D:\MisProyectos\0_TEMPLATES\SETUP-AI)] -.copied manually.-> F1[F1.1 Populate ai-toolkit/default/]
+    CATALOG[(Remote declarative catalog)] -.declares sources.-> F1[F1.1 Shared skills and native agents]
     F1 --> F2[F1.2 catalog.yaml]
-    F2 --> F3[F1.3 setup-ai.md]
+    F2 --> F3[F1.3 Self-updating launcher]
     F3 --> F4[F1.4 README]
     F3 --> F5[F1.5 Automated verification]
     F4 --> GATE{Final Gate}
@@ -72,7 +72,7 @@ flowchart LR
 ## 🚫 Out of Roadmap
 
 - **Additional profiles beyond `default`** — First one delivered: the `ui-ux` profile (superset of `default`, plus `ui-spec`/`clarify-uix` skills) shipped via specs/001-add-ui-ux-profile-with-new-ui-spec-and-clarify-uix. Further profiles beyond `ui-ux` remain Future ([[product-spec]]).
-- **Verified Codex CLI support** (beyond best-effort) — Future ([[product-spec]]).
+- **Additional Codex runtime validation** — Future ([[product-spec]]); native Codex support is present, but broader runtime coverage remains to be verified.
 - **Support for other AI agents** (Devin, Cursor, Windsurf, etc.) — Out of scope / Future ([[product-spec]]).
 - **Per-skill granular versioning or rollback** — Out of scope ([[product-spec]]).
 - **Catalog version notifications** — Future ([[product-spec]]).

@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-03 |
+> | **Updated** | 2026-08-07 |
 > | **Version** | v0.1 |
 
 ## 🎯 Vision
@@ -20,7 +20,7 @@
 | Reproducing the same set of skills/agents in every new repo means copying `.claude/` folders by hand | There is no centralized distribution mechanism; every repo keeps its own copy, which drifts out of sync over time |
 | Spec-driven development flows (product-spec, tech-spec, roadmap, plan-feature, implement-feature...) get reinvented project by project | There is no standard, versioned, reusable catalog in a single place |
 | Installing AI tooling in a repo usually drags in dependencies, package managers, and configuration | Existing solutions (plugins, npm packages, marketplaces) add friction and failure surface |
-| Every AI coding agent (Claude Code, Codex CLI...) expects its skills/commands in a different location and format | There is no installation layer that translates a single catalog into each agent's native format |
+| Every AI coding agent (Claude Code, Codex CLI...) expects its skills and agents in different native locations and formats | There is no installation layer that copies a shared skills source and native agent artifacts to each agent's destinations |
 
 ## 👤 Target User
 
@@ -30,37 +30,37 @@
 
 ## 💎 Design Principles
 
-- **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. No package manager, no library, and nothing to install globally beyond a single optional pointer file (the `/setup-ai` launcher) that the user has to say yes to.
+- **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. No package manager, no library, and nothing to install globally beyond a single optional `/setup-ai` launcher that the user has to say yes to.
 - **README as product** — the README is the kit's "front": it must convince and allow installing in under 2 minutes. It is treated as the main piece, not an afterthought.
 - **Extensible profiles from day one** — the catalog now ships two profiles, `default` and `ui-ux` (a superset of `default`'s catalog plus the `ui-spec` and `clarify-uix` skills), and the installation mechanism detects and asks about available profiles without needing a redesign when more are added.
-- **Multi-agent by adaptation, not lowest common denominator** — every supported agent (Claude Code, Codex CLI) receives the catalog translated into its native format (`.claude/commands` + `.claude/agents` vs. `.codex/skills`), not a degraded generic version.
+- **Multi-agent by shared skills and native agents** — every supported agent receives the same literal skill source at its native skills path, while its agents remain native artifacts (`.md` for Claude Code and `.toml` for Codex), without runtime translation.
 - **Deliberately vendor-agnostic delivery** — the kit is distributed as plain-text instructions fetched over plain HTTPS, never published to a single vendor's proprietary channel (e.g. the Claude Code plugin/marketplace system, see ADR-007 in tech-spec.md). This is a conscious tradeoff, not an oversight: it keeps the same one-liner/copy-paste mechanism usable by any AI agent capable of fetching and following instructions, so support can extend to more providers over time (today Claude Code and Codex CLI) without being tied to, or gated by, any one agent's ecosystem.
 - **Direct, jargon-free tone** — installer messages, README, and skill names are clear, short, and have a light, easygoing touch ("Keep it AIsy"), never sounding corporate.
-- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself is versioned via git tags `vX.Y.Z` only — there is no `VERSION` file — computed and pushed automatically on merge to `main` from the PR title's prefix (`release:`/`feature:`/`fix:`/`chore:`, per CLAUDE.md); see ADR-006 in tech-spec.md. That versioning is decoupled from, and does not affect, how the catalog gets installed.) The global `/setup-ai` launcher obeys the distribution rule by carrying no embedded content at all: it is a pointer that re-fetches the live instructions on every run, so it cannot go stale and needs no update mechanism of its own.
+- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself is versioned via git tags `vX.Y.Z` only — there is no `VERSION` file — computed and pushed automatically on merge to `main` from the PR title's prefix (`release:`/`feature:`/`fix:`/`chore:`, per CLAUDE.md); see ADR-006 in tech-spec.md. That versioning is decoupled from, and does not affect, how the catalog gets installed.) The optional global launcher embeds its platform template: when run, it may download the template from `setup-ai.md`, compares it with its own content, updates only when it differs, and continues the installation if that update fails.
 
 ## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
     U[User in a target repo] -->|"one-liner from the README, or pasted instructions"| S[setup-ai]
-    U -->|"/setup-ai — if the launcher was saved earlier"| L["Global launcher<br/>(one pointer file, user level)"]
-    L -->|"fetches the live setup-ai on every run"| S
+    U -->|"/setup-ai — if the launcher was saved earlier"| L["Global launcher<br/>(embedded platform template, user level)"]
+    L -->|"may compare/update its template, then runs setup"| S
     S -.->|"offers to save it once, only if the user says yes"| L
     S -->|fetch| CAT[(my-aisy-toolkit<br/>profile catalog)]
     CAT -->|available profiles| S
     S -->|asks for profile if more than one| U
     S -->|asks which agent| U
     U -->|answers| AG{AI Agent}
-    AG -->|Claude Code| CC[".claude/commands + .claude/agents"]
-    AG -->|Codex CLI — best-effort| CX[".codex/skills"]
+    AG -->|Claude Code| CC[".claude/skills + .claude/agents"]
+    AG -->|Codex CLI — best-effort| CX[".agents/skills + Codex native agents"]
     CC --> D[Target repo ready for<br/>spec-driven development]
     CX --> D
 ```
 
 - **User** — starts the installation from the repo where they want the kit, by one of two routes: the one-liner from the README, or the global `/setup-ai` launcher if they saved it in an earlier install. Picks a profile if asked. Does not interact directly with the `my-aisy-toolkit` repo.
-- **setup-ai** — entry point (instructions/script) that fetches the catalog, always asks the user which AI agent to target (never inferred from the target repo's structure), asks for the profile only if the catalog declares more than one, and writes the corresponding files into the target repo. Both routes land here and run the exact same steps. Does not modify target-repo application code or configuration unrelated to skills/agents; the only thing it may write outside the target repo is the global launcher, and only with the user's explicit yes.
-- **Global launcher (`/setup-ai`)** — optional shortcut, saved once at user level and living outside any repo. It is a pointer with no logic and no catalog content of its own: all it does is fetch the live `setup-ai` and run it against whatever repo is open, skipping the offer to save itself. `setup-ai` offers it at the end of an install, starting from the agent the user already confirmed in Step 1 as the default candidate; its own directory-presence check (`~/.claude/`, `~/.codex/`, `~/.agents/`) only decides whether that confirmed agent's candidacy survives and whether the other agent joins as an additional candidate. If the confirmed agent is dropped — file already exists, or its directory genuinely doesn't exist — the user is told why in the same turn, not just in the Wrap-up. Offered only once, and never overwrites a file that already sits at its destination.
-- **my-aisy-toolkit (catalog)** — single source of truth for profiles, skills, and agents, published under `/ai-toolkit/<profile>/` (e.g. `/ai-toolkit/default/`). Does not execute itself; it only serves as content for `setup-ai` to consume. This is decoupled from the repo's own internal `.claude/` folder, which is used only to develop this toolkit itself (dogfooding) and is never what gets installed into a target repo.
+- **setup-ai** — entry point (instructions/script) that fetches the catalog, always asks the user which AI agent to target (never inferred from the target repo's structure), asks for the profile only if the catalog declares more than one, and writes the corresponding files into the target repo. Skills are copied literally from `ai-toolkit/skills/<name>/SKILL.md` to `.claude/skills/<name>/SKILL.md` or `.agents/skills/<name>/SKILL.md`; agents are copied from `ai-toolkit/agents/claude/*.md` and `ai-toolkit/agents/codex/*.toml` to their native destinations. Both routes land here and run the exact same steps.
+- **Global launcher (`/setup-ai`)** — optional shortcut, saved once at user level and living outside any repo. It contains the platform template. On execution it may download the current template from `setup-ai.md`, compares it, updates itself only if different, and continues with the embedded installation flow if the check or update fails. `setup-ai` offers it at the end of an install only with the user's explicit yes, and reports any unavailable candidate or write failure without reverting the completed catalog install.
+- **my-aisy-toolkit (catalog)** — single source of truth: shared skills under `/ai-toolkit/skills/<name>/SKILL.md` and separate native agents under `/ai-toolkit/agents/claude/*.md` and `/ai-toolkit/agents/codex/*.toml`; `catalog.yaml` declares their installed paths. It does not execute itself; it only serves content for `setup-ai` to consume. This is decoupled from the repo's own internal `.claude/` folder, which is used only to develop this toolkit itself (dogfooding) and is never what gets installed into a target repo.
 - **Target repo** — receives the installed files and becomes operational for spec-driven development through the corresponding AI agent's skills. Each skill/agent's internal logic lives in its own self-documented file.
 
 ## 🛠️ Interfaces
@@ -89,20 +89,20 @@ Plain-text block the user pastes directly into the conversation of any AI coding
 
 #### Global launcher (`/setup-ai`)
 
-Optional shortcut so the user never has to go back to the README. It is **not** a copy of `setup-ai`: it is one small file whose entire body is "fetch the live `setup-ai` from GitHub and follow it against the current repo", plus an explicit instruction not to offer saving the launcher again — it is already installed.
+Optional shortcut so the user never has to go back to the README. It is an embedded platform-specific `setup-ai` template. Each execution may download the matching template from `setup-ai.md`, compares it with the local launcher, updates only when it differs, then continues the setup; a failed check or update never blocks setup.
 
 | Agent | Where it's saved | How it's invoked |
 |-------|------------------|------------------|
 | Claude Code | `~/.claude/commands/setup-ai.md` | `/setup-ai` (optional `[profile]` argument) |
-| Codex CLI — best-effort | `~/.codex/skills/setup-ai/SKILL.md` (fallback `~/.agents/skills/setup-ai/SKILL.md`) | `$setup-ai` — a `$` skill, not a slash command |
+| Codex CLI — best-effort | `~/.agents/skills/setup-ai/SKILL.md` | `$setup-ai` — a `$` skill, not a slash command |
 
-> The Codex row is best-effort like the rest of Codex support: the user-level path has not been verified against a real Codex CLI install, and there the command is `$setup-ai`, never `/setup-ai`.
+> The Codex row is best-effort like the rest of Codex support: its native skills location is `.agents/skills/`, and the command is `$setup-ai`, never `/setup-ai`.
 
 How it gets there:
 
 - **Only with an explicit yes.** `setup-ai` asks once, at the very end, after the repo is already set up. A no, a silence, or an ambiguous answer are all treated as no, and nothing outside the repo is written.
-- **Confirmed-agent-first, environment-checked.** The agent confirmed in Step 1 is always the starting candidate for the offer. The directory-existence check (`~/.claude/`, `~/.codex/` or `~/.agents/`) still runs, but now it only decides (a) whether that confirmed agent's candidacy survives, and (b) whether the other, non-confirmed agent joins as an additional candidate. If the confirmed agent is dropped — its launcher file already exists, or its user-level directory genuinely doesn't exist — `setup-ai` says so explicitly in that same turn, not only in the Wrap-up. This environment check is only about the launcher — it never replaces the mandatory "which agent am I setting this up for?" question, which is always asked.
-- **Only once.** If a file already sits at the destination, it is not opened, not compared, and not overwritten; the question is not asked again either, and the install reports that it left the existing file alone. Replacing it is a manual job: delete it and run the setup again.
+- **Confirmed-agent-first, environment-checked.** The agent confirmed in Step 1 is always the starting candidate for the offer. The directory-existence check (`~/.claude/`, `~/.codex/` or `~/.agents/`) decides whether that confirmed agent's candidacy survives and whether the other agent joins as an additional candidate. If the confirmed agent is dropped because its user-level directory genuinely does not exist, `setup-ai` says so explicitly in that same turn. This environment check is only about the launcher — it never replaces the mandatory "which agent am I setting this up for?" question, which is always asked.
+- **Safe template refresh.** If a launcher already exists, it is retained when it matches the downloaded platform template; when it differs, the launcher may update it before continuing. A refresh failure is reported but never prevents the catalog installation.
 - **Never blocking.** If the write fails (permissions, no home directory, disk), the catalog install already finished and is not reverted — the user just gets the reason in the wrap-up report.
 
 > [!warning] Side effect
@@ -142,7 +142,7 @@ Running any of the methods above on a repo that already has the kit installed. A
 | `ui-developer` | Designs and implements complete screens (HTML/CSS/TS/React). |
 | `judge` | Reviews other agents' work and issues a PASS / CHANGES_REQUESTED verdict. |
 
-> Codex CLI has no native equivalent to subagents; in best-effort mode only the **skills** catalog is translated to `.codex/skills/`.
+> Codex CLI receives the same skills copied literally to `.agents/skills/<name>/SKILL.md` and its native agent artifacts from `ai-toolkit/agents/codex/*.toml`; Claude Code receives literal skills in `.claude/skills/<name>/SKILL.md` and `ai-toolkit/agents/claude/*.md` in its native agents location.
 
 #### `ui-ux` profile
 
@@ -155,9 +155,11 @@ Superset of `default`'s 10 skills and 6 agents, plus:
 
 Agents: identical to `default`'s 6 agents — no new agent introduced.
 
+Across shared skills, Claude Code preserves each skill's own questioning flow. In Codex, each turn presents exactly one pending question, with identifiable options and an explicit invitation to answer with an option or free text; unresolved free-text decisions are recorded as gaps and only independent work continues. If Codex has no native question tool, the skill uses conversational fallback. When applicable, prompts use the language of the user's latest message.
+
 ### Catalog — Utils pack (optional)
 
-`packs.utils` is an optional, non-profile group of skills, independent of the chosen profile. It is asked as a single non-blocking question during install only if the catalog declares a `packs.utils` section; installed files get an `aisy.` prefix (`aisy.<skill>.md` for Claude Code, `aisy.<skill>/SKILL.md` for Codex CLI) to avoid collisions with the user's own skills.
+`packs.utils` is an optional, non-profile group of skills, independent of the chosen profile. It is asked as a single non-blocking question during install only if the catalog declares a `packs.utils` section; its literal shared files get an `aisy.` prefix at `.claude/skills/aisy.<skill>/SKILL.md` or `.agents/skills/aisy.<skill>/SKILL.md` to avoid collisions with the user's own skills.
 
 | Skill | What it does |
 |-------|----------|
@@ -169,7 +171,7 @@ Agents: identical to `default`'s 6 agents — no new agent introduced.
 
 **Healthcheck**
 
-Verifying the installation means checking that the expected files for the installed profile exist: `.claude/commands/*.md` and `.claude/agents/*.md` for Claude Code, or `.codex/skills/*/SKILL.md` for Codex. There is no running process or endpoint to query — it's a file-presence check.
+Verifying the installation means checking that the expected files for the installed profile exist: `.claude/skills/*/SKILL.md` and `.claude/agents/*.md` for Claude Code, or `.agents/skills/*/SKILL.md` and the installed Codex native `*.toml` agents for Codex. There is no running process or endpoint to query — it's a file-presence check.
 
 **Logging**
 
@@ -179,7 +181,7 @@ Verifying the installation means checking that the expected files for the instal
 
 | Deliverable | Description |
 |:-----------:|-------------|
-| 💻 **Catalog (source code)** | `/ai-toolkit/<profile>/commands/` (skills) and `/ai-toolkit/<profile>/agents/` (subagents) per profile — today `default` and `ui-ux` (a superset of `default` plus `ui-spec`/`clarify-uix`, reusing `default`'s agents) — plus `/ai-toolkit/utils/commands/` (optional Utils pack: `digest`, `grill-me`, `for-dummies`), the canonical versions `setup-ai` fetches from. Populated from the maintainer's local skills vault, not authored from scratch in this repo. |
+| 💻 **Catalog (source code)** | Shared skills at `/ai-toolkit/skills/<name>/SKILL.md`, copied literally to each platform's skills directory; native agents at `/ai-toolkit/agents/claude/*.md` and `/ai-toolkit/agents/codex/*.toml`; `catalog.yaml` declares profile membership and every destination path. The optional Utils skills use the same shared-skill structure and `aisy.` destination prefix. |
 | 🛠️ **setup-ai** | Installation instructions/script: one-liner method and copy-paste method. |
 | 📚 **README** | Presents the kit, installation instructions (both methods), the `default` profile catalog, and a quick usage guide. |
 
@@ -192,13 +194,12 @@ Verifying the installation means checking that the expected files for the instal
 > │   ├── commands/
 > │   └── agents/
 > ├── ai-toolkit/
-> │   ├── default/         # Distributable catalog, profile "default"
-> │   │   ├── commands/    # Skill catalog (10 skills)
-> │   │   └── agents/      # Subagent catalog (6 agents)
-> │   ├── ui-ux/           # Distributable catalog, profile "ui-ux" (superset of default + 2 skills)
-> │   │   └── commands/    # ui-spec.md, clarify-uix.md (agents reused from default/agents/)
-> │   └── utils/           # Optional Utils pack (non-profile), installed with the "aisy." prefix
-> │       └── commands/    # digest, grill-me, for-dummies
+> │   ├── skills/          # One shared source per skill
+> │   │   └── <name>/SKILL.md
+> │   ├── agents/
+> │   │   ├── claude/      # Native Claude Code agent (*.md)
+> │   │   └── codex/       # Native Codex agent (*.toml)
+> │   └── catalog.yaml     # Profile membership and installed destinations
 > ├── specs/               # product-spec.md, tech-spec.md, roadmap.md for this repo itself
 > ├── setup-ai.md          # Plain-text installation instructions (root)
 > └── README.md            # Project front: installation, catalog, usage
@@ -220,7 +221,7 @@ Verifying the installation means checking that the expected files for the instal
 
 ## ❓ Discovery
 
-- [x] ~~Is Codex CLI supported in v1?~~ → Yes, in best-effort mode (translated to `.codex/skills/`), documented as unverified in a real environment until it can be tested.
+- [x] ~~Is Codex CLI supported in v1?~~ → Yes, in best-effort mode: shared skills are copied literally to `.agents/skills/` and Codex agents use native `.toml` artifacts, documented as unverified in a real environment until it can be tested.
 - [x] ~~How is the catalog versioned?~~ → Catalog *distribution* always brings the latest of the main branch; no semantic versioning or version selection there. Separately, the repo itself is now SemVer-tagged automatically: merging a PR to `main` computes and pushes the next `vX.Y.Z` git tag from the PR title prefix (`release:`/`feature:`/`fix:`/`chore:`, enforced by a required precheck — see CLAUDE.md and ADR-006 in tech-spec.md); there is no `VERSION` file, the git tag is the sole source of truth. The two are independent: bumping the repo version never changes what `setup-ai` installs.
 - [x] ~~Tone for user-facing content?~~ → Direct, jargon-free, with a light easygoing touch ("Keep it AIsy").
 - [x] ~~Exact location of the `setup-ai` script/instructions within the repo?~~ → Repo root (`setup-ai.md`), per tech-spec.md.
