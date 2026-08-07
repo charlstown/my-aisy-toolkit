@@ -17,7 +17,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/skills-15-blue?style=flat-square" alt="Skills">
   <img src="https://img.shields.io/badge/agents-6-informational?style=flat-square" alt="Agentes">
-  <img src="https://img.shields.io/badge/updated-2026--08--03-lightgrey?style=flat-square" alt="Actualizado">
+  <img src="https://img.shields.io/badge/Claude_Code-compatible-7C3AED?style=flat-square" alt="Compatible con Claude Code">
+  <img src="https://img.shields.io/badge/Codex_CLI-compatible-10A37F?style=flat-square" alt="Compatible con Codex CLI">
 </p>
 
 <p align="center">
