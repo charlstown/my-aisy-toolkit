@@ -16,8 +16,9 @@
 
 ## Batch 2 — Cobertura de regresión y validación en entorno aislado
 
-- [ ] @test-developer · Definir cobertura verificable del flujo de Step 6: añadir o, si el repositorio no dispone de infraestructura automatizada para estas instrucciones ejecutadas por agentes, documentar casos manuales reproducibles en un directorio HOME temporal que cubran el recuadro ASCII, una sola confirmación, detección previa de Claude y Codex, ausencia de una o ambas rutas, copia idempotente y fallo de detectabilidad posterior a la copia.
-- [ ] @tester · Ejecutar la validación aislada del lanzador global: usando un repositorio de prueba y un HOME temporal, comprobar la instalación correcta de ambos artefactos y su detección/invocación desde un segundo repositorio, además de los diagnósticos cuando falte la ruta de Claude, Codex o ambas; registrar comandos, rutas temporales y resultados sin tocar el HOME real.
+- [x] @test-developer · Definir cobertura verificable del flujo de Step 6: añadir o, si el repositorio no dispone de infraestructura automatizada para estas instrucciones ejecutadas por agentes, documentar casos manuales reproducibles en un directorio HOME temporal que cubran el recuadro ASCII, una sola confirmación, detección previa de Claude y Codex, ausencia de una o ambas rutas, copia idempotente y fallo de detectabilidad posterior a la copia.
+- [blocked] @tester · Ejecutar la validación aislada del lanzador global: usando un repositorio de prueba y un HOME temporal, comprobar la instalación correcta de ambos artefactos y su detección/invocación desde un segundo repositorio, además de los diagnósticos cuando falte la ruta de Claude, Codex o ambas; registrar comandos, rutas temporales y resultados sin tocar el HOME real.
+  - Reason: La sesión dinámica de Codex/Claude no puede conectarse a la API desde este entorno; la validación estructural con HOME temporal pasó, pero faltan los escenarios interactivos y de detección en repo-b.
 
 ## Batch 3 — Revisión de calidad
 
