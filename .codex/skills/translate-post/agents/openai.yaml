@@ -1,0 +1,4 @@
+interface:
+  display_name: "Translate Post"
+  short_description: "Translate posts with tone and formatting preserved"
+  default_prompt: "Use $translate-post to translate this post for the target audience."

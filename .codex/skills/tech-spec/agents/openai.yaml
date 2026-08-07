@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tech Spec"
+  short_description: "Create a technical architecture specification"
+  default_prompt: "Use $tech-spec to create or update the project TechSpec."

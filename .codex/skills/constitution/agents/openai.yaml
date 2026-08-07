@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Constitution"
+  short_description: "Bootstrap product, technical, and roadmap specs"
+  default_prompt: "Use $constitution to build the project foundation specs in order."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clarify Feature"
+  short_description: "Resolve documented requirement gaps"
+  default_prompt: "Use $clarify-feature to resolve the open decisions in a feature requirements file."

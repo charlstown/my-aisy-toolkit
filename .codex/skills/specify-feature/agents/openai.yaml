@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specify Feature"
+  short_description: "Create feature requirements from available sources"
+  default_prompt: "Use $specify-feature to turn feature input into a requirements document."

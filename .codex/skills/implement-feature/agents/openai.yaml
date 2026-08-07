@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Feature"
+  short_description: "Execute approved feature plans safely"
+  default_prompt: "Use $implement-feature to execute pending tasks from feature plans."
