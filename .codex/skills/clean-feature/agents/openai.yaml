@@ -1,4 +1,0 @@
-interface:
-  display_name: "Clean Feature"
-  short_description: "Align specs and archive completed work"
-  default_prompt: "Use $clean-feature to align root specs and clean a completed feature folder."

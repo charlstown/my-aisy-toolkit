@@ -1,4 +1,0 @@
-interface:
-  display_name: "Plan Feature"
-  short_description: "Turn requirements into an implementation plan"
-  default_prompt: "Use $plan-feature to create an actionable plan from a requirements file."

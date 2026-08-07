@@ -1,4 +1,0 @@
-interface:
-  display_name: "Digest"
-  short_description: "Research a vague question and recommend a path"
-  default_prompt: "Use $digest to investigate a question and compare a recommendation with an alternative."

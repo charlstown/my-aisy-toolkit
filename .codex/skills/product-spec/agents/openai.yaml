@@ -1,4 +1,0 @@
-interface:
-  display_name: "Product Spec"
-  short_description: "Create a focused product specification"
-  default_prompt: "Use $product-spec to create or update the project ProductSpec."

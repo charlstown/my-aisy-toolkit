@@ -1,4 +1,0 @@
-interface:
-  display_name: "New GitHub Issue"
-  short_description: "Investigate and document a GitHub issue"
-  default_prompt: "Use $new-issue to create a well-documented bug or feature issue."
