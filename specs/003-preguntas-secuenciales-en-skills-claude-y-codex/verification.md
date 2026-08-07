@@ -13,4 +13,4 @@ Fecha: 2026-08-07
 | Regresión de Claude | Conserva el mecanismo indicado por cada skill; no se modifica ninguna variante duplicada. | PASS |
 | Ejemplo `description: none` | Se declara ilustrativo y no obligatorio. | PASS |
 
-Comprobación estática adicional: no hay referencias a `userAsqTool` en `AGENTS.md` ni en las skills compartidas bajo `.agents/skills/`.
+Comprobación estática adicional: no hay referencias a `userAsqTool` en `AGENTS.md` ni en las skills compartidas bajo `ai-toolkit/skills/`.
