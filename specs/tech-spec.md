@@ -10,6 +10,8 @@
 
 ## 📌 Scope
 
+> **Current catalog architecture.** `ai-toolkit/skills/<name>/SKILL.md` is the sole distributable skill source and is copied byte-for-byte. Native agents are stored independently at `ai-toolkit/agents/claude/*.md` and `ai-toolkit/agents/codex/*.toml`; `catalog.yaml` supplies all literal paths. Any older passage below that describes command-folder distribution or runtime translation is historical context superseded by ADR-002.
+
 This document covers the technical installation mechanism (`setup-ai`) and the catalog format (skills and agents, currently spanning the `default` and `ui-ux` profiles, plus optional non-profile packs such as `utils`) for Claude Code and, in best-effort mode, Codex CLI. The product's what and why are already defined in [[product-spec]]; this document only answers the how.
 
 ## 🧱 Tech Stack
@@ -211,16 +213,17 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 - (-) Behavior depends on the agent correctly interpreting natural-language instructions; it's not deterministic like code.
 - Mitigation: explicit, step-by-step instructions in `setup-ai.md`, manually verified in a scratch repo before publishing changes.
 
-### ADR-002: Codex translation at install time, no pre-generated catalog
+### ADR-002: Shared skills and native agents
 
-**Decision**: The repo only maintains the catalog in Claude Code's native format (`.claude/commands`, `.claude/agents`). The translation to `.codex/skills/*/SKILL.md` is done by the agent itself at install time, following the instructions in `setup-ai.md`.
+**Decision**: Each distributable skill exists once at `ai-toolkit/skills/<name>/SKILL.md` and is copied byte-for-byte to either agent's native skill destination. Agents remain native artifacts: Claude Markdown under `ai-toolkit/agents/claude/` and Codex TOML under `ai-toolkit/agents/codex/`.
 
-**Context**: Maintaining both formats in parallel in the repo was considered. It was discarded because it would duplicate maintenance for every new skill, and because there is currently no way to test Codex in a real environment to verify a pre-generated version would be correct.
+**Context**: Runtime translation made installs non-deterministic. A shared `SKILL.md` preserves a single skill source without asking the installer to reinterpret it, while agents retain the formats their platforms require.
 
 **Consequences**:
-- (+) A single source of truth for the catalog; zero duplicated maintenance.
-- (-) Higher risk of inconsistent or incorrect translations since they can't be validated against a real Codex before publishing.
-- Mitigation: Codex support documented as best-effort in [[product-spec]]; reconsider a pre-generated catalog if Codex usage grows.
+- (+) Reproducible, byte-for-byte skill installation for both platforms.
+- (+) Deliberate agent differences are explicit and independently reviewable.
+- (-) Maintainers must keep the manifest coverage current.
+- Mitigation: `AGENTS.md` is the maintenance source of truth and PR review checks `default`, `ui-ux`, and `utils` coverage.
 
 ### ADR-003: `catalog.yaml` as an explicit catalog manifest
 
@@ -272,9 +275,9 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 
 **Release process (automated via GitHub Actions)**: the maintainer's whole "release step" is opening a PR titled with the correct prefix (`release:`/`feature:`/`fix:`/`chore:`, case-insensitive, per the table in `CLAUDE.md`). `pr-title-check.yml` runs as a required status check on `opened`/`edited`/`synchronize` and blocks the merge of any PR whose title doesn't start with one of those prefixes. On merge to `main`, `publish-version-tag.yml` reads the merged PR's title prefix and the latest existing `vX.Y.Z` tag, computes the next tag via `.github/scripts/compute-next-tag.sh`, and pushes it — no manual `VERSION` bump, no manual `git tag`/`git push`, and no GitHub Release created. `CHANGELOG.md` remains hand-maintained and is not touched by either workflow.
 
-### ADR-007: Global launcher as a pointer, not a copy of `setup-ai.md`
+### ADR-007: Embedded global launcher with explicit self-update
 
-**Decision**: The entry point (`setup-ai.md` at the repo root, reached from the README one-liner or by copy-paste) and the optional global launcher (`~/.claude/commands/setup-ai.md`, or `~/.codex/skills/setup-ai/SKILL.md` with `~/.agents/` fallback) are **two different files with two different jobs**. The launcher contains no catalog content and no installation logic of its own — it only fetches the live `setup-ai.md` and follows it — and it is written only with the user's explicit yes, only for a candidate whose user-level directory actually exists — starting from the agent confirmed in Step 1, with any drop from candidacy now announced to the user in the moment — only once, and never over an existing file.
+**Decision**: The optional global launcher contains the setup engine locally. It fetches `setup-ai.md` only when the user explicitly invokes `/setup-ai` or `$setup-ai`, solely to compare and update its own byte-for-byte template; a failed update check never prevents its embedded engine from installing the selected catalog artifacts.
 
 **Context**: Two alternatives were evaluated. (1) **Copying `setup-ai.md` verbatim** into the user-level command directory: it works on day one and then freezes — the copy stops matching the repo the moment the instructions change, which directly contradicts the "always the latest version" principle in [[product-spec]] and would force a launcher update mechanism that doesn't exist. (2) **Using Claude Code's native plugin/marketplace system**, raised and postponed in issue #8 itself: it would solve the same problem with less bespoke text, but it only exists for Claude Code, so Codex CLI would be left with no shortcut at all, and it would couple the product to a single agent's feature — against the "multi-agent by adaptation" principle. Writing the launcher unconditionally (no question) was also discarded outright: the user's home is outside the repo the user asked us to touch.
 
