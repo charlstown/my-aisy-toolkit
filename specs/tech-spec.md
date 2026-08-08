@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-08 |
+> | **Updated** | 2026-08-09 |
 > | **Version** | v0.1 |
 > | **ProductSpec** | [[product-spec]] |
 
@@ -59,7 +59,7 @@ flowchart TB
 
 #### `setup-ai.md` — Installation instructions
 
-Natural-language guide an AI agent follows step by step. It asks for the target, fetches root `/catalog.yaml` using the retained stable direct-download method, shows every profile with its skills, then asks for the profile. It adds all declared utils automatically, constructs a literal in-memory artifact plan, and copies each artifact to the selected target-native `aisy.<name>` destination. Its Step 6 contains the literal native launcher templates and the target-specific authorization contract.
+Natural-language guide an AI agent follows step by step. It asks for the target, fetches exactly root `/catalog.yaml` using the retained stable direct-download method, then validates literally that `profiles` exists and that every artifact declared for the confirmed target is present and has an explicit literal path. Only after that validation does it show every profile with its skills, ask for the profile, add all declared utils automatically, and construct a literal in-memory artifact plan. An invalid or incomplete catalog is reported and terminates execution before any write. Its Step 6 contains the literal native launcher templates and the target-specific authorization contract.
 
 #### Global launcher — user-level command
 
@@ -99,6 +99,7 @@ Presents the kit, documents both installation methods, and serves as the repo's 
 | Global launcher invocation (`/aisy.setup-ai`, `$aisy.setup-ai`) | Native command/skill installed by Step 6 | Selected user-level agent directory | Invokes the embedded maintenance instructions from any repository; Step 6 does not self-update launcher templates |
 | Global launcher installation (Step 6) | Target-root check, one authorization, literal copy and post-copy checks | Selected Claude or Codex user-level directory | Never reads or writes the other target. It creates only a needed subdirectory under an existing root and reuses the retained bootstrap template. |
 | Fetch the manifest | Stable direct GET (agent/environment capability) | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/catalog.yaml` | The exact URL only. Structural method failures are remembered for the run; resource failures retry the remaining compatible chain. |
+| Validate the manifest | Literal structural validation before profile display or planning | In-memory root `/catalog.yaml` | Requires `profiles` and a present, explicit literal path for every artifact declared for the confirmed target; an invalid or incomplete catalog is reported and terminates before any write. |
 | Fetch each declared artifact | Stable direct GET | `raw.githubusercontent.com/.../main/ai-toolkit/skills/<name>/SKILL.md`, `ai-toolkit/agents/claude/*.md`, or `ai-toolkit/agents/codex/*.toml` | One request per manifest-declared file; bytes are retained in memory when possible and copied literally to the selected target-native destination. |
 | Install shared skill | Literal byte copy | Target repo | `.claude/skills/aisy.<name>/SKILL.md` for Claude; `.agents/skills/aisy.<name>/SKILL.md` for Codex |
 | Install native agent | Literal file copy | Target repo | `.claude/agents/*.md` for Claude; `.codex/agents/*.toml` for Codex |
@@ -222,7 +223,7 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 
 ### ADR-003: `catalog.yaml` as an explicit catalog manifest
 
-**Decision**: A single root `catalog.yaml` declares every profile artifact and every automatic `packs.utils` artifact with its literal source path: shared skills under `ai-toolkit/skills/<name>/SKILL.md`, Claude agents under `ai-toolkit/agents/claude/*.md`, and Codex agents under `ai-toolkit/agents/codex/*.toml`. It contains no persistent hashes or other integrity metadata. The installer never derives paths from a profile-folder convention or dynamically lists remote directories.
+**Decision**: A single root `catalog.yaml` declares every profile artifact and every automatic `packs.utils` artifact with its literal source path: shared skills under `ai-toolkit/skills/<name>/SKILL.md`, Claude agents under `ai-toolkit/agents/claude/*.md`, and Codex agents under `ai-toolkit/agents/codex/*.toml`. After fetching exactly that root manifest, the installer requires `profiles` and validates that every artifact declared for the confirmed target is present with an explicit literal path before it displays profiles or skills, asks for the profile, or constructs the plan; an invalid or incomplete catalog is reported and stops execution before any write. It contains no persistent hashes or other integrity metadata. The installer never derives paths from a profile-folder convention or dynamically lists remote directories.
 
 **Context**: Having the agent list `.claude/commands/` and `.claude/agents/` directly via the GitHub API was considered. It was discarded because it depends on the agent having a tool to list remote directories (not all do), and because an explicit manifest lets profiles be defined independently of the repo's folder structure.
 
