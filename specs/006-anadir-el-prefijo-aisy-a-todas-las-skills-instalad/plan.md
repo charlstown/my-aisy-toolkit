@@ -2,7 +2,7 @@
 
 ## Batch 1 — Alcance y mapa de migración
 
-- [ ] @architect · Inventariar nombres y superficies publicadas: recorrer `catalog.yaml`, `ai-toolkit/skills/`, `setup-ai.md`, las plantillas de lanzador y la documentación para relacionar cada skill distribuible con su nombre fuente, destino instalado, comando de Claude Code y comando de Codex; dejar explícito que los directorios fuente no se renombran y que no habrá migración ni borrado de nombres históricos locales.
+- [x] @architect · Inventariar nombres y superficies publicadas: recorrer `catalog.yaml`, `ai-toolkit/skills/`, `setup-ai.md`, las plantillas de lanzador y la documentación para relacionar cada skill distribuible con su nombre fuente, destino instalado, comando de Claude Code y comando de Codex; dejar explícito que los directorios fuente no se renombran y que no habrá migración ni borrado de nombres históricos locales.
 
 ## Batch 2 — Registro e instalación con el nuevo identificador
 
