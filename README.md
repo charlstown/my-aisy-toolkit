@@ -45,7 +45,7 @@ Fetch and follow the setup instructions at https://raw.githubusercontent.com/cha
 
 Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes.
 
-`setup-ai` is the installer: it asks which platform and profile you want, reads the declared catalog, and copies the selected skills and native agents into your repository. See the [detailed catalog](ai-toolkit/README.md) to compare the `default`, `ui-ux`, and optional `utils` selections before installing.
+`/aisy.setup-ai` is the installer: it asks which platform and profile you want, reads the declared catalog, and copies the selected skills and native agents into your repository. New installations use `aisy.<name>` for every skill and leave any historical unprefixed folders untouched. See the [detailed catalog](ai-toolkit/README.md) to compare the `default`, `ui-ux`, and optional `utils` selections before installing.
 
 ---
 
@@ -65,8 +65,8 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 - **15 skills** in total: 10 covering the full spec-driven workflow (`default` profile), +2 for a dedicated UI/UX pass (`ui-ux` profile), +3 optional standalone ones (`utils` pack)
 - **6 subagents** for architecture, implementation, testing, UI, and review
-- **2 catalog profiles**: `default` and `ui-ux` (adds `/ui-spec` and `/clarify-uix`)
-- **1 optional skill pack**: `utils` (`/digest`, `/grill-me`, `/for-dummies`), installable on top of any profile
+- **2 catalog profiles**: `default` and `ui-ux` (adds `/aisy.ui-spec` and `/aisy.clarify-uix`)
+- **1 optional skill pack**: `utils` (`/aisy.digest`, `/aisy.grill-me`, `/aisy.for-dummies`), installable on top of any profile
 - **1 install method**: one URL or one pasted file, nothing to download
 - **2 AI coding agents** supported: Claude Code and Codex CLI, each with its native agent artifacts
 
@@ -74,7 +74,7 @@ And the catalog keeps growing as new skills and agents are added.
 
 ## 🔁 How it works
 
-Point your agent at the setup URL once — that's the only install step. `/constitution` bootstraps the specs (product-spec, tech-spec, roadmap), then every feature goes through the same closed loop: `/specify-feature` scopes it, `/clarify-feature` closes any decision gaps, `/plan-feature` breaks it down, `/implement-feature` builds it, and `/clean-feature` closes the loop by aligning the specs again before the next feature starts.
+Point your agent at the setup URL once — that's the only install step. `/aisy.constitution` bootstraps the specs (product-spec, tech-spec, roadmap), then every feature goes through the same closed loop: `/aisy.specify-feature` scopes it, `/aisy.clarify-feature` closes any decision gaps, `/aisy.plan-feature` breaks it down, `/aisy.implement-feature` builds it, and `/aisy.clean-feature` closes the loop by aligning the specs again before the next feature starts.
 
 <p align="center">
   <img src="assets/skill-cycle.svg" alt="Setup feeds into a repeating cycle: constitution, specify-feature, plan-feature, implement-feature, clean-feature, back to constitution" width="720">
@@ -86,16 +86,16 @@ Point your agent at the setup URL once — that's the only install step. `/const
 
 | Skill | What it does |
 |-------|----------|
-| `/constitution` | Kicks off product-spec and tech-spec in sequence to bootstrap a project's root specs. |
-| `/product-spec` | Generates or updates `specs/product-spec.md` by interviewing the user. |
-| `/tech-spec` | Generates or updates `specs/tech-spec.md` (the technical how) from the product-spec. |
-| `/roadmap` | Generates `specs/roadmap.md` from the product-spec and tech-spec. |
-| `/new-issue` | Opens a bug or feature issue on GitHub, investigating or clarifying depending on type. |
-| `/specify-feature` | Detects features from various sources (including open GitHub issues) and scaffolds a `requirements.md` per feature. |
-| `/clarify-feature` | Closes the pending decision gaps in one or more `requirements.md` files. |
-| `/plan-feature` | Generates `plan.md` from a `requirements.md`, attributing tasks to subagents. |
-| `/implement-feature` | Orchestrates the execution of one or more `plan.md` files using git worktrees. |
-| `/clean-feature` | Aligns the root specs with completed work and closes the associated issue. |
+| `/aisy.constitution` | Kicks off product-spec and tech-spec in sequence to bootstrap a project's root specs. |
+| `/aisy.product-spec` | Generates or updates `specs/product-spec.md` by interviewing the user. |
+| `/aisy.tech-spec` | Generates or updates `specs/tech-spec.md` (the technical how) from the product-spec. |
+| `/aisy.roadmap` | Generates `specs/roadmap.md` from the product-spec and tech-spec. |
+| `/aisy.new-issue` | Opens a bug or feature issue on GitHub, investigating or clarifying depending on type. |
+| `/aisy.specify-feature` | Detects features from various sources (including open GitHub issues) and scaffolds a `requirements.md` per feature. |
+| `/aisy.clarify-feature` | Closes the pending decision gaps in one or more `requirements.md` files. |
+| `/aisy.plan-feature` | Generates `plan.md` from a `requirements.md`, attributing tasks to subagents. |
+| `/aisy.implement-feature` | Orchestrates the execution of one or more `plan.md` files using git worktrees. |
+| `/aisy.clean-feature` | Aligns the root specs with completed work and closes the associated issue. |
 
 **Agents** (Claude Code subagents)
 
@@ -117,8 +117,8 @@ Everything in `default`, plus two skills for a dedicated UI/UX pass (12 skills t
 
 | Skill | What it does |
 |-------|----------|
-| `/ui-spec` | Interviews top-down (content structure → layout → interaction/states → devices/accessibility) to design a UI screen, with concept mockups and a self-critique pass, and writes `specs/ui-spec.md`. |
-| `/clarify-uix` | The UI/UX counterpart to `/clarify-feature`: runs a top-down round of UI/UX questions (4, 8, or 12) and folds the answers into `requirements.md`. |
+| `/aisy.ui-spec` | Interviews top-down (content structure → layout → interaction/states → devices/accessibility) to design a UI screen, with concept mockups and a self-critique pass, and writes `specs/ui-spec.md`. |
+| `/aisy.clarify-uix` | The UI/UX counterpart to `/aisy.clarify-feature`: runs a top-down round of UI/UX questions (4, 8, or 12) and folds the answers into `requirements.md`. |
 
 ## 🧰 Optional pack: `utils`
 
@@ -126,9 +126,9 @@ Standalone skills that don't belong to any profile — installable on top of `de
 
 | Skill | What it does |
 |-------|----------|
-| `/digest` | Turns a vague doubt into a short interrogation, a brief web research pass, and a recommendation with an alternative. |
-| `/grill-me` | Critically interrogates a document to close gaps and inconsistencies, then rewrites it with what it learned. |
-| `/for-dummies` | Explains one or more concepts from a prompt, link, or document like an expert teacher, with examples and optional resources. |
+| `/aisy.digest` | Turns a vague doubt into a short interrogation, a brief web research pass, and a recommendation with an alternative. |
+| `/aisy.grill-me` | Critically interrogates a document to close gaps and inconsistencies, then rewrites it with what it learned. |
+| `/aisy.for-dummies` | Explains one or more concepts from a prompt, link, or document like an expert teacher, with examples and optional resources. |
 
 ## 🗂️ Project structure
 
