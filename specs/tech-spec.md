@@ -154,7 +154,7 @@ The global launchers (Step 6) are verified in the same run using a temporary HOM
 
 **Tools**
 
-No persistent automated tooling in the repo. A temporary automated verification script was built and run once (evidence recorded in `specs/005-automated-install-verification-check/evidence.md`) to confirm the manual scratch-repo flow described above, then deleted by design. Manual verification remains the repeatable process, documented as a conscious limitation in Known Limitations.
+The persistent contract test `.github/scripts/verify-setup-fetch-contract.test.sh` checks the written fetch-recovery rules without making network requests. It covers the bootstrap, catalog, artifact retry (two complete method chains), and the Claude/Codex launcher auto-update paths, including the `CRYPT_E_NO_REVOCATION_CHECK` diagnosis. Run it locally with `bash .github/scripts/verify-setup-fetch-contract.test.sh`; it is not currently wired into GitHub Actions. Manual scratch-repo verification remains necessary for real agent behavior and destination writes.
 
 ## 🔌 Deployment
 
@@ -288,7 +288,7 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 
 ## ⚠️ Known Limitations
 
-- No persistent automated tests or CI/CD for `setup-ai`'s own install-flow: validation of what gets installed and in what format is normally manual, in a scratch repo, before publishing changes to main. A one-off automated verification script (`scripts/verify-install-temp.ps1`) was built and run once to confirm this manual process (see `specs/005-automated-install-verification-check/evidence.md`), then deleted by design — there is no repeatable automated tooling checked into the repo for this purpose. The repo does now have CI/CD for a different, unrelated purpose — PR title validation (`.github/workflows/pr-title-check.yml`, required status check) and automated version-tag publishing (`.github/workflows/publish-version-tag.yml`) — but neither of those tests or verifies `setup-ai`'s installation behavior.
+- The repository has a persistent, network-free contract test for `setup-ai` fetch recovery (`.github/scripts/verify-setup-fetch-contract.test.sh`), but no CI workflow invokes it and it cannot verify a real agent's interpretation or destination writes. Validation of installed files and formats therefore remains manual in a scratch repo before publishing changes to main. Existing CI/CD covers unrelated PR-title validation (`.github/workflows/pr-title-check.yml`) and version-tag publishing (`.github/workflows/publish-version-tag.yml`), not the installation flow.
 - Codex CLI support is best-effort: it hasn't been possible to verify it in a real Codex environment.
 - Shared skills and each platform's native agents are maintained manually; changes require keeping their explicit `catalog.yaml` entries current.
 - Requests to `raw.githubusercontent.com` are anonymous and subject to GitHub's unauthenticated rate limit.
