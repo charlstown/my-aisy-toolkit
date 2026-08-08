@@ -4,7 +4,7 @@
 > | **Status** | 🟢 Done |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-08 |
+> | **Updated** | 2026-08-09 |
 > | **Version** | v0.1 |
 > | **Parent specs** | [[product-spec]] · [[tech-spec]] |
 > | **Scope** | Completed evolution: target-selected `setup-ai` flow for Claude Code and Codex, declarative root catalog, shared `ai-toolkit/skills/`, native agents in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`, literal copying, automatic `packs.utils`, optional target-scoped launchers, transient byte/SHA-256 verification, and conditional discovery |
@@ -41,9 +41,10 @@ This phase delivers the completed product evolution: a declarative remote catalo
 |---|---|---|---|---|
 | F1.1 | Populate shared `ai-toolkit/skills/` + native `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/` | — | ✅ Done | Skills have one distributable source; each agent keeps its native artifact and catalog routes (ADR-005) |
 | F1.2 | `catalog.yaml` manifest | F1.1 | ✅ Done | Declares the `default` profile: skill/agent list and source paths (ADR-003) |
-| F1.3 | Target-scoped `setup-ai` launchers and embedded installer engine | F1.2 | ✅ Done | Requires an explicit target (`both` only when requested), copies only selected target artifacts plus automatic utils, then requests one launcher authorization. It never creates a missing global root; structural verification is required and discovery is conditional (ADR-004, ADR-007). |
+| F1.3 | Target-scoped `setup-ai` launchers and embedded installer engine | F1.2 | ✅ Done | Requires an explicit target (`both` only when requested), copies only selected target artifacts plus automatic utils, then requests one launcher authorization. Downloads are limited to declared routes and use transient verification. It never creates a missing global root, nor migrates, renames, or removes historic unprefixed installations; structural verification is required and discovery is conditional (ADR-004, ADR-007). |
 | F1.4 | README as product front | F1.3 | ✅ Done | Presents the kit, both install methods, and the `default` profile catalog |
 | F1.5 | Automated install verification check | F1.3 | ✅ Done | Installs into a dummy/scratch folder and confirms every catalog file was copied unmodified |
+| F1.6 | Explicit indexes in Codex conversational fallback | F1.1 | ✅ Done | All 15 shared skills require indexed options and an instruction to answer by index or free text only when `ask_user_question` is unavailable; Claude, the catalog, and routes are unchanged. |
 
 **Phase 1 closing criterion** — Manual scratch-repo verification confirms every source declared by the selected profile, `packs.utils`, and selected native-agent list in root `catalog.yaml` is installed byte-for-byte at its `aisy.` destination. It verifies the post-copy transient SHA-256 and frontmatter where applicable; discovery is checked only when the active session exposes it. A missing selected global root prevents only the optional launcher, never the local installation.
 

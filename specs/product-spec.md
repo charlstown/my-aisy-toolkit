@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-08 |
+> | **Updated** | 2026-08-09 |
 > | **Version** | v0.1 |
 
 ## 🎯 Vision
@@ -58,7 +58,7 @@ flowchart LR
 ```
 
 - **User** — starts the installation from the repo where they want the kit, by one of two routes: the one-liner from the README, or a previously installed `/aisy.setup-ai` or `$aisy.setup-ai` launcher. Selects a target and a displayed profile. Does not interact directly with the `my-aisy-toolkit` repo.
-- **setup-ai** — plain-text entry point that asks for one target (Claude or Codex; `both` only when explicitly requested), fetches `/catalog.yaml`, displays every profile and its skills, then asks for a profile. It installs the profile and all `packs.utils` entries locally without another question. It uses the native question capability when available and otherwise waits for a conversational answer. Skills are copied literally to `aisy.<name>` destinations; agents remain native. Both entry routes execute this same flow.
+- **setup-ai** — plain-text entry point that asks for one target (Claude or Codex; `both` only when explicitly requested), fetches `/catalog.yaml`, validates `profiles` and the artifacts declared for the selected target, then displays every profile and its skills and asks for a valid profile. It installs the profile and all `packs.utils` entries locally without another question. It uses the native question capability when available and otherwise waits for a conversational answer. Skills are copied literally to `aisy.<name>` destinations; agents remain native. Both entry routes execute this same flow.
 - **Global launcher** — optional user-level `aisy.setup-ai` shortcut for the selected target only. At the end of the local installation, Step 6 checks only that target's existing root, asks once, and copies its literal template idempotently. It never creates a missing root, reads or writes the other agent's root, self-updates, or treats unavailable discovery as a failed installation.
 - **my-aisy-toolkit (catalog)** — single source of truth: shared skills under `/ai-toolkit/skills/<name>/SKILL.md`, separate native agents under `/ai-toolkit/agents/claude/*.md` and `/ai-toolkit/agents/codex/*.toml`, and the literal root manifest `/catalog.yaml`. It does not execute itself; it only serves content for `setup-ai` to consume. This is decoupled from the repo's own internal `.claude/` folder, which is used only to develop this toolkit itself (dogfooding) and is never what gets installed into a target repo.
 - **Target repo** — receives the installed files and becomes operational for spec-driven development through the corresponding AI agent's skills. Each skill/agent's internal logic lives in its own self-documented file.
@@ -94,7 +94,7 @@ Step 6 runs after local installation. It considers only the selected target (or 
 
 | Agent | Where it's saved | How it's invoked |
 |-------|------------------|------------------|
-| Claude Code | `~/.claude/commands/aisy.setup-ai.md` | `/aisy.setup-ai` (optional `[profile]` argument) |
+| Claude Code | `~/.claude/commands/aisy.setup-ai.md` | `/aisy.setup-ai` |
 | Codex CLI — best-effort | `~/.codex/skills/aisy.setup-ai/SKILL.md`; fallback `~/.agents/skills/aisy.setup-ai/SKILL.md` only when `.codex/` is absent and `.agents/` exists | `$aisy.setup-ai` — a `$` skill, not a slash command |
 
 > The Codex row is best-effort like the rest of Codex support. Its canonical global root is `~/.codex/`; `$aisy.setup-ai` is never a slash command.
@@ -159,7 +159,7 @@ Superset of `default`'s 10 skills and 6 agents, plus:
 
 Agents: identical to `default`'s 6 agents — no new agent introduced.
 
-Across shared skills, Claude Code preserves each skill's own questioning flow. In Codex, each turn presents exactly one pending question, with identifiable options and an explicit invitation to answer with an option or free text; unresolved free-text decisions are recorded as gaps and only independent work continues. If Codex has no native question tool, the skill uses conversational fallback. When applicable, prompts use the language of the user's latest message.
+Across shared skills, Claude Code preserves each skill's own questioning flow. In Codex, when `ask_user_question` is unavailable, the conversational fallback presents exactly one pending question at a time, using multiple-choice or sequential alternatives with visible indexes and an explicit invitation to answer by index or with free text; it processes the answer before asking another question, records unresolved free-text decisions as gaps, and continues only independent work. When applicable, prompts use the language of the user's latest message.
 
 ### Catalog — Utils pack (automatic)
 
@@ -229,4 +229,4 @@ Verifying the repository installation means checking the selected target's expec
 - [x] ~~How is the catalog versioned?~~ → Catalog *distribution* always brings the latest of the main branch; no semantic versioning or version selection there. Separately, the repo itself is now SemVer-tagged automatically: merging a PR to `main` computes and pushes the next `vX.Y.Z` git tag from the PR title prefix (`release:`/`feature:`/`fix:`/`chore:`, enforced by a required precheck — see CLAUDE.md and ADR-006 in tech-spec.md); there is no `VERSION` file, the git tag is the sole source of truth. The two are independent: bumping the repo version never changes what `setup-ai` installs.
 - [x] ~~Tone for user-facing content?~~ → Direct, jargon-free, with a light easygoing touch ("Keep it AIsy").
 - [x] ~~Exact location of the `setup-ai` script/instructions within the repo?~~ → Repo root (`setup-ai.md`), per tech-spec.md.
-- [x] ~~Concrete mechanism for profile and active-agent selection?~~ → ADR-004: the agent is always asked explicitly (never inferred/detected from folders present); the profile is asked only if the catalog declares more than one.
+- [x] ~~Concrete mechanism for target, profile, and global-launcher authorization?~~ → ADR-004: the target is always asked explicitly (never inferred/detected from folders present); after validating the catalog, every displayed profile is shown and a valid profile is selected; the third decision is optional authorization for the target-scoped global launcher.
