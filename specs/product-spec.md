@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-07 |
+> | **Updated** | 2026-08-08 |
 > | **Version** | v0.1 |
 
 ## 🎯 Vision
@@ -30,22 +30,22 @@
 
 ## 💎 Design Principles
 
-- **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. No package manager, no library, and nothing to install globally beyond a single optional `/setup-ai` launcher that the user has to say yes to.
+- **Zero dependencies / zero friction** — installation via a one-liner fetch or by pasting plain text into any agent. No package manager, no library, and no global write unless the user authorizes the optional global launchers in a single confirmation.
 - **README as product** — the README is the kit's "front": it must convince and allow installing in under 2 minutes. It is treated as the main piece, not an afterthought.
 - **Extensible profiles from day one** — the catalog now ships two profiles, `default` and `ui-ux` (a superset of `default`'s catalog plus the `ui-spec` and `clarify-uix` skills), and the installation mechanism detects and asks about available profiles without needing a redesign when more are added.
 - **Multi-agent by shared skills and native agents** — every supported agent receives the same literal skill source at its native skills path, while its agents remain native artifacts (`.md` for Claude Code and `.toml` for Codex), without runtime translation.
 - **Deliberately vendor-agnostic delivery** — the kit is distributed as plain-text instructions fetched over plain HTTPS, never published to a single vendor's proprietary channel (e.g. the Claude Code plugin/marketplace system, see ADR-007 in tech-spec.md). This is a conscious tradeoff, not an oversight: it keeps the same one-liner/copy-paste mechanism usable by any AI agent capable of fetching and following instructions, so support can extend to more providers over time (today Claude Code and Codex CLI) without being tied to, or gated by, any one agent's ecosystem.
 - **Direct, jargon-free tone** — installer messages, README, and skill names are clear, short, and have a light, easygoing touch ("Keep it AIsy"), never sounding corporate.
-- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself is versioned via git tags `vX.Y.Z` only — there is no `VERSION` file — computed and pushed automatically on merge to `main` from the PR title's prefix (`release:`/`feature:`/`fix:`/`chore:`, per CLAUDE.md); see ADR-006 in tech-spec.md. That versioning is decoupled from, and does not affect, how the catalog gets installed.) The optional global launcher embeds its platform template: when run, it may download the template from `setup-ai.md`, compares it with its own content, updates only when it differs, and continues the installation if that update fails.
+- **Always the latest version** — no semantic versioning or release tags for *catalog distribution*: installing or re-installing always brings the current state of the catalog's main branch, with no version selection for the end user. (The repo itself is versioned via git tags `vX.Y.Z` only — there is no `VERSION` file — computed and pushed automatically on merge to `main` from the PR title's prefix (`release:`/`feature:`/`fix:`/`chore:`, per CLAUDE.md); see ADR-006 in tech-spec.md. That versioning is decoupled from, and does not affect, how the catalog gets installed.) Global launchers are copied idempotently from the current platform templates when the user authorizes them.
 
 ## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
     U[User in a target repo] -->|"one-liner from the README, or pasted instructions"| S[setup-ai]
-    U -->|"/setup-ai — if the launcher was saved earlier"| L["Global launcher<br/>(embedded platform template, user level)"]
-    L -->|"may compare/update its template, then runs setup"| S
-    S -.->|"offers to save it once, only if the user says yes"| L
+    U -->|"global launcher, if installed"| L["Global Claude/Codex launchers<br/>(user level)"]
+    L -->|"runs setup"| S
+    S -.->|"dual preflight, ASCII report, one authorization"| L
     S -->|fetch| CAT[(my-aisy-toolkit<br/>profile catalog)]
     CAT -->|available profiles| S
     S -->|asks for profile if more than one| U
@@ -59,7 +59,7 @@ flowchart LR
 
 - **User** — starts the installation from the repo where they want the kit, by one of two routes: the one-liner from the README, or the global `/setup-ai` launcher if they saved it in an earlier install. Picks a profile if asked. Does not interact directly with the `my-aisy-toolkit` repo.
 - **setup-ai** — entry point (instructions/script) that fetches the catalog, always asks the user which AI agent to target (never inferred from the target repo's structure), asks for the profile only if the catalog declares more than one, and writes the corresponding files into the target repo. Skills are copied literally from `ai-toolkit/skills/<name>/SKILL.md` to `.claude/skills/<name>/SKILL.md` or `.agents/skills/<name>/SKILL.md`; agents are copied from `ai-toolkit/agents/claude/*.md` and `ai-toolkit/agents/codex/*.toml` to their native destinations. Both routes land here and run the exact same steps.
-- **Global launcher (`/setup-ai`)** — optional shortcut, saved once at user level and living outside any repo. It contains the platform template. On execution it may download the current template from `setup-ai.md`, compares it, updates itself only if different, and continues with the embedded installation flow if the check or update fails. `setup-ai` offers it at the end of an install only with the user's explicit yes, and reports any unavailable candidate or write failure without reverting the completed catalog install.
+- **Global launchers** — optional Claude Code and Codex shortcuts saved at user level outside any repo. Step 6 checks both installations before offering a single authorization in an ASCII box. It copies both platform templates idempotently only when both agents are detected, then verifies detection by each agent and reports a concrete diagnostic on failure.
 - **my-aisy-toolkit (catalog)** — single source of truth: shared skills under `/ai-toolkit/skills/<name>/SKILL.md` and separate native agents under `/ai-toolkit/agents/claude/*.md` and `/ai-toolkit/agents/codex/*.toml`; `catalog.yaml` declares their installed paths. It does not execute itself; it only serves content for `setup-ai` to consume. This is decoupled from the repo's own internal `.claude/` folder, which is used only to develop this toolkit itself (dogfooding) and is never what gets installed into a target repo.
 - **Target repo** — receives the installed files and becomes operational for spec-driven development through the corresponding AI agent's skills. Each skill/agent's internal logic lives in its own self-documented file.
 
@@ -77,7 +77,7 @@ Single command the user pastes into their terminal (or asks their agent to run) 
 | `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly; never inferred from the target repo's structure (`.claude/`, `.codex/`). |
 
 > [!warning] Side effect
-> Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders. **One opt-in exception:** at the end of the install, `setup-ai` may offer to save the global launcher — a **single** file in the agent's user-level command directory — and writes it only if the user explicitly says yes. Without that yes, nothing outside the target repo is touched, and nothing in the user's home is ever overwritten, moved, or deleted. **Also:** if the catalog declares `packs.utils`, `setup-ai` additionally asks a non-blocking Utils question (reply by number(s), "all", or blank) to optionally install additional `aisy.`-prefixed skills, independent of the chosen profile.
+> Writes/overwrites files inside `.claude/` and/or `.codex/` in the target repo. Does not touch application code or other folders. **One opt-in exception:** after a successful dual preflight, `setup-ai` may save both global launchers in their user-level command directories after one explicit yes. If either agent is not detected, it writes neither launcher and reports the reason. **Also:** if the catalog declares `packs.utils`, `setup-ai` additionally asks a non-blocking Utils question (reply by number(s), "all", or blank) to optionally install additional `aisy.`-prefixed skills, independent of the chosen profile.
 
 #### Copy-paste (plain instructions)
 
@@ -87,9 +87,11 @@ Plain-text block the user pastes directly into the conversation of any AI coding
 |-------|------|---------|--------------|
 | `profile` | string | `default` | Same as the one-liner; the agent asks if it's not specified and several profiles exist. |
 
-#### Global launcher (`/setup-ai`)
+#### Global launchers (`/setup-ai`)
 
-Optional shortcut so the user never has to go back to the README. It is an embedded platform-specific `setup-ai` template. Each execution may download the matching template from `setup-ai.md`, compares it with the local launcher, updates only when it differs, then continues the setup; a failed check or update never blocks setup.
+Step 6 performs a dual Claude Code/Codex preflight, displays the result in an ASCII box, and asks once for authorization. If either agent installation cannot be detected, it stops the global operation with a diagnostic and never reports a partial global installation. After authorization, both templates are copied idempotently and each agent must detect its launcher; any detection failure is diagnosed.
+
+Optional user-level shortcuts so the user never has to go back to the README. Their current platform templates are copied idempotently only after the Step 6 preflight and authorization.
 
 | Agent | Where it's saved | How it's invoked |
 |-------|------------------|------------------|
@@ -100,13 +102,12 @@ Optional shortcut so the user never has to go back to the README. It is an embed
 
 How it gets there:
 
-- **Only with an explicit yes.** `setup-ai` asks once, at the very end, after the repo is already set up. A no, a silence, or an ambiguous answer are all treated as no, and nothing outside the repo is written.
-- **Confirmed-agent-first, environment-checked.** The agent confirmed in Step 1 is always the starting candidate for the offer. The directory-existence check (`~/.claude/`, `~/.codex/` or `~/.agents/`) decides whether that confirmed agent's candidacy survives and whether the other agent joins as an additional candidate. If the confirmed agent is dropped because its user-level directory genuinely does not exist, `setup-ai` says so explicitly in that same turn. This environment check is only about the launcher — it never replaces the mandatory "which agent am I setting this up for?" question, which is always asked.
-- **Safe template refresh.** If a launcher already exists, it is retained when it matches the downloaded platform template; when it differs, the launcher may update it before continuing. A refresh failure is reported but never prevents the catalog installation.
-- **Never blocking.** If the write fails (permissions, no home directory, disk), the catalog install already finished and is not reverted — the user just gets the reason in the wrap-up report.
+- **One explicit authorization after dual preflight.** `setup-ai` checks the global destinations for both Claude Code and Codex before asking once, at the end of the repo setup. A no, silence, or ambiguous answer is treated as no.
+- **All-or-nothing global installation.** If either agent cannot be detected, no global launcher is copied. The user receives a clear diagnostic identifying the missing agent installation and possible reason. This preflight never replaces the mandatory target-agent question for the repo installation.
+- **Idempotent copy and detection.** Existing launchers are copied only as needed from the current templates. After copying, each agent must detect its launcher; a failed detection is investigated and reported.
 
 > [!warning] Side effect
-> This is the only file the kit ever writes outside the target repo, and only after the user says yes.
+> These launchers are the only files the kit writes outside the target repo, and only after the user says yes once and both agents pass preflight.
 
 #### Re-installation / update
 
@@ -171,7 +172,7 @@ Across shared skills, Claude Code preserves each skill's own questioning flow. I
 
 **Healthcheck**
 
-Verifying the installation means checking that the expected files for the installed profile exist: `.claude/skills/*/SKILL.md` and `.claude/agents/*.md` for Claude Code, or `.agents/skills/*/SKILL.md` and the installed Codex native `*.toml` agents for Codex. There is no running process or endpoint to query — it's a file-presence check.
+Verifying the repository installation means checking that the expected files for the installed profile exist: `.claude/skills/*/SKILL.md` and `.claude/agents/*.md` for Claude Code, or `.agents/skills/*/SKILL.md` and the installed Codex native `*.toml` agents for Codex. For an authorized global-launcher installation, success additionally requires both agents to detect their copied launcher; failed detection is diagnosed and never presented as partial success.
 
 **Logging**
 

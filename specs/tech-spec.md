@@ -4,7 +4,7 @@
 > | **Status** | 🟡 Draft |
 > | **Owner** | Carlos |
 > | **Created** | 2026-08-01 |
-> | **Updated** | 2026-08-07 |
+> | **Updated** | 2026-08-08 |
 > | **Version** | v0.1 |
 > | **ProductSpec** | [[product-spec]] |
 
@@ -36,15 +36,13 @@ This document covers the technical installation mechanism (`setup-ai`) and the c
 ```mermaid
 flowchart LR
     U[AI agent in the target repo] -->|"one-liner / copy-paste"| S[setup-ai.md]
-    U -->|"/setup-ai or $setup-ai"| L["Global launcher<br/>(embedded engine)"]
-    L -.->|"optional template check/update only"| S
+    U -->|"/setup-ai or $setup-ai"| L["Global launchers<br/>(Claude + Codex)"]
     S -.fetch HTTPS.-> RAW[(raw.githubusercontent.com)]
-    L -.fetch HTTPS.-> RAW
     RAW -->|catalog.yaml + declared artifacts| U
     U -->|"literal copies"| DEST[(Target repo<br/>.claude/skills · .claude/agents<br/>.agents/skills · .codex/agents)]
 ```
 
-The copy-paste route follows `setup-ai.md`. The launcher carries the same installation engine locally, so an update-check failure is reported but does not prevent the local engine from installing catalog artifacts.
+The copy-paste route follows `setup-ai.md`. Step 6 installs the two native global launchers together after one explicit authorization; their only purpose is to make the same maintenance workflow available from any repository.
 
 ```mermaid
 flowchart TB
@@ -55,25 +53,24 @@ flowchart TB
     SK --> RM[README.md]
     CA --> RM
     CO --> RM
-    SA -.->|"Step 6: templates embedded verbatim in setup-ai.md"| GL["~/.claude/commands/setup-ai.md<br/>~/.codex/skills/setup-ai/SKILL.md<br/>(global launcher, outside any repo)"]
-    GL -.->|"contains installation engine and compares template"| SA
+    SA -.->|"Step 6: native templates copied verbatim after one authorization"| GL["~/.claude/commands/setup-ai.md<br/>~/.codex/skills/setup-ai/SKILL.md<br/>(global launchers, outside any repo)"]
     INT[".claude/<br/>(internal only, not distributed)"]
 ```
 
 #### `setup-ai.md` — Installation instructions
 
-Natural-language guide an AI agent follows step by step to ask for profile and target agent, fetch the manifest and each declared artifact, and copy it literally to the target-native destination. It also contains the global-launcher templates used by Step 6.
+Natural-language guide an AI agent follows step by step to ask for profile and target agent, fetch the manifest and each declared artifact, and copy it literally to the target-native destination. Its Step 6 also contains the native global-launcher templates and their dual-installation contract.
 
 #### Global launcher — user-level command
 
-Optional shortcut, written outside any repo so the user can re-run the install from anywhere without going back to the README. It contains an embedded installation engine. On explicit invocation it may fetch `setup-ai.md` only to extract, compare, and update its own template; that check is not the source of the active installation instructions.
+Paired user-level shortcuts, written outside any repo so the user can run `setup-ai` from anywhere to update or reinstall skills. Step 6 always targets both detected agents; it is not a local-repository launcher or a self-updating template mechanism.
 
 | Target agent | Path | Format | Invoked as |
 |---|---|---|---|
-| Claude Code | `~/.claude/commands/setup-ai.md` | Markdown + frontmatter (`description`, `argument-hint`), same shape as any user-level slash command | `/setup-ai` (optional `[profile]` argument) |
-| Codex CLI — best-effort | `~/.codex/skills/setup-ai/SKILL.md`, fallback `~/.agents/skills/setup-ai/SKILL.md` when `~/.codex/` doesn't exist but `~/.agents/` does | Folder with `SKILL.md` + frontmatter (`name`, `description`), mirroring the repo-level `.codex/skills/<name>/SKILL.md` convention | `$setup-ai` — a `$` skill, never a slash command |
+| Claude Code | `~/.claude/commands/setup-ai.md`, when `~/.claude/` is detected | Markdown + frontmatter (`description`, `argument-hint`), same shape as any user-level slash command | `/setup-ai` |
+| Codex CLI | `~/.codex/skills/setup-ai/SKILL.md`, or `~/.agents/skills/setup-ai/SKILL.md` only when `.codex/` is absent and `.agents/` is detected | Folder with `SKILL.md` + frontmatter (`name`, `description`) | `$setup-ai` |
 
-Written by Step 6 of `setup-ai.md`, with the user's explicit confirmation. The launcher compares its current template with the template extracted from `setup-ai.md` and updates itself when the embedded template differs. A failed fetch or comparison is reported; it leaves the existing launcher intact and the embedded engine still runs. Catalog artifacts and launcher templates are copied literally, never translated.
+Before writing, Step 6 shows an ASCII panel explaining `setup-ai`, its dual global availability and its use from any repository, then requests one authorization only. It preflights both agent roots and aborts the entire global operation if either is missing: it never offers a partial installation. It copies each native template byte-for-byte, treating identical existing content as unchanged, and verifies the exact path, bytes and recognizable native shape afterwards. If a runtime discovery check is available, it is attempted; otherwise the limitation is reported rather than claiming executable discoverability. Catalog artifacts and launcher templates are copied literally, never translated.
 
 #### `catalog.yaml` — Catalog manifest
 
@@ -99,7 +96,8 @@ Presents the kit, documents both installation methods, and serves as the repo's 
 
 | Internal operation | Method | External service | Notes |
 |---------------------|--------|-------------------|-------|
-| Launcher invocation (`/setup-ai`, `$setup-ai`) | Embedded engine; optional GET via agent's native fetch | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/setup-ai.md` | Runs the local engine. It fetches only to extract, compare, and update its own template; fetch failure is reported and does not stop catalog installation |
+| Global launcher invocation (`/setup-ai`, `$setup-ai`) | Native command/skill installed by Step 6 | Local user-level agent directory | Invokes the maintenance instructions from any repository; Step 6 does not self-update launcher templates |
+| Global launcher installation (Step 6) | Preflight, one authorization, literal copies and post-copy checks | Claude and Codex user-level directories | Requires both detected roots before either write; identical content is unchanged, otherwise the native template is updated or created |
 | Fetch the manifest | GET (agent's native fetch) | `raw.githubusercontent.com/<org>/my-aisy-toolkit/main/catalog.yaml` | No authentication; fails if the repo becomes private or GitHub is unavailable |
 | Fetch each declared artifact | GET (agent's native fetch) | `raw.githubusercontent.com/.../main/ai-toolkit/skills/<name>/SKILL.md`, `ai-toolkit/agents/claude/*.md`, or `ai-toolkit/agents/codex/*.toml` | One request per manifest-declared file; the artifact is copied literally to its target-native destination |
 | Install shared skill | Literal file copy | Target repo | `.claude/skills/<name>/SKILL.md` for Claude; `.agents/skills/<name>/SKILL.md` for Codex |
@@ -118,16 +116,16 @@ Presents the kit, documents both installation methods, and serves as the repo's 
 | Skill/agent file fetch | 404 / timeout | Retry once; if it persists, inform and skip that file | Must not block installing the rest of the profile |
 | Writing to target repo | File already exists | Compare source and destination; update only if different | The installer reports unchanged, updated, or newly installed artifacts; it never translates their contents |
 | Target agent detection | User doesn't confirm Claude or Codex | Ask again; write nothing until answered | Prevents installing in the wrong format |
-| Writing the global launcher (Step 6) | Permission denied, home directory missing or not creatable, disk full | Report the real reason in the wrap-up and continue; no retry, no alternative path | The catalog install already finished and is **not** reverted — the launcher is an opt-in extra, never a blocker (ADR-007) |
-| Fetching `setup-ai.md` for launcher template update | 404 / timeout / unreachable | Inform the user and continue with the embedded engine | The existing launcher is unchanged; the selected catalog installation remains available (ADR-007) |
+| Global launcher preflight (Step 6) | Claude, Codex or both agent roots are absent | Stop before confirmation and before any write; identify every missing root and tell the user to install or initialize that agent | No partial global installation is offered |
+| Global launcher copy or verification (Step 6) | Permission denied, missing subdirectory, byte/shape mismatch, or discovery check fails | Report the affected agent, destination and concrete result; do not delete either copy | If runtime discovery is unavailable, report structural verification as the limit instead of claiming discoverability |
 
 **Propagation**
 
-There is no server or real HTTP status codes to propagate: the agent reports each error directly to the user in the conversation, in natural language, at the moment it occurs.
+There is no server or real HTTP status codes to propagate: the agent reports each error directly to the user in the conversation, in natural language, at the moment it occurs. For Step 6, the dual-root preflight, single authorization and post-copy diagnostics above supersede the previous optional/local-launcher behavior.
 
 ## 🩺 Healthcheck
 
-Manual verification: compare the files in `.claude/skills/` + `.claude/agents/` (Claude) or `.agents/skills/` + `.codex/agents/` (Codex) against the literal artifact paths selected in `catalog.yaml`. Confirm each installed file is byte-for-byte equal to its catalog source. There is no running process or endpoint to query.
+Manual verification: compare the files in `.claude/skills/` + `.claude/agents/` (Claude) or `.agents/skills/` + `.codex/agents/` (Codex) against the literal artifact paths selected in `catalog.yaml`. Confirm each installed file is byte-for-byte equal to its catalog source. For Step 6, verify both detected global destinations, their native command/skill shape, their bytes and any discovery check exposed by the active agent session. There is no running process or endpoint to query.
 
 ## 📋 Logging
 
@@ -149,14 +147,14 @@ Not applicable: there is no executable code of its own, only Markdown/YAML conte
 
 Prerequisite: an empty scratch repo. Flow verified manually before merging relevant changes to `catalog.yaml`, `setup-ai.md`, or the catalog: run both installation methods (one-liner and copy-paste) against Claude Code and, when possible, against Codex CLI, and confirm the files land in the correct location and format.
 
-The global launcher (Step 6) is verified in the same run: it is written only after an explicit yes; on invocation it can detect and apply a changed launcher template; and, when its template fetch fails, it reports the update failure while the embedded engine still completes a catalog installation. For both agents, verify literal skill and agent contents and the destinations `.claude/skills`, `.claude/agents`, `.agents/skills`, and `.codex/agents` as applicable.
+The global launchers (Step 6) are verified in the same run using a temporary HOME: confirm the ASCII explanation, exactly one authorization, both roots detected before writes, no writes when either root is missing, byte-for-byte native copies, idempotent re-runs and post-copy structure/bytes checks. From a second scratch repository, invoke the launcher for both agents and use the discovery check when the active session exposes one; otherwise record that execution discoverability could not be asserted. For both agents, verify literal skill and agent contents and the destinations `.claude/skills`, `.claude/agents`, `.agents/skills`, and `.codex/agents` as applicable.
 
 > [!warning] Never verify the launcher against the real home directory
 > Testing Step 6 **must** be done with `HOME` pointed at a throwaway scratch directory, never against the maintainer's real `~/.claude/` or `~/.codex/`. There is already a legacy, unrelated `~/.claude/commands/setup-ai.md` on that machine, and nothing in this flow may write, overwrite, move, or delete anything there. A test that touches the real home is a failed test, whatever its result.
 
 **Tools**
 
-No persistent automated tooling in the repo. A temporary automated verification script was built and run once (evidence recorded in `specs/005-automated-install-verification-check/evidence.md`) to confirm the manual scratch-repo flow described above, then deleted by design. Manual verification remains the repeatable process, documented as a conscious limitation in Known Limitations.
+The persistent contract test `.github/scripts/verify-setup-fetch-contract.test.sh` checks the written fetch-recovery rules without making network requests. It covers the bootstrap, catalog, artifact retry (two complete method chains), and the Claude/Codex launcher auto-update paths, including the `CRYPT_E_NO_REVOCATION_CHECK` diagnosis. Run it locally with `bash .github/scripts/verify-setup-fetch-contract.test.sh`; it is not currently wired into GitHub Actions. Manual scratch-repo verification remains necessary for real agent behavior and destination writes.
 
 ## 🔌 Deployment
 
@@ -176,7 +174,7 @@ None. There is no build step: content is served as-is from the main branch.
 
 1. Edit shared skills, native agents, `setup-ai.md`, or `catalog.yaml` on a working branch.
 2. In an empty scratch repo, ask the agent: `Fetch and follow the onboarding instructions from: https://raw.githubusercontent.com/<org>/my-aisy-toolkit/<branch>/setup-ai.md`, pointing at the test branch instead of `main`.
-3. Verify the files are written literally to the correct skill and agent locations for the chosen profile and agent, then exercise the launcher update and update-failure paths.
+3. Verify the files are written literally to the correct skill and agent locations for the chosen profile and agent, then exercise the global dual-launcher preflight, idempotency and post-copy diagnostic paths with a temporary HOME.
 
 ## 📦 Dependencies
 
@@ -271,32 +269,33 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 
 **Release process (automated via GitHub Actions)**: the maintainer's whole "release step" is opening a PR titled with the correct prefix (`release:`/`feature:`/`fix:`/`chore:`, case-insensitive, per the table in `CLAUDE.md`). `pr-title-check.yml` runs as a required status check on `opened`/`edited`/`synchronize` and blocks the merge of any PR whose title doesn't start with one of those prefixes. On merge to `main`, `publish-version-tag.yml` reads the merged PR's title prefix and the latest existing `vX.Y.Z` tag, computes the next tag via `.github/scripts/compute-next-tag.sh`, and pushes it — no manual `VERSION` bump, no manual `git tag`/`git push`, and no GitHub Release created. `CHANGELOG.md` remains hand-maintained and is not touched by either workflow.
 
-### ADR-007: Embedded global launcher with explicit self-update
+### ADR-007: Dual global launchers with one authorization and no self-update
 
-**Decision**: The optional global launcher contains the setup engine locally. It fetches `setup-ai.md` only when the user explicitly invokes `/setup-ai` or `$setup-ai`, solely to compare and update its own byte-for-byte template; a failed update check never prevents its embedded engine from installing the selected catalog artifacts.
+**Decision**: Step 6 installs native global launchers for both Claude Code and Codex only after one explicit authorization. It first requires both agent roots to be detected, then copies the native templates byte-for-byte, preserves identical files without rewriting them, and performs post-copy structural, byte and available discovery checks. It does not use template self-update or a local-repository launcher.
 
-**Context**: Two alternatives were evaluated. (1) **Copying `setup-ai.md` verbatim** into the user-level command directory: it works on day one and then freezes — the copy stops matching the repo the moment the instructions change, which directly contradicts the "always the latest version" principle in [[product-spec]] and would force a launcher update mechanism that doesn't exist. (2) **Using Claude Code's native plugin/marketplace system**, raised and postponed in issue #8 itself: it would solve the same problem with less bespoke text, but it only exists for Claude Code, so Codex CLI would be left with no shortcut at all, and it would couple the product to a single agent's feature — against the "multi-agent by adaptation" principle. Writing the launcher unconditionally (no question) was also discarded outright: the user's home is outside the repo the user asked us to touch.
+**Supersession**: The historical context and consequences below describe the replaced embedded/self-updating launcher proposal. The operative contract is the dual global installation stated in this decision and in Module Design, Error Handling, Healthcheck and Testing Strategy.
+
+**Context**: A local-only launcher and separate per-agent confirmations would make the maintenance command harder to understand and use. A partial global installation was rejected because it leaves an ambiguous, asymmetric state. Creating agent roots merely to satisfy detection was also rejected: a real Claude or Codex installation must already provide its own root. The only permitted user-level writes are the two known native destinations after the dual preflight and one authorization.
 
 **Consequences**:
-- (+) The launcher can update its own embedded template when the remote template changes, while continuing to operate from its local engine.
-- (+) Same shortcut for both agents, each in its native shape, with no dependency on any agent-specific distribution feature.
-- (+) The only write outside the target repo is one file, opt-in, non-destructive, and never repeated.
-- (-) The kit now writes outside the target repo at all, which weakens the previously absolute "nothing outside `.claude/`/`.codex/`" promise stated in the README, [[product-spec]], and `setup-ai.md` itself.
-- Mitigation: the exception is spelled out in all of those places, is limited to those exact paths, requires an explicit yes (silence and ambiguity count as no), and never deletes, moves, or overwrites anything in the user's home.
-- (-) A template-update check adds an HTTPS round trip when the launcher is invoked.
-- Mitigation: update-check failure is reported, leaves the existing launcher intact, and does not block the local engine from completing installation.
-- (-) The Claude Code plugin/marketplace route stays on the table as a possible future duplicate of this mechanism.
-- Mitigation: revisit only if Claude-Code-only distribution ever becomes acceptable; until then this file-based launcher is the single mechanism for both agents.
+- (+) One visual explanation and one authorization establish the same global maintenance capability for both agents.
+- (+) The preflight prevents a half-installed state and preserves existing files when their bytes are already identical.
+- (+) Post-copy structural and available discovery checks make failures diagnosable without destructive rollback.
+- (-) The global operation cannot proceed if either agent root is absent, even when the other agent is available.
+- Mitigation: identify every missing agent root and instruct the user to install or initialize it, then rerun `setup-ai`.
+- (-) Runtime discoverability depends on commands exposed by the active agent session.
+- Mitigation: report a structural-only verification result when no discovery command is available; never claim an unperformed runtime check passed.
 
 ## ⚠️ Known Limitations
 
-- No persistent automated tests or CI/CD for `setup-ai`'s own install-flow: validation of what gets installed and in what format is normally manual, in a scratch repo, before publishing changes to main. A one-off automated verification script (`scripts/verify-install-temp.ps1`) was built and run once to confirm this manual process (see `specs/005-automated-install-verification-check/evidence.md`), then deleted by design — there is no repeatable automated tooling checked into the repo for this purpose. The repo does now have CI/CD for a different, unrelated purpose — PR title validation (`.github/workflows/pr-title-check.yml`, required status check) and automated version-tag publishing (`.github/workflows/publish-version-tag.yml`) — but neither of those tests or verifies `setup-ai`'s installation behavior.
+- The repository has a persistent, network-free contract test for `setup-ai` fetch recovery (`.github/scripts/verify-setup-fetch-contract.test.sh`), but no CI workflow invokes it and it cannot verify a real agent's interpretation or destination writes. Validation of installed files and formats therefore remains manual in a scratch repo before publishing changes to main. Existing CI/CD covers unrelated PR-title validation (`.github/workflows/pr-title-check.yml`) and version-tag publishing (`.github/workflows/publish-version-tag.yml`), not the installation flow.
 - Codex CLI support is best-effort: it hasn't been possible to verify it in a real Codex environment.
 - Shared skills and each platform's native agents are maintained manually; changes require keeping their explicit `catalog.yaml` entries current.
 - Requests to `raw.githubusercontent.com` are anonymous and subject to GitHub's unauthenticated rate limit.
 - Correct installation depends on the target agent faithfully following the natural-language instructions in `setup-ai.md`; there's no deterministic behavior guarantee like with a script.
 - The global launcher's Codex CLI destination (`~/.codex/skills/setup-ai/SKILL.md`, fallback `~/.agents/skills/setup-ai/SKILL.md`) has **not** been verified against a real Codex CLI install — official docs point at `~/.agents/skills`, while the binary and community sources also use `~/.codex/skills`. If the choice is wrong, the file is inert (Codex simply won't list `$setup-ai`), not destructive. Best-effort like the rest of Codex support (ADR-002, ADR-007).
-- Launcher template updates are best-effort: a network failure prevents only the template comparison/update and is reported, while the embedded installation engine continues with the selected catalog installation.
+- The global launchers do not self-update. Updating or reinstalling the toolkit is an explicit `setup-ai` maintenance action, not a background template refresh.
+- Step 6 can verify the two written files, their bytes and native shape in a temporary HOME, but executable discovery/invocation is only asserted when the active Claude or Codex session exposes a supported discovery check. It reports that limitation explicitly rather than treating it as a successful runtime check.
 
 ## ❓ Discovery
 
