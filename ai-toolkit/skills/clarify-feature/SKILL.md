@@ -1,4 +1,5 @@
 ---
+name: aisy.clarify-feature
 description: Interrogates the user to close the gaps section of one or more requirements.md files (the `DEFINITION GAP` from specify-feature), then folds every decision into the document and deletes the section once fully resolved. Trigger when the user says "clarify-feature", "clarifica", "cierra los gaps", "resuelve los gaps", or invokes /aisy.clarify-feature.
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: aisy.plan-feature
 description: Given a requirements.md path, evaluates gaps, asks up to 3 critical questions if needed, discovers the repo's subagents, then invokes the planner subagent to generate a plan.md whose tasks are attributed to the best-fitting agent (`@agent`). Trigger when the user says "plan-feature", "genera el plan", "planifica esta feature", "crea el plan.md", or invokes /aisy.plan-feature.
 ---
 

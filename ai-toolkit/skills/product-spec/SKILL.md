@@ -1,5 +1,5 @@
 ---
-name: product-spec
+name: aisy.product-spec
 description: Creates or updates the ProductSpec for a project or module. Reads existing context, interviews the user about vision/users/scope, and generates specs/product-spec.md following the PSPEC template (Metadata · Vision · Problem Statement · Target User · Design Principles · Architecture · Interfaces · Configuration · Operations · Deliverables · Project Structure · Out of Scope · Future · Discovery). Trigger when the user says "product spec", "create productspec", "genera productspec", or invokes /aisy.product-spec.
 ---
 

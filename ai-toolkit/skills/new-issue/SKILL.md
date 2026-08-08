@@ -1,4 +1,5 @@
 ---
+name: aisy.new-issue
 description: Opens a bug or a feature request on GitHub. Automatically detects the type; if it is not clear, it asks. Bug → investigate, reproduce and document. Feature → clarify in up to 3 questions and open the issue. Trigger with /aisy.new-issue.
 ---
 

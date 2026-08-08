@@ -1,4 +1,5 @@
 ---
+name: aisy.grill-me
 description: Critical interrogation of a document to reduce gaps, clarify decisions, and detect inconsistencies. When finished, it rewrites the document with everything learned. Requires an input document. Trigger when the user says "grill me", "interrógate", "interrogatorio", "analiza gaps", "interrogate me", "analyze gaps", or invokes /aisy.grill-me.
 ---
 

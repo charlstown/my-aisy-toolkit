@@ -1,4 +1,5 @@
 ---
+name: aisy.specify-feature
 description: Detects features from a file, a URL, a repo's roadmap.md, GitHub issues, or a vague prompt, lets the user pick which ones to develop, and scaffolds a numbered specs/ folder with a spec-kit-style requirements.md per feature — evidencing gaps instead of resolving them. Trigger when the user says "specify-feature", "especifica", "define los requirements", or invokes /aisy.specify-feature.
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: aisy.ui-spec
 description: Interviews the user top-down (content structure → layout → interaction/states → devices/accessibility) to design a UI screen, presents an initial concept and ASCII mockups before each question round, runs a self-critique pass, and writes/updates specs/ui-spec.md. Trigger when the user says "design the screen", "define the UI for...", "ui spec", or invokes /aisy.ui-spec.
 ---
 

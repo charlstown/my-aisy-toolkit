@@ -1,5 +1,5 @@
 ---
-name: digest
+name: aisy.digest
 description: "A partir de un prompt vago del usuario (una duda, un temor o una reflexión), lanza un interrogatorio corto (máximo 3 preguntas) para acotar qué y cómo investigar, hace una investigación breve en internet sobre tendencias, artículos o documentos relacionados con el tema, y cierra siempre con al menos 1 recomendación y 1 alternativa (opción B), justificando el porqué de la decisión recomendada. Trigger cuando el usuario diga 'digest', 'digiere esto', 'tengo una duda sobre...', 'no sé si debería...', o invoque /aisy.digest."
 ---
 

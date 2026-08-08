@@ -1,5 +1,5 @@
 ---
-name: roadmap
+name: aisy.roadmap
 description: "Generates or updates a project's roadmap from the ProductSpec and the TechSpec. Detects whether there are PoCs defined in the TechSpec and includes a Phase 0 of PoCs if there are any; otherwise it organizes only features into phases. Generates specs/roadmap.md following the RMAP template (Metadata · Tracking · Vision · Overview · Phases · Dependency Graph · Gates · Out of Roadmap)."
 when_to_use: "When the user says 'roadmap', 'genera roadmap', 'create roadmap', 'planifica el roadmap', or invokes /aisy.roadmap."
 ---

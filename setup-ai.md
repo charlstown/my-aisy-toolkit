@@ -8,77 +8,76 @@ Fetch and follow the setup instructions at https://raw.githubusercontent.com/cha
 
 For this bootstrap GET, use the agent's native fetch capability first. If it fails, record the failed method and its cause, then try each compatible download method available in the environment sequentially, using that same URL and stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response; continue to the next method. Do not substitute a cache, memory, remote listing, or another path. Only after every compatible method fails, report that the setup instructions could not be read together with the recorded method-and-cause diagnostics; do not install or write an engine.
 
-The bootstrap fetch is intentional. An installed `/aisy.setup-ai` or `$aisy.setup-ai` launcher instead contains the installation engine below and only fetches this file to update itself.
+The bootstrap fetch is intentional. An installed `/aisy.setup-ai` or `$aisy.setup-ai` launcher retains the literal engine below and never fetches `setup-ai.md` to update itself.
 
 ---
 
 ## Instructions for the agent
 
-Run Steps 1–6 in order in the repository the user selected. Do not write outside `.claude/`, `.codex/`, or `.agents/`, except for the one launcher file explicitly approved in Step 6. Report failures as they occur.
+Run Steps 1–6 in order in the repository the user selected. Keep the catalog, downloaded bytes, transient SHA-256 values, literal artifact plan, and per-artifact state only in memory. Do not write outside the confirmed target's local directories (`.claude/`, or `.agents/` and `.codex/`), except for a selected global launcher explicitly approved in Step 6. Report failures as they occur and continue with independent artifacts.
 
 ### Step 1 — choose the target
 
-Use the platform's blocking native question facility, never plain printed text: `AskUserQuestion` in Claude Code and `ask_user_question` in Codex CLI. Wait for every required answer before continuing. For text marked **user message, word for word**, detect the language from the user's most recent message (ignore earlier mixed-language history); translate its prose while preserving its structure and options. Default to English when there is no user input. This translation rule never applies to byte-for-byte file templates.
+Use `AskUserQuestion` in Claude Code or `ask_user_question` in Codex CLI when it is available. If the native facility is unavailable, ask conversationally and wait for an answer before any dependent step. For every fixed user-facing message, use the language of the user's most recent message (English if unavailable), while preserving its options and structure. This translation rule never applies to literal file templates.
 
-**User message, word for word:**
+Ask exactly this question (translated only under the preceding rule):
 
 ```
 One thing before I touch anything — which agent am I setting this up for?
 
   1. Claude Code
   2. Codex CLI
+  3. Both (only if you explicitly want both)
 ```
 
-If missing or ambiguous, invoke the same blocking question mechanism again with this **user message, word for word**:
+If missing or ambiguous, use the same available question mechanism again:
 
 ```
-I still need to know which one — Claude Code or Codex CLI? Nothing gets written until you tell me.
+I still need to know which one — Claude Code, Codex CLI, or both if you explicitly request both. Nothing gets written until you tell me.
 ```
 
-Never infer the answer from folders. After the catalog is available, use the same blocking mechanism to ask for a profile only if more than one profile exists and none was named. If `packs.utils` exists, ask once (non-blocking) which numbered extras to install; `all` selects all, a valid comma-separated list selects those entries, and missing/unclear input selects none.
+Never infer the target from folders. Record the confirmed target set in memory. Accept `both` only when the user explicitly requests it; it is never a default, fallback, or consequence of detecting two folders. This is the first decision of the run.
 
-### Step 2 — fetch the declared catalog
+### Step 2 — fetch the catalog, show profiles, and plan
 
-For every GET in this engine, use the platform's native fetch capability first. On any error, record the failed method and its cause, then try each compatible alternative download method that is available in the environment sequentially—never in parallel—with the same URL, and stop at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Do not use a cache, memory, a remote listing, or another path as a substitute for a failed download. Diagnose the resource only after every compatible method is exhausted, using the recorded method-and-cause diagnostics.
+For every GET in this engine, use the platform's native fetch capability first. On any error, record the failed method and its cause, then try each compatible alternative download method available in the environment sequentially—never in parallel—with the same URL, stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Do not substitute a cache, memory, remote listing, or another path. Diagnose a resource only after every compatible method is exhausted, using the recorded method-and-cause diagnostics. Remember a structural method failure for this execution, but allow resource-specific failures to use remaining compatible methods.
 
-GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/catalog.yaml` through that complete method chain. If every method fails, stop without writing. The manifest is the only selection authority: use `profiles.<profile>.skills`, `profiles.<profile>.agents.<confirmed-agent>`, and selected literal paths from `packs.utils`. Do not list remote directories, infer paths, translate, or seek semantic equivalents.
+GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/catalog.yaml` through that complete method chain. If every method fails, stop without writing. The manifest is the only selection authority; do not list remote directories, infer paths, translate, or seek semantic equivalents.
 
-### Step 3 — fetch selected artifacts
+Before selecting a profile, show every declared profile by catalog name and list every skill path under `profiles.<profile>.skills`. If there is more than one profile, ask for one valid displayed profile using the native question facility or the conversational fallback; wait for the answer. If exactly one profile exists, show it and select it. A launcher argument may supply a profile only when it exactly matches a displayed profile; otherwise ask. This is the second decision of the run.
 
-GET each selected path from `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/<path>` exactly as declared, through the complete method chain. Fetch fresh on every run. Retry a failed artifact once by repeating the complete chain; report and skip it only if both complete chains fail, then continue.
+Add every literal path in `packs.utils` automatically, without a utils question. Build one literal in-memory artifact plan containing only `profiles.<profile>.skills`, every `packs.utils` path, and `profiles.<profile>.agents.claude` and/or `profiles.<profile>.agents.codex` for the confirmed target set. Every plan entry records its declared source path, exact raw URL, artifact kind, selected target destination(s), and state. Deduplicate identical source paths while preserving all selected destinations. Do not persist the plan or hashes.
 
-### Step 4 — install for Claude Code
+### Step 3 — fetch planned artifacts
 
-For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, derive the installed identifier as `aisy.<name>` and copy bytes literally to `.claude/skills/aisy.<name>/SKILL.md`. Apply the same destination rule to selected utils. Copy each declared Claude agent literally to `.claude/agents/<name>.md`. Create absent files, overwrite only when bytes differ, and leave identical files untouched. Do not create aliases, redirects, or delete historical unprefixed skill folders.
+For every planned source, GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/<path>` exactly from its declared path through the complete method chain. Fetch each selected artifact fresh and exactly once per run. If its first complete chain fails, retry that artifact once by repeating the complete chain. On success, retain the exact response bytes and compute a transient SHA-256 before copying. On failure after both chains, record every method and cause, mark only that artifact and its destinations failed, report it, then continue with every other planned artifact.
 
-### Step 5 — install for Codex CLI
+### Step 4 — install selected local artifacts
 
-For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, derive the installed identifier as `aisy.<name>` and copy bytes literally to `.agents/skills/aisy.<name>/SKILL.md`. Apply the same destination rule to selected utils. Copy each declared Codex agent literally to `.codex/agents/<name>.toml`. Create absent files, overwrite only when bytes differ, and leave identical files untouched. Never translate, reinterpret, or generate skills or agents. Do not create aliases, redirects, or delete historical unprefixed skill folders.
+For a confirmed Claude target, copy every fetched shared skill and automatic util as literal bytes to `.claude/skills/aisy.<name>/SKILL.md`, deriving `<name>` only from the declared `ai-toolkit/skills/<name>/SKILL.md` path. Copy only declared Claude agents as literal bytes to `.claude/agents/<name>.md`.
 
-### Step 6 — global launcher
+For a confirmed Codex target, copy every fetched shared skill and automatic util as literal bytes to `.agents/skills/aisy.<name>/SKILL.md` and copy only declared Codex agents as literal bytes to `.codex/agents/<name>.toml`.
 
-Resolve `~` against the effective HOME. Before displaying or accepting any authorization, detect both global agent roots without creating either root: Claude Code is available only when `~/.claude/` exists, with destination `~/.claude/commands/aisy.setup-ai.md`; Codex is available when `~/.codex/` exists, with destination `~/.codex/skills/aisy.setup-ai/SKILL.md`, or, only when `~/.codex/` does not exist and `~/.agents/` does, with destination `~/.agents/skills/aisy.setup-ai/SKILL.md`. Subdirectories below a detected root may be created later.
+For every planned destination, create it if absent; otherwise compare its bytes with retained artifact bytes and overwrite only if different. Read back each created or updated destination, compare exact bytes and transient SHA-256 with the source, and record `created`, `updated`, `unchanged`, or `failed` with its concrete cause. A fetch, write, or verification failure affects only that artifact or destination: continue with every other independent entry. Never translate, reinterpret, generate, alias, redirect, migrate, rename, or delete artifacts or historical unprefixed folders. Do not read, check, or write an unconfirmed target's local directories.
 
-If either agent root is unavailable, do not write either launcher and end Step 6 with `Global aisy.setup-ai launcher not installed: missing Claude Code path (~/.claude/)`, `missing Codex path (~/.codex/ or ~/.agents/)`, or both causes in the same response. Add that the user must install or initialize the missing agent and run `aisy.setup-ai` again. Do not offer a partial installation or ask the user to choose an agent.
+### Step 5 — retain the result state
 
-When both roots are available, show this CLI-compatible ASCII panel before the single confirmation:
+Keep the per-artifact results in memory. Local failures do not prevent the optional launcher operation in Step 6, and no failed or skipped artifact may be reported as installed.
 
-```text
-+------------------------------------------------------------------+
-| aisy.setup-ai                                                    |
-| Installs the global launcher to update or reinstall My AIsy     |
-| Toolkit skills from any repository in the team.                 |
-| Available globally for: Claude Code and Codex.                  |
-+------------------------------------------------------------------+
-```
+### Step 6 — optional global launcher
 
-Then ask exactly once for authorization to install the global `aisy.setup-ai` launcher for both Claude Code and Codex. This optional confirmation must require an explicit yes and must not ask which tool to install. Existing destination launcher files are read only to compare or update this toolkit launcher; never delete them. The launcher is an embedded copy of this engine (Steps 1–6), not a pointer that re-runs this file.
+Resolve `~` against the effective HOME. For each confirmed target only, inspect its existing global root without creating it:
 
-Before executing its embedded engine, an installed launcher may GET this same `setup-ai.md` solely to check for a newer launcher template. Use its native fetch capability first and, on any error, record the failed method and its cause, then try each compatible alternative download method available sequentially with the same URL, stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Do not substitute a cache, memory, remote listing, or another path. From that response, extract only the literal template for its own platform, then compare those bytes with its own file: overwrite only if different and leave it alone if identical. Only after every compatible fetch method is exhausted, continue with the embedded engine and include its recorded method-and-cause diagnostics in the wrap-up; extraction, comparison, or writing failures also continue with the embedded engine and include their actual reason. No other installed skill or command fetches `setup-ai.md` in routine use.
+- Claude Code: `~/.claude/`, with destination `~/.claude/commands/aisy.setup-ai.md`.
+- Codex CLI: `~/.codex/`, with destination `~/.codex/skills/aisy.setup-ai/SKILL.md`; only if `~/.codex/` is absent and `~/.agents/` exists, use `~/.agents/skills/aisy.setup-ai/SKILL.md`.
 
-After that single authorization, copy the complete Claude launcher template **byte-for-byte** to `~/.claude/commands/aisy.setup-ai.md` and the complete Codex launcher template **byte-for-byte** to the detected Codex destination. Create only the necessary `commands/` or `skills/aisy.setup-ai/` subdirectories beneath their already-detected agent roots. For each destination, create it when absent, overwrite it only when its bytes differ from the corresponding native template, and leave it untouched when the bytes are identical. Do not translate, reinterpret, delete, or otherwise modify either template or any historical launcher.
+Never inspect, read, or write the other target's root in a single-target run. A missing selected root is a launcher failure for that target; do not create it and do not undo local installation.
 
-After each copy or unchanged comparison, verify that the exact destination file exists and its bytes equal the corresponding native template. Then verify its agent-recognizable structure: Claude Code requires `~/.claude/commands/aisy.setup-ai.md` to remain Markdown with its Claude command frontmatter; Codex requires the selected global skill directory to contain `SKILL.md` with `name: aisy.setup-ai` frontmatter. Attempt the command or skill discovery/refresh check exposed by that agent in the current session. If the agent does not expose such a check in this session or version, report that verification is limited to the expected file path, bytes, and structure and do not claim executable discovery. If a supported discovery check does not find the launcher, report the agent, written path, and that check's concrete result. If the file, bytes, structure, or discovery check fails, report the concrete cause for that agent; do not delete or roll back either launcher, and still complete the independent verification of the other one.
+Show the confirmed target's exact global destination (or missing root) and ask exactly once, using the native question facility or conversational fallback, whether to install its global `aisy.setup-ai` launcher. For an explicit `both` run, show both selected destinations and ask one authorization for both. Require an explicit yes; no, silence, or ambiguity is `rejected`. This is the third and final decision of the run.
+
+After authorization, process each selected target independently. Copy only the exact content inside its corresponding embedded Markdown fence below, byte-for-byte, to its selected destination; do not copy the fence itself. Create only needed subdirectories beneath an existing selected root. Compare existing bytes first, overwrite only if different, then read back and verify exact bytes and transient SHA-256. Verify Claude's `description` and `argument-hint` frontmatter or Codex's `name: aisy.setup-ai` frontmatter. Attempt discovery only when the current session exposes a supported check; otherwise report the discovery limitation without treating structural verification as failed. A failure for one launcher does not block another explicitly selected launcher. Never delete or roll back a launcher.
+
+The launcher template is retained from this bootstrap and is copied as literal content. Neither launcher may auto-update, GET `setup-ai.md`, extract a remote template, compare itself to a remote template, or write itself while invoked.
 
 #### Claude launcher template
 
@@ -93,16 +92,13 @@ Use this global launcher from any team repository to update or reinstall My AIsy
 
 ## Embedded engine
 
-1. Ask the target with `AskUserQuestion`; never infer it. Use an argument as the already-selected profile. For every user-facing fixed message, use the user's most recent language (English if unavailable), while preserving its options and structure. Ask a profile only if the catalog has more than one; ask optional utils once after reading the catalog.
-2. For every GET, use Claude Code's native fetch capability first. On any error, record the failed method and its cause, then try each compatible alternative download method available in the environment sequentially—never in parallel—with the same URL, stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Never substitute a cache, memory, remote listing, or another path. Diagnose a resource only after every compatible method is exhausted, using the recorded method-and-cause diagnostics. Fetch only `catalog.yaml` through that complete method chain; abort with no writes only if every method fails. Select only its declared `skills`, `agents.claude`, and optional `packs.utils` paths.
-3. Fetch each selected artifact fresh and exactly once through the complete method chain; retry an individual failed artifact once by repeating that complete chain, report it, then skip only that artifact.
-4. Derive every installed skill identifier as `aisy.<name>` and copy every shared skill byte-for-byte to `.claude/skills/aisy.<name>/SKILL.md`; apply the same destination rule to selected utils. Do not create aliases, redirects, or remove historical unprefixed folders.
-5. Copy every declared Claude agent byte-for-byte to `.claude/agents/<name>.md`. For every destination in steps 4–5: create if absent, overwrite only if bytes differ, otherwise leave unchanged.
-6. Do not offer, save, or create a local-only launcher. This global launcher is invoked as `/aisy.setup-ai` from any team repository. Report installed, updated, skipped, and utils; include the global launcher outcome below. No step fetches setup instructions as installation input.
+This launcher confirms Claude Code as its only target. Do not inspect, ask for, or write Codex paths, and do not install another launcher. An optional `[profile]` argument is valid only when it exactly matches a displayed catalog profile; otherwise ask using `AskUserQuestion` when available, or a conversational fallback.
 
-The launcher auto-update happens before this engine. If an argument names a profile, use it.
-
-Before Step 1, GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to extract the literal **Claude launcher template**. Use Claude Code's native fetch capability first and, on any error, record the failed method and its cause, then try each compatible alternative download method available sequentially with the same URL, stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Do not substitute a cache, memory, remote listing, or another path. Compare that complete candidate file byte-for-byte with this file: overwrite this exact path only if different, otherwise leave it alone. Only if every compatible fetch method fails, record the method-and-cause diagnostics and continue with this embedded engine; template absence/malformation, comparison, or writing failures likewise record their actual reason and continue. Never use the fetched file as installation instructions and never save another launcher from this launcher.
+1. GET only `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/catalog.yaml` through the complete direct-download method chain: use Claude Code's native fetch capability first; on error record method and cause, then try each compatible alternative sequentially, never in parallel, with the same URL and stop at the first success. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response. Do not substitute cache, memory, remote listing, or another path. Abort without writing only after every compatible method is exhausted.
+2. Show every profile and all declared skill paths, then select a valid profile (use the one profile automatically if there is only one). Add every `packs.utils` path automatically. Build an in-memory literal plan containing only selected profile skills, every util, and `agents.claude`, with exact URLs, destinations, states, and no persistent hashes or plan.
+3. Fetch every planned source fresh and exactly once through the same complete method chain. Retry a failed artifact once by repeating that chain; after two failed chains report methods and causes, skip only it, and continue. Retain successful response bytes and a transient SHA-256.
+4. Derive `aisy.<name>` from each shared skill or util path and copy bytes only to `.claude/skills/aisy.<name>/SKILL.md`; copy declared Claude agents only to `.claude/agents/<name>.md`. Create absent files, overwrite only differing bytes, read back each changed file, and verify bytes and transient SHA-256. Record each result and continue after individual fetch, write, or verification failures. Never translate, alias, redirect, migrate, rename, or delete historical unprefixed folders.
+5. Report created and updated paths, an unchanged count, failures with causes, automatic utils, download method, and any discovery limitation. This launcher has no Step 6: it never fetches `setup-ai.md`, auto-updates, compares or writes a launcher, or accesses a non-Claude target.
 ```
 
 #### Codex launcher template
@@ -118,18 +114,15 @@ Use this global launcher from any team repository to update or reinstall My AIsy
 
 ## Embedded engine
 
-1. Ask the target with `ask_user_question`; never infer it. For every user-facing fixed message, use the user's most recent language (English if unavailable), while preserving its options and structure. Ask a profile only if the catalog has more than one; ask optional utils once after reading the catalog.
-2. For every GET, use Codex CLI's native fetch capability first. On any error, record the failed method and its cause, then try each compatible alternative download method available in the environment sequentially—never in parallel—with the same URL, stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Never substitute a cache, memory, remote listing, or another path. Diagnose a resource only after every compatible method is exhausted, using the recorded method-and-cause diagnostics. Fetch only `catalog.yaml` through that complete method chain; abort with no writes only if every method fails. Select only its declared `skills`, `agents.codex`, and optional `packs.utils` paths.
-3. Fetch each selected artifact fresh and exactly once through the complete method chain; retry an individual failed artifact once by repeating that complete chain, report it, then skip only that artifact.
-4. Derive every installed skill identifier as `aisy.<name>` and copy every shared skill byte-for-byte to `.agents/skills/aisy.<name>/SKILL.md`; apply the same destination rule to selected utils. Do not create aliases, redirects, or remove historical unprefixed folders.
-5. Copy every declared Codex agent byte-for-byte to `.codex/agents/<name>.toml`. For every destination in steps 4–5: create if absent, overwrite only if bytes differ, otherwise leave unchanged.
-6. Do not offer, save, or create a local-only launcher. This global launcher is invoked as `$aisy.setup-ai` from any team repository. Report installed, updated, skipped, and utils; include the global launcher outcome below. No step fetches setup instructions as installation input.
+This launcher confirms Codex CLI as its only target. Do not inspect, ask for, or write Claude paths, and do not install another launcher. Use `ask_user_question` when available, or a conversational fallback, to select a valid displayed profile when the catalog has more than one.
 
-The launcher auto-update happens before this engine.
-
-Before Step 1, GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md` only to extract the literal **Codex launcher template**. Use Codex CLI's native fetch capability first and, on any error, record the failed method and its cause, then try each compatible alternative download method available sequentially with the same URL, stopping at the first successful download. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response, and continue to the next method. Do not substitute a cache, memory, remote listing, or another path. Compare that complete candidate file byte-for-byte with this file: overwrite this exact path only if different, otherwise leave it alone. Only if every compatible fetch method fails, record the method-and-cause diagnostics and continue with this embedded engine; template absence/malformation, comparison, or writing failures likewise record their actual reason and continue. Never use the fetched file as installation instructions and never save another launcher from this launcher.
+1. GET only `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/catalog.yaml` through the complete direct-download method chain: use Codex CLI's native fetch capability first; on error record method and cause, then try each compatible alternative sequentially, never in parallel, with the same URL and stop at the first success. Treat `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response. Do not substitute cache, memory, remote listing, or another path. Abort without writing only after every compatible method is exhausted.
+2. Show every profile and all declared skill paths, then select a valid profile (use the one profile automatically if there is only one). Add every `packs.utils` path automatically. Build an in-memory literal plan containing only selected profile skills, every util, and `agents.codex`, with exact URLs, destinations, states, and no persistent hashes or plan.
+3. Fetch every planned source fresh and exactly once through the same complete method chain. Retry a failed artifact once by repeating that chain; after two failed chains report methods and causes, skip only it, and continue. Retain successful response bytes and a transient SHA-256.
+4. Derive `aisy.<name>` from each shared skill or util path and copy bytes only to `.agents/skills/aisy.<name>/SKILL.md`; copy declared Codex agents only to `.codex/agents/<name>.toml`. Create absent files, overwrite only differing bytes, read back each changed file, and verify bytes and transient SHA-256. Record each result and continue after individual fetch, write, or verification failures. Never translate, alias, redirect, migrate, rename, or delete historical unprefixed folders.
+5. Report created and updated paths, an unchanged count, failures with causes, automatic utils, download method, and any discovery limitation. This launcher has no Step 6: it never fetches `setup-ai.md`, auto-updates, compares or writes a launcher, or accesses a non-Codex target.
 ```
 
 ### Wrap-up
 
-Report installed, updated, and skipped paths; list installed utils separately; and state the global launcher outcome as `created`, `updated`, `unchanged`, `rejected` (the global-install authorization was declined), or `failed` with its real reason. When the outcome is `created`, `updated`, or `unchanged`, state that `/aisy.setup-ai` and `$aisy.setup-ai` can update or reinstall skills from any team repository. For every exhausted GET chain, report each failed method with its cause; identify `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response. Do not report this diagnosis while a compatible download method remains untried, and do not report unchanged repository files.
+Report created and updated local paths, an aggregate unchanged count without enumerating unchanged files, every failed artifact or destination with its real cause, automatic utils, confirmed target, selected profile, used download method, and any discovery limitation. State each selected launcher outcome as `created`, `updated`, `unchanged`, `rejected` (authorization declined), or `failed` with its real reason. Mention only the launcher invocation(s) actually selected: `/aisy.setup-ai` for Claude and/or `$aisy.setup-ai` for Codex. For every exhausted GET chain, report each failed method with its cause; identify `CRYPT_E_NO_REVOCATION_CHECK` as a fetch/schannel failure before HTTP, never as a 4xx/5xx response. Do not report this diagnosis while a compatible download method remains untried.
