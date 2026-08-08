@@ -4,7 +4,7 @@ description: Given a requirements.md path, evaluates gaps, asks up to 3 critical
 
 ## Codex question fallback
 
-When running in Codex, use `ask_user_question` when it is available. Otherwise ask conversationally.
+When running in Codex, use `ask_user_question` when it is available. Only when it is unavailable, ask conversationally: show each alternative in every multiple-choice or sequential question with an explicit index, and explicitly instruct the user to reply with that index or with free-form text.
 
 Present exactly one pending question at a time, with identifiable options and an explicit instruction that the user may choose an option or provide their own answer. Wait for and process that answer before asking another question or executing a dependent step. Treat free-form answers as valid. When the user says they do not know yet (or equivalent), record a gap and continue only with independent questions or steps.
 
