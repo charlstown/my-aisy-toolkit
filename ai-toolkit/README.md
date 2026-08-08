@@ -1,8 +1,8 @@
 # Detailed catalog
 
-## `setup-ai` and this catalog
+## `aisy.setup-ai` and this catalog
 
-The [main README](../README.md) explains how to run `setup-ai`. The installer asks which platform and profile you want, reads `catalog.yaml`, and copies exactly the selected artifacts. This page lets you compare each option before choosing it.
+The [main README](../README.md) explains how to run `aisy.setup-ai`. The installer asks which platform and profile you want, reads `catalog.yaml`, and copies exactly the selected artifacts. This page lets you compare each option before choosing it. Every newly installed skill uses the `aisy.<name>` identifier; existing unprefixed folders are neither migrated nor deleted.
 
 ## What to install
 
@@ -22,16 +22,16 @@ This is the complete spec-driven development workflow, from defining the product
 
 | Skill | What it does |
 |---|---|
-| `constitution` | Creates the project's documentation foundation by running ProductSpec, TechSpec, and roadmap in the correct order. |
-| `product-spec` | Defines or updates the vision, users, scope, and deliverables in `specs/product-spec.md`. |
-| `tech-spec` | Documents the technical solution—stack, architecture, data, integrations, and operations—in `specs/tech-spec.md`. |
-| `roadmap` | Turns the ProductSpec and TechSpec into phases, dependencies, and completion criteria in `specs/roadmap.md`. |
-| `new-issue` | Investigates a bug or feature request and opens a well-documented GitHub issue. |
-| `specify-feature` | Turns an idea, issue, URL, document, or roadmap into a numbered folder with `requirements.md`. |
-| `clarify-feature` | Resolves the *gaps* already identified in `requirements.md` and consolidates the decisions. |
-| `plan-feature` | Generates an actionable `plan.md` from requirements and assigns each task to the right agent. |
-| `implement-feature` | Executes pending plans and manages dependencies, retries, and task status. |
-| `clean-feature` | Aligns root specs with a completed feature, archives its folder, and closes the related issue. |
+| `aisy.constitution` | Creates the project's documentation foundation by running ProductSpec, TechSpec, and roadmap in the correct order. |
+| `aisy.product-spec` | Defines or updates the vision, users, scope, and deliverables in `specs/product-spec.md`. |
+| `aisy.tech-spec` | Documents the technical solution—stack, architecture, data, integrations, and operations—in `specs/tech-spec.md`. |
+| `aisy.roadmap` | Turns the ProductSpec and TechSpec into phases, dependencies, and completion criteria in `specs/roadmap.md`. |
+| `aisy.new-issue` | Investigates a bug or feature request and opens a well-documented GitHub issue. |
+| `aisy.specify-feature` | Turns an idea, issue, URL, document, or roadmap into a numbered folder with `requirements.md`. |
+| `aisy.clarify-feature` | Resolves the *gaps* already identified in `requirements.md` and consolidates the decisions. |
+| `aisy.plan-feature` | Generates an actionable `plan.md` from requirements and assigns each task to the right agent. |
+| `aisy.implement-feature` | Executes pending plans and manages dependencies, retries, and task status. |
+| `aisy.clean-feature` | Aligns root specs with a completed feature, archives its folder, and closes the related issue. |
 
 ### `ui-ux` profile
 
@@ -39,8 +39,8 @@ Includes **everything in the `default` profile** and adds these two skills for d
 
 | Additional skill | What it does |
 |---|---|
-| `ui-spec` | Designs a screen from the top down: content, layout, interaction, states, devices, and accessibility; writes `specs/ui-spec.md`. |
-| `clarify-uix` | Resolves UI/UX decisions in `requirements.md` through structured question rounds. |
+| `aisy.ui-spec` | Designs a screen from the top down: content, layout, interaction, states, devices, and accessibility; writes `specs/ui-spec.md`. |
+| `aisy.clarify-uix` | Resolves UI/UX decisions in `requirements.md` through structured question rounds. |
 
 ### Optional `utils` pack
 
@@ -48,9 +48,9 @@ This pack belongs to neither profile. It can be installed alongside `default` or
 
 | Skill | What it does |
 |---|---|
-| `digest` | Researches an uncertain question or decision, asks only the necessary questions, and concludes with a reasoned recommendation and alternative. |
-| `grill-me` | Critically questions a document to find inconsistencies and gaps, then rewrites it using the resulting decisions. |
-| `for-dummies` | Explains concepts, links, or documents in a teaching-oriented way, with examples and optional resources. |
+| `aisy.digest` | Researches an uncertain question or decision, asks only the necessary questions, and concludes with a reasoned recommendation and alternative. |
+| `aisy.grill-me` | Critically questions a document to find inconsistencies and gaps, then rewrites it using the resulting decisions. |
+| `aisy.for-dummies` | Explains concepts, links, or documents in a teaching-oriented way, with examples and optional resources. |
 
 ## Native agents
 
@@ -69,8 +69,7 @@ Each profile installs the same six roles. Their responsibility is equivalent, bu
 
 | Artifact | Claude Code | Codex CLI |
 |---|---|---|
-| Profile skill | `.claude/skills/<name>/SKILL.md` | `.agents/skills/<name>/SKILL.md` |
-| `utils` skill | `.claude/skills/aisy.<name>/SKILL.md` | `.agents/skills/aisy.<name>/SKILL.md` |
+| Any skill | `.claude/skills/aisy.<name>/SKILL.md` | `.agents/skills/aisy.<name>/SKILL.md` |
 | Native agent | `.claude/agents/<name>.md` | `.codex/agents/<name>.toml` |
 
 ## Maintenance

@@ -12,8 +12,8 @@
 
 ## Batch 3 — Contenido y documentación coherentes
 
-- [ ] @code-developer · Actualizar referencias invocables distribuidas: sustituir en cada `ai-toolkit/skills/*/SKILL.md` los comandos y referencias cruzadas a skills por sus formas `aisy.<skill-name>`, incluido `setup-ai`, preservando las reglas específicas de invocación de cada plataforma y sin duplicar las skills compartidas.
-- [ ] @code-developer · Alinear documentación y especificaciones operativas: actualizar `README.md`, `README-ES.md`, `ai-toolkit/README.md`, `setup-ai.md` y los documentos de especificación que describen rutas o comandos instalados para que no anuncien skills distribuibles sin el prefijo; explicar que una instalación nueva no limpia nombres existentes.
+- [x] @code-developer · Actualizar referencias invocables distribuidas: sustituir en cada `ai-toolkit/skills/*/SKILL.md` los comandos y referencias cruzadas a skills por sus formas `aisy.<skill-name>`, incluido `setup-ai`, preservando las reglas específicas de invocación de cada plataforma y sin duplicar las skills compartidas.
+- [x] @code-developer · Alinear documentación y especificaciones operativas: actualizar `README.md`, `README-ES.md`, `ai-toolkit/README.md`, `setup-ai.md` y los documentos de especificación que describen rutas o comandos instalados para que no anuncien skills distribuibles sin el prefijo; explicar que una instalación nueva no limpia nombres existentes.
 
 ## Batch 4 — Pruebas reproducibles
 
