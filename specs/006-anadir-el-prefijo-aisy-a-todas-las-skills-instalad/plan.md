@@ -22,5 +22,7 @@
 
 ## Batch 5 — Validación de instalación y revisión
 
-- [ ] @tester · Ejecutar la matriz de instalación aislada: en repositorios y hogares temporales, verificar perfiles `default` y `ui-ux` más `utils` para Claude Code y Codex, confirmar que cada skill resultante se detecta como `aisy.<name>`, probar el lanzador global `aisy.setup-ai` y confirmar que ninguna comprobación elimina nombres heredados.
-- [ ] @judge · Revisar cumplimiento de la convención: auditar el diff y la evidencia contra FR-001 a FR-006 y SC-001 a SC-004, verificando cobertura funcional de `default`, `ui-ux` y `utils` en ambas plataformas, ausencia de compatibilidad implícita y consistencia entre catálogo, instalador, plantillas y documentación.
+- [blocked] @tester · Ejecutar la matriz de instalación aislada: en repositorios y hogares temporales, verificar perfiles `default` y `ui-ux` más `utils` para Claude Code y Codex, confirmar que cada skill resultante se detecta como `aisy.<name>`, probar el lanzador global `aisy.setup-ai` y confirmar que ninguna comprobación elimina nombres heredados.
+  - Reason: los cambios requeridos de los batches 1–3 aún no existen en este worktree; la verificación estática devuelve 57 incumplimientos y no hay instalador actualizado que ejecutar de forma válida.
+- [blocked] @judge · Revisar cumplimiento de la convención: auditar el diff y la evidencia contra FR-001 a FR-006 y SC-001 a SC-004, verificando cobertura funcional de `default`, `ui-ux` y `utils` en ambas plataformas, ausencia de compatibilidad implícita y consistencia entre catálogo, instalador, plantillas y documentación.
+  - Reason: CHANGES_REQUESTED — faltan los cambios de los batches 1–3 y, por ello, no existe evidencia de una matriz de instalación aprobable.
