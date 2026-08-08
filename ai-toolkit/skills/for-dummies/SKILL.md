@@ -1,4 +1,5 @@
 ---
+name: aisy.for-dummies
 description: Explains one or more concepts from a vague prompt, link, or document like an expert teacher, with examples and up to 3 optional free resources per concept. Trigger when the user says "for dummies", "explícamelo para dummies", "explain it like I'm five", "explícamelo como si no supiera nada", "no entiendo este concepto", "I don't get this concept", or invokes /aisy.for-dummies.
 ---
 

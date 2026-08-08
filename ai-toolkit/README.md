@@ -2,7 +2,9 @@
 
 ## `aisy.setup-ai` and this catalog
 
-The [main README](../README.md) explains how to run `aisy.setup-ai`. The installer asks which platform and profile you want, reads `catalog.yaml`, and copies exactly the selected artifacts. This page lets you compare each option before choosing it. Every newly installed skill uses the `aisy.<name>` identifier; existing unprefixed folders are neither migrated nor deleted.
+The [main README](../README.md) explains how to run `aisy.setup-ai`. It is a plain-text, dependency-free instruction flow, not an executable installer: the agent reads the root `catalog.yaml` literal manifest and copies the declared bytes. The flow makes exactly three decisions: target, displayed profile, and optional global-launcher authorization. `both` is valid only when explicitly selected and is never inferred from folders.
+
+Every newly installed skill uses `aisy.<name>`. Existing unprefixed folders are neither migrated, renamed, nor deleted. `packs.utils` is added automatically to every selected profile; it does not add a fourth decision.
 
 ## What to install
 
@@ -10,7 +12,7 @@ The [main README](../README.md) explains how to run `aisy.setup-ai`. The install
 |---|---|---|
 | The complete workflow to define, plan, build, and close features | **`default`** | 10 spec-driven development skills and 6 specialized agents. |
 | The above plus interface design and UI/UX decision clarification | **`ui-ux`** | Everything in `default` + 2 UI/UX skills. |
-| Extra help to research, understand, or review documents | **`utils`** | An optional pack of 3 skills, compatible with either profile. |
+| Extra help to research, understand, or review documents | **`utils`** | An automatic pack of 3 skills, installed with either profile. |
 
 The tables below describe every installed item.
 
@@ -42,9 +44,9 @@ Includes **everything in the `default` profile** and adds these two skills for d
 | `aisy.ui-spec` | Designs a screen from the top down: content, layout, interaction, states, devices, and accessibility; writes `specs/ui-spec.md`. |
 | `aisy.clarify-uix` | Resolves UI/UX decisions in `requirements.md` through structured question rounds. |
 
-### Optional `utils` pack
+### Automatic `utils` pack
 
-This pack belongs to neither profile. It can be installed alongside `default` or `ui-ux`; its destinations use the `aisy.` prefix to avoid collisions with skills in the target repository.
+This pack belongs to neither profile. When `catalog.yaml` declares `packs.utils`, every entry is automatically installed alongside `default` or `ui-ux`; its destinations use the `aisy.` prefix to avoid collisions with skills in the target repository.
 
 | Skill | What it does |
 |---|---|
@@ -72,9 +74,18 @@ Each profile installs the same six roles. Their responsibility is equivalent, bu
 | Any skill | `.claude/skills/aisy.<name>/SKILL.md` | `.agents/skills/aisy.<name>/SKILL.md` |
 | Native agent | `.claude/agents/<name>.md` | `.codex/agents/<name>.toml` |
 
+For a single-target installation, only that target's local directories are accessed. Explicit `both` installs both sets. After the local copy, the third and final decision asks once whether to install the selected target's global launcher:
+
+| Target | Global destination | Invocation |
+|---|---|---|
+| Claude Code | `~/.claude/commands/aisy.setup-ai.md` | `/aisy.setup-ai` |
+| Codex CLI | `~/.codex/skills/aisy.setup-ai/SKILL.md`; fallback `~/.agents/skills/aisy.setup-ai/SKILL.md` only if `.codex/` is absent and `.agents/` exists | `$aisy.setup-ai` |
+
+The installer never creates a missing global root. Its launchers reuse the retained local template, never fetch `setup-ai.md`, and never self-update. The final report lists created and updated paths, an unchanged count, failures with causes, automatic utils, target and profile, launcher outcome, download method, and any discovery limitation.
+
 ## Maintenance
 
-- Change a skill only in `skills/<name>/SKILL.md`, then review its path in `catalog.yaml`.
+- Change a skill only in `skills/<name>/SKILL.md`, then review its path in the root `../catalog.yaml`; do not move or duplicate the manifest.
 - Change an agent only in its corresponding native variant.
 - When profiles or utils change, check that `default`, `ui-ux`, and `utils` retain their intended coverage for both platforms.
 

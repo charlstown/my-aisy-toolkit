@@ -1,4 +1,5 @@
 ---
+name: aisy.clarify-uix
 description: The UI/UX-focused counterpart to `clarify-feature`. Instead of working a pre-itemized gap section, it lets the user pick how many top-down UI/UX questions to run (4, 8, or 12, with one marked as recommended by an analyzed heuristic), interrogates in gated rounds organized like `ui-spec`'s four stages, and folds every answer into the target `requirements.md` using the exact same mechanics `clarify-feature` uses. Trigger when the user says "clarify-uix", "clarifica la UX", "clarify the UI/UX", "resuelve los gaps de UI/UX", or invokes /aisy.clarify-uix.
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: aisy.implement-feature
 description: Orchestrator that reads one or multiple plan.md files, uses git worktrees for isolation, supports sequential or parallel (max 2 workers) execution, detects cross-plan dependencies, and marks tasks [x] or [blocked] with retry logic. Trigger when the user says "implement-feature", "develop plan", "ejecuta el plan", "implementa el plan", "desarrolla el plan", or invokes /aisy.implement-feature.
 ---
 

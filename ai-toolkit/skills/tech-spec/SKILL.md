@@ -1,5 +1,5 @@
 ---
-name: tech-spec
+name: aisy.tech-spec
 description: "Creates or updates the TechSpec for a project or module following Spec Driven Development. Reads the existing context, interviews the user in iterative rounds about the technical how (stack, architecture, data, integrations, operations, decisions), and generates specs/tech-spec.md following the TSPEC template. The TechSpec answers how it is built; the ProductSpec already defines the what and the why."
 when_to_use: "When the user says 'tech spec', 'genera techspec', 'create tech spec', or invokes /aisy.tech-spec."
 ---

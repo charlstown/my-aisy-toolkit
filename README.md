@@ -43,9 +43,11 @@ From inside the repo you want to set up, paste this into your agent's conversati
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-Your agent fetches the file, follows the steps in it, and tells you what it installed. There's nothing to download, no package manager, and no script to run. Side effects are limited to files written inside `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes.
+Your agent fetches the plain-text instructions, follows them, and gives you a final report. There is nothing to download, no package manager, and no executable installer: the agent copies the catalog's literal files. `catalog.yaml` stays a single literal manifest at the repository root.
 
-`/aisy.setup-ai` is the installer: it asks which platform and profile you want, reads the declared catalog, and copies the selected skills and native agents into your repository. New installations use `aisy.<name>` for every skill and leave any historical unprefixed folders untouched. See the [detailed catalog](ai-toolkit/README.md) to compare the `default`, `ui-ux`, and optional `utils` selections before installing.
+`aisy.setup-ai` makes exactly three decisions: target (Claude Code, Codex CLI, or explicit `both`), displayed profile, and one opt-in authorization for a global launcher after local installation. It automatically adds `packs.utils`; it never asks a fourth utils question. A single-target run never touches the other target, and `both` is never inferred from folders.
+
+New skills use `aisy.<name>` and historical unprefixed folders are not migrated, renamed, or deleted. See the [detailed catalog](ai-toolkit/README.md) before installing.
 
 ---
 
@@ -63,10 +65,10 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 ## 📦 What will you find here?
 
-- **15 skills** in total: 10 covering the full spec-driven workflow (`default` profile), +2 for a dedicated UI/UX pass (`ui-ux` profile), +3 optional standalone ones (`utils` pack)
+- **15 skills** in total: 10 covering the full spec-driven workflow (`default` profile), +2 for a dedicated UI/UX pass (`ui-ux` profile), +3 standalone ones (`utils` pack)
 - **6 subagents** for architecture, implementation, testing, UI, and review
 - **2 catalog profiles**: `default` and `ui-ux` (adds `/aisy.ui-spec` and `/aisy.clarify-uix`)
-- **1 optional skill pack**: `utils` (`/aisy.digest`, `/aisy.grill-me`, `/aisy.for-dummies`), installable on top of any profile
+- **1 automatic skill pack**: `utils` (`/aisy.digest`, `/aisy.grill-me`, `/aisy.for-dummies`), installed with either profile
 - **1 install method**: one URL or one pasted file, nothing to download
 - **2 AI coding agents** supported: Claude Code and Codex CLI, each with its native agent artifacts
 
@@ -120,9 +122,9 @@ Everything in `default`, plus two skills for a dedicated UI/UX pass (12 skills t
 | `/aisy.ui-spec` | Interviews top-down (content structure → layout → interaction/states → devices/accessibility) to design a UI screen, with concept mockups and a self-critique pass, and writes `specs/ui-spec.md`. |
 | `/aisy.clarify-uix` | The UI/UX counterpart to `/aisy.clarify-feature`: runs a top-down round of UI/UX questions (4, 8, or 12) and folds the answers into `requirements.md`. |
 
-## 🧰 Optional pack: `utils`
+## 🧰 Automatic pack: `utils`
 
-Standalone skills that don't belong to any profile — installable on top of `default` or `ui-ux`:
+Standalone skills that don't belong to any profile. Every `packs.utils` entry is installed automatically with `default` or `ui-ux`:
 
 | Skill | What it does |
 |-------|----------|
@@ -137,13 +139,8 @@ Just the pieces that matter to a reader deciding whether to install:
 ```
 my-aisy-toolkit/
 ├── ai-toolkit/
-│   ├── default/
-│   │   ├── commands/    # 10 skills
-│   │   └── agents/      # 6 subagents
-│   ├── ui-ux/
-│   │   └── commands/    # +2 skills (ui-spec, clarify-uix)
-│   └── utils/
-│       └── commands/    # +3 optional skills (digest, grill-me, for-dummies)
+│   ├── skills/          # shared, literal SKILL.md sources
+│   └── agents/          # native Claude Markdown and Codex TOML
 ├── catalog.yaml
 ├── setup-ai.md
 └── README.md
@@ -151,17 +148,18 @@ my-aisy-toolkit/
 
 ## 📝 Good to know
 
-**Re-installing or updating.** Re-running either install method on a repo that already has the kit brings the latest version of the catalog, adds any skills or agents that are new since your last install, and updates the ones that changed. There's no semantic versioning to track. You always land on the current catalog.
+**Re-installing or updating.** Re-running setup brings the latest catalog and updates only selected `aisy.` destinations whose literal bytes changed. It does not migrate, rename, or delete historical unprefixed installations.
 
-**Params**
+**Local destinations and launcher**
 
-| Param | Type | Default | Description |
-|-------|------|---------|--------------|
-| `profile` | string | `default` | Catalog profile to install. If more than one is available and none is specified, your agent asks which one you want. |
-| `agent` | string | asked | Target AI agent (`claude`, `codex`). Always asked explicitly, never inferred from folders already in your repo. |
-| utils pack | boolean | asked | Whether to add the optional `utils` skills on top of the chosen profile. Only asked when the catalog declares a `packs.utils` section. |
+| Target | Local skills | Native agents | Optional global launcher |
+|-------|--------------|---------------|--------------------------|
+| Claude Code | `.claude/skills/aisy.<name>/SKILL.md` | `.claude/agents/<name>.md` | `~/.claude/commands/aisy.setup-ai.md` → `/aisy.setup-ai` |
+| Codex CLI | `.agents/skills/aisy.<name>/SKILL.md` | `.codex/agents/<name>.toml` | `~/.codex/skills/aisy.setup-ai/SKILL.md` → `$aisy.setup-ai`; fallback to `~/.agents/skills/aisy.setup-ai/SKILL.md` only when `.codex/` is absent and `.agents/` exists |
 
-Side effects stay contained to `.claude/` and/or `.codex/` in your repo, except a single global launcher file the installer may offer to save at the end — only if you say yes. Application code and everything else in your repo is left alone.
+The global launcher is offered only once, after local installation, and only for the selected target (for explicit `both`, once for both selected destinations). A missing global root is reported and never created. Launchers do not fetch `setup-ai.md` or self-update.
+
+The final report names created and updated paths, counts unchanged artifacts, details failures, and separately states the automatic utils, confirmed target and profile, launcher result, download method, and any discovery limitation. Application code is left alone.
 
 ## 🤝 Code of Conduct
 

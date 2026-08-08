@@ -1,4 +1,5 @@
 ---
+name: aisy.clean-feature
 description: Cleans up feature/fix folders whose plan.md is complete. For each folder, it audits and aligns the root specs (product-spec, tech-spec, css-spec, ui-spec, infra-spec, security-spec, roadmap) with the changes introduced, updates the ones that are out of date, closes the associated GitHub issue (with a comment and a link to the branch) and deletes the folder. It finishes with a chore commit and a push to dev. Trigger when the user says "clean-feature", "cleanup", "limpia las carpetas", "limpia los specs", "alinea los specs", "clean up the folders", "clean up the specs", "align the specs" or invokes /aisy.clean-feature.
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: aisy.constitution
 description: Bootstraps a project's foundational specs in one motion — runs `product-spec` first to establish the what/why, then `tech-spec` once it's finished (tech-spec's own Phase 0 already reads the freshly written specs/product-spec.md), then `roadmap` once tech-spec is finished (roadmap's own Phase 0 reads both specs/product-spec.md and specs/tech-spec.md on its own). Trigger when the user says "constitution", "constitución", "funda el proyecto", "bootstrap specs", "crea la constitución del proyecto", or invokes /aisy.constitution.
 ---
 
