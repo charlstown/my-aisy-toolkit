@@ -6,7 +6,7 @@ Install the toolkit by asking an AI agent to fetch and follow this file:
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-The bootstrap fetch is intentional. An installed `/setup-ai` or `$setup-ai` launcher instead contains the installation engine below and only fetches this file to update itself.
+The bootstrap fetch is intentional. An installed `/aisy.setup-ai` or `$aisy.setup-ai` launcher instead contains the installation engine below and only fetches this file to update itself.
 
 ---
 
@@ -45,15 +45,15 @@ GET each selected path from `https://raw.githubusercontent.com/charlstown/my-ais
 
 ### Step 4 — install for Claude Code
 
-For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, copy bytes literally to `.claude/skills/<name>/SKILL.md`; selected utils go to `.claude/skills/aisy.<name>/SKILL.md`. Copy each declared Claude agent literally to `.claude/agents/<name>.md`. Create absent files, overwrite only when bytes differ, and leave identical files untouched.
+For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, derive the installed identifier as `aisy.<name>` and copy bytes literally to `.claude/skills/aisy.<name>/SKILL.md`. Apply the same destination rule to selected utils. Copy each declared Claude agent literally to `.claude/agents/<name>.md`. Create absent files, overwrite only when bytes differ, and leave identical files untouched. Do not create aliases, redirects, or delete historical unprefixed skill folders.
 
 ### Step 5 — install for Codex CLI
 
-For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, copy bytes literally to `.agents/skills/<name>/SKILL.md`; selected utils go to `.agents/skills/aisy.<name>/SKILL.md`. Copy each declared Codex agent literally to `.codex/agents/<name>.toml`. Create absent files, overwrite only when bytes differ, and leave identical files untouched. Never translate, reinterpret, or generate skills or agents.
+For every fetched shared skill `ai-toolkit/skills/<name>/SKILL.md`, derive the installed identifier as `aisy.<name>` and copy bytes literally to `.agents/skills/aisy.<name>/SKILL.md`. Apply the same destination rule to selected utils. Copy each declared Codex agent literally to `.codex/agents/<name>.toml`. Create absent files, overwrite only when bytes differ, and leave identical files untouched. Never translate, reinterpret, or generate skills or agents. Do not create aliases, redirects, or delete historical unprefixed skill folders.
 
 ### Step 6 — global launcher
 
-Offer exactly once to save a launcher for the confirmed agent. This is optional and requires an explicit yes. Existing launcher files are read only to compare/update this toolkit launcher; never delete them. The launcher is an embedded copy of this engine (Steps 1–6), not a pointer that re-runs this file.
+Offer exactly once to save a launcher for the confirmed agent. This is optional and requires an explicit yes. Write the Claude launcher to the global `.claude/skills/aisy.setup-ai/SKILL.md` location and the Codex launcher to the global `$CODEX_HOME/skills/aisy.setup-ai/SKILL.md` location. Existing launcher files are read only to compare/update this toolkit launcher; never delete them. The launcher is an embedded copy of this engine (Steps 1–6), not a pointer that re-runs this file.
 
 Before executing its embedded engine, an installed launcher may GET this same `setup-ai.md` solely to check for a newer launcher template. From that response, extract only the literal template for its own platform, then compare those bytes with its own file: overwrite only if different and leave it alone if identical. If that fetch, extraction, comparison, or write fails, continue with the embedded engine and include the actual reason in the wrap-up. No other installed skill or command fetches `setup-ai.md` in routine use.
 
@@ -63,17 +63,17 @@ Write the appropriate template below **byte-for-byte**. Do not translate or rein
 
 ```markdown
 ---
-description: Install or update My AIsy Toolkit in the current repository. Trigger on /setup-ai.
+description: Install or update My AIsy Toolkit in the current repository. Trigger on /aisy.setup-ai.
 argument-hint: "[profile]"
 ---
-# setup-ai
+# aisy.setup-ai
 
 ## Embedded engine
 
 1. Ask the target with `AskUserQuestion`; never infer it. Use an argument as the already-selected profile. For every user-facing fixed message, use the user's most recent language (English if unavailable), while preserving its options and structure. Ask a profile only if the catalog has more than one; ask optional utils once after reading the catalog.
 2. Fetch only `catalog.yaml`. Abort with no writes if it cannot be read. Select only its declared `skills`, `agents.claude`, and optional `packs.utils` paths.
 3. Fetch each selected artifact fresh and exactly once; retry an individual failed artifact once, report it, then skip only that artifact.
-4. Copy every shared skill byte-for-byte to `.claude/skills/<name>/SKILL.md`, and selected utils to `.claude/skills/aisy.<name>/SKILL.md`.
+4. Derive every installed skill identifier as `aisy.<name>` and copy every shared skill byte-for-byte to `.claude/skills/aisy.<name>/SKILL.md`; apply the same destination rule to selected utils. Do not create aliases, redirects, or remove historical unprefixed folders.
 5. Copy every declared Claude agent byte-for-byte to `.claude/agents/<name>.md`. For every destination in steps 4–5: create if absent, overwrite only if bytes differ, otherwise leave unchanged.
 6. Do not offer or create another launcher. Report installed, updated, skipped, and utils; include any launcher update failure below. No step fetches setup instructions as installation input.
 
@@ -86,17 +86,17 @@ Before Step 1, GET `https://raw.githubusercontent.com/charlstown/my-aisy-toolkit
 
 ```markdown
 ---
-name: setup-ai
-description: Install or update My AIsy Toolkit in the current repository. Trigger on $setup-ai.
+name: aisy.setup-ai
+description: Install or update My AIsy Toolkit in the current repository. Trigger on $aisy.setup-ai.
 ---
-# setup-ai
+# aisy.setup-ai
 
 ## Embedded engine
 
 1. Ask the target with `ask_user_question`; never infer it. For every user-facing fixed message, use the user's most recent language (English if unavailable), while preserving its options and structure. Ask a profile only if the catalog has more than one; ask optional utils once after reading the catalog.
 2. Fetch only `catalog.yaml`. Abort with no writes if it cannot be read. Select only its declared `skills`, `agents.codex`, and optional `packs.utils` paths.
 3. Fetch each selected artifact fresh and exactly once; retry an individual failed artifact once, report it, then skip only that artifact.
-4. Copy every shared skill byte-for-byte to `.agents/skills/<name>/SKILL.md`, and selected utils to `.agents/skills/aisy.<name>/SKILL.md`.
+4. Derive every installed skill identifier as `aisy.<name>` and copy every shared skill byte-for-byte to `.agents/skills/aisy.<name>/SKILL.md`; apply the same destination rule to selected utils. Do not create aliases, redirects, or remove historical unprefixed folders.
 5. Copy every declared Codex agent byte-for-byte to `.codex/agents/<name>.toml`. For every destination in steps 4–5: create if absent, overwrite only if bytes differ, otherwise leave unchanged.
 6. Do not offer or create another launcher. Report installed, updated, skipped, and utils; include any launcher update failure below. No step fetches setup instructions as installation input.
 

@@ -6,9 +6,9 @@
 
 ## Batch 2 — Registro e instalación con el nuevo identificador
 
-- [ ] @code-developer · Prefijar destinos de skills de perfil: actualizar las instrucciones y ambos motores embebidos de `setup-ai.md` para derivar el destino instalado como `aisy.<name>` para cada artefacto declarado en `profiles.*.skills`, conservando la copia literal del contenido y la selección declarativa del catálogo.
-- [ ] @code-developer · Unificar el pack utils con el esquema prefijado: ajustar las instrucciones de instalación para que perfiles y `packs.utils` usen el mismo cálculo de destino `aisy.<name>` en `.claude/skills/` y `.agents/skills/`, sin crear aliases, redirecciones ni operaciones sobre carpetas históricas sin prefijo.
-- [ ] @code-developer · Renombrar el lanzador global: modificar las plantillas Claude y Codex, sus rutas de escritura, frontmatter, títulos, descripciones y autoactualización para publicar `aisy.setup-ai` y documentar su invocación nativa (`/aisy.setup-ai` en Claude y el identificador equivalente de skill en Codex), sin tocar ni eliminar lanzadores heredados.
+- [x] @code-developer · Prefijar destinos de skills de perfil: actualizar las instrucciones y ambos motores embebidos de `setup-ai.md` para derivar el destino instalado como `aisy.<name>` para cada artefacto declarado en `profiles.*.skills`, conservando la copia literal del contenido y la selección declarativa del catálogo.
+- [x] @code-developer · Unificar el pack utils con el esquema prefijado: ajustar las instrucciones de instalación para que perfiles y `packs.utils` usen el mismo cálculo de destino `aisy.<name>` en `.claude/skills/` y `.agents/skills/`, sin crear aliases, redirecciones ni operaciones sobre carpetas históricas sin prefijo.
+- [x] @code-developer · Renombrar el lanzador global: modificar las plantillas Claude y Codex, sus rutas de escritura, frontmatter, títulos, descripciones y autoactualización para publicar `aisy.setup-ai` y documentar su invocación nativa (`/aisy.setup-ai` en Claude y el identificador equivalente de skill en Codex), sin tocar ni eliminar lanzadores heredados.
 
 ## Batch 3 — Contenido y documentación coherentes
 
