@@ -43,7 +43,11 @@ Desde dentro del repositorio que quieres configurar, pega esto en la conversaci�
 Fetch and follow the setup instructions at https://raw.githubusercontent.com/charlstown/my-aisy-toolkit/main/setup-ai.md
 ```
 
-Tu agente descarga el archivo, sigue los pasos que contiene y te cuenta qué instaló. No hay nada que descargar, ningún gestor de paquetes y ningún script que ejecutar. Los efectos secundarios se limitan a los archivos escritos dentro de `.claude/` y/o `.codex/` en tu repositorio, salvo un único archivo del launcher global que el instalador puede ofrecer guardar al final — solo si dices que sí.
+Tu agente descarga las instrucciones de texto plano, las sigue y te entrega un informe final. No hay nada que descargar, ningún gestor de paquetes ni instalador ejecutable: el agente copia los archivos literales del catálogo. `catalog.yaml` conserva su ubicación como manifiesto literal único en la raíz del repositorio.
+
+`aisy.setup-ai` toma exactamente tres decisiones: destino (Claude Code, Codex CLI o `both` explícito), perfil mostrado y una autorización opcional para el launcher global después de la instalación local. Añade `packs.utils` automáticamente; no hay una cuarta pregunta sobre utils. En una instalación de un único destino nunca toca el otro, y `both` nunca se deduce de las carpetas.
+
+Las nuevas skills usan `aisy.<name>` y las carpetas históricas sin prefijo no se migran, renombran ni eliminan. Consulta el [catálogo detallado](ai-toolkit/README.md) antes de instalar.
 
 ---
 
@@ -61,10 +65,10 @@ codex "Fetch and follow the setup instructions at https://raw.githubusercontent.
 
 ## 📦 ¿Qué vas a encontrar aquí?
 
-- **15 skills** en total: 10 que cubren todo el flujo dirigido por especificaciones (perfil `default`), +2 para una pasada dedicada de UI/UX (perfil `ui-ux`), +3 opcionales independientes (pack `utils`)
+- **15 skills** en total: 10 que cubren todo el flujo dirigido por especificaciones (perfil `default`), +2 para una pasada dedicada de UI/UX (perfil `ui-ux`), +3 independientes (pack `utils`)
 - **6 subagentes** para arquitectura, implementación, testing, UI y revisión
 - **2 perfiles de catálogo**: `default` y `ui-ux` (añade `/aisy.ui-spec` y `/aisy.clarify-uix`)
-- **1 pack de skills opcional**: `utils` (`/aisy.digest`, `/aisy.grill-me`, `/aisy.for-dummies`), instalable sobre cualquier perfil
+- **1 pack de skills automático**: `utils` (`/aisy.digest`, `/aisy.grill-me`, `/aisy.for-dummies`), instalado con cualquier perfil
 - **1 método de instalación**: una URL o un archivo pegado, nada que descargar
 - **2 agentes de código IA** soportados: Claude Code y Codex CLI, cada uno con sus artefactos nativos
 
@@ -114,9 +118,9 @@ Todo lo del perfil `default`, más dos skills para una pasada dedicada de UI/UX 
 | `/aisy.ui-spec` | Entrevista de arriba a abajo (estructura de contenido → layout → interacción/estados → dispositivos/accesibilidad) para diseñar una pantalla, con mockups del concepto y una pasada de autocrítica, y escribe `specs/ui-spec.md`. |
 | `/aisy.clarify-uix` | La contraparte de UI/UX de `/aisy.clarify-feature`: lanza una ronda de arriba a abajo de preguntas de UI/UX (4, 8 o 12) y vuelca las respuestas en `requirements.md`. |
 
-## 🧰 Pack opcional: `utils`
+## 🧰 Pack automático: `utils`
 
-Skills independientes que no pertenecen a ningún perfil — instalables sobre `default` o `ui-ux`:
+Skills independientes que no pertenecen a ningún perfil. Todas las entradas de `packs.utils` se instalan automáticamente con `default` o `ui-ux`:
 
 | Skill | Qué hace |
 |-------|----------|
@@ -131,13 +135,8 @@ Solo las piezas que le importan a alguien decidiendo si instalar o no:
 ```
 my-aisy-toolkit/
 ├── ai-toolkit/
-│   ├── default/
-│   │   ├── commands/    # 10 skills
-│   │   └── agents/      # 6 subagentes
-│   ├── ui-ux/
-│   │   └── commands/    # +2 skills (ui-spec, clarify-uix)
-│   └── utils/
-│       └── commands/    # +3 skills opcionales (digest, grill-me, for-dummies)
+│   ├── skills/          # fuentes compartidas y literales SKILL.md
+│   └── agents/          # Markdown nativo de Claude y TOML nativo de Codex
 ├── catalog.yaml
 ├── setup-ai.md
 └── README.md
@@ -145,17 +144,18 @@ my-aisy-toolkit/
 
 ## 📝 Cosas a saber
 
-**Reinstalar o actualizar.** Volver a ejecutar cualquiera de los dos métodos de instalación en un repositorio que ya tiene el kit trae la última versión del catálogo, añade las skills o agentes nuevos desde tu última instalación y actualiza los que hayan cambiado. No hay versionado semántico que rastrear. Siempre acabas en el catálogo actual.
+**Reinstalar o actualizar.** Volver a ejecutar setup trae el último catálogo y actualiza únicamente los destinos `aisy.` seleccionados cuyos bytes literales hayan cambiado. No migra, renombra ni elimina instalaciones históricas sin prefijo.
 
-**Parámetros**
+**Destinos locales y launcher**
 
-| Parámetro | Tipo | Por defecto | Descripción |
-|-------|------|---------|--------------|
-| `profile` | string | `default` | Perfil del catálogo a instalar. Si hay más de uno disponible y no se especifica ninguno, tu agente pregunta cuál quieres. |
-| `agent` | string | preguntado | Agente IA destino (`claude`, `codex`). Siempre se pregunta explícitamente, nunca se infiere de las carpetas que ya haya en tu repositorio. |
-| pack utils | boolean | preguntado | Si añadir las skills opcionales de `utils` sobre el perfil elegido. Solo se pregunta cuando el catálogo declara una sección `packs.utils`. |
+| Destino | Skills locales | Agentes nativos | Launcher global opcional |
+|-------|--------------|---------------|--------------------------|
+| Claude Code | `.claude/skills/aisy.<name>/SKILL.md` | `.claude/agents/<name>.md` | `~/.claude/commands/aisy.setup-ai.md` → `/aisy.setup-ai` |
+| Codex CLI | `.agents/skills/aisy.<name>/SKILL.md` | `.codex/agents/<name>.toml` | `~/.codex/skills/aisy.setup-ai/SKILL.md` → `$aisy.setup-ai`; alternativa `~/.agents/skills/aisy.setup-ai/SKILL.md` solo si `.codex/` no existe y `.agents/` sí |
 
-Los efectos secundarios se limitan a `.claude/` y/o `.codex/` en tu repositorio, salvo un único archivo del launcher global que el instalador puede ofrecer guardar al final — solo si dices que sí. El código de la aplicación y todo lo demás en tu repositorio se deja intacto.
+El launcher global se ofrece una sola vez, después de la instalación local, y únicamente para el destino elegido (con `both` explícito, una vez para los dos destinos seleccionados). Si falta la raíz global se informa y no se crea. Los launchers no descargan `setup-ai.md` ni se autoactualizan.
+
+El informe final indica las rutas creadas y actualizadas, cuenta los artefactos sin cambios, detalla los fallos y separa las utils automáticas, el destino y perfil confirmados, el resultado del launcher, el método de descarga y cualquier limitación de descubrimiento. El código de la aplicación se deja intacto.
 
 ## 🤝 Código de conducta
 

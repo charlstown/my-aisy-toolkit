@@ -12,7 +12,7 @@
 
 > **Current catalog architecture.** `ai-toolkit/skills/<name>/SKILL.md` is the sole distributable skill source and is copied byte-for-byte. Native agents are stored independently at `ai-toolkit/agents/claude/*.md` and `ai-toolkit/agents/codex/*.toml`; root `/catalog.yaml` supplies all literal source paths. Any older passage below that describes command-folder distribution or runtime translation is historical context superseded by ADR-002.
 
-This document covers the technical installation mechanism (`setup-ai`) and the catalog format (skills and agents, currently spanning the `default` and `ui-ux` profiles, plus optional non-profile packs such as `utils`) for Claude Code and, in best-effort mode, Codex CLI. The product's what and why are already defined in [[product-spec]]; this document only answers the how.
+This document covers the technical installation mechanism (`setup-ai`) and the catalog format (skills and agents, currently spanning the `default` and `ui-ux` profiles, plus the automatic non-profile `packs.utils`) for Claude Code and, in best-effort mode, Codex CLI. The product's what and why are already defined in [[product-spec]]; this document only answers the how.
 
 ## 🧱 Tech Stack
 
@@ -74,7 +74,7 @@ Before writing, Step 6 shows the selected target's exact destination and request
 
 #### `catalog.yaml` — Catalog manifest
 
-Single root index declaring, for each profile and optional pack, the included skills and native agents plus each artifact's explicit source path in this repository.
+Single root index declaring each profile's included skills and native agents, plus the automatic `packs.utils` skill paths. Every artifact source path is explicit and literal; the manifest stores neither persistent hashes nor integrity metadata.
 
 #### `ai-toolkit/skills/` — Shared skill catalog
 
@@ -222,7 +222,7 @@ No npm/package-manager dependency was added, but the repo does rely on the GitHu
 
 ### ADR-003: `catalog.yaml` as an explicit catalog manifest
 
-**Decision**: A single `catalog.yaml` at the repo root declares every profile and pack artifact with its literal source path: shared skills under `ai-toolkit/skills/<name>/SKILL.md`, Claude agents under `ai-toolkit/agents/claude/*.md`, and Codex agents under `ai-toolkit/agents/codex/*.toml`. The installer never derives paths from a profile-folder convention or dynamically lists remote directories.
+**Decision**: A single root `catalog.yaml` declares every profile artifact and every automatic `packs.utils` artifact with its literal source path: shared skills under `ai-toolkit/skills/<name>/SKILL.md`, Claude agents under `ai-toolkit/agents/claude/*.md`, and Codex agents under `ai-toolkit/agents/codex/*.toml`. It contains no persistent hashes or other integrity metadata. The installer never derives paths from a profile-folder convention or dynamically lists remote directories.
 
 **Context**: Having the agent list `.claude/commands/` and `.claude/agents/` directly via the GitHub API was considered. It was discarded because it depends on the agent having a tool to list remote directories (not all do), and because an explicit manifest lets profiles be defined independently of the repo's folder structure.
 

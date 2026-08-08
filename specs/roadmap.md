@@ -7,11 +7,11 @@
 > | **Updated** | 2026-08-08 |
 > | **Version** | v0.1 |
 > | **Parent specs** | [[product-spec]] · [[tech-spec]] |
-> | **Scope** | Completed evolution: global dual-agent `setup-ai` launcher for Claude Code and Codex, declarative remote catalog, shared `ai-toolkit/skills/`, native agents in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`, literal copying, ASCII confirmation, single authorization, preflight without partial installation, and post-copy detection |
+> | **Scope** | Completed evolution: target-selected `setup-ai` flow for Claude Code and Codex, declarative root catalog, shared `ai-toolkit/skills/`, native agents in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`, literal copying, automatic `packs.utils`, optional target-scoped launchers, transient byte/SHA-256 verification, and conditional discovery |
 
 ## 🎯 Vision
 
-This roadmap records the completed evolution from the initial distributable catalog into a global dual-agent `setup-ai` launcher backed by a declarative remote catalog. Skills now have one shared source in `ai-toolkit/skills/`; agents remain native in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`. Installation fetches the catalog and artifacts, presents an ASCII confirmation, performs a preflight for both agents before a single authorization, copies sources literally, and verifies that each agent detects its installed skill. There are no prior PoCs blocking the start. The milestone closes when an automated check confirms a dummy-repo install lands every declared source byte-for-byte.
+This roadmap records the completed evolution from the initial distributable catalog into a target-selected `setup-ai` flow backed by a declarative root catalog. Skills now have one shared source in `ai-toolkit/skills/`; agents remain native in `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/`. Installation asks explicitly for Claude, Codex, or `both`, copies the literal artifacts for the selected target plus automatic utils, and offers one target-scoped launcher authorization after local installation. Byte and transient SHA-256 verification are required after copying; runtime discovery is attempted only when supported and otherwise reported as a limitation. There are no prior PoCs blocking the start. The milestone closes when manual scratch-repo verification confirms declared source bytes land in the selected target-native destinations.
 
 ## 📊 Overview
 
@@ -41,11 +41,11 @@ This phase delivers the completed product evolution: a declarative remote catalo
 |---|---|---|---|---|
 | F1.1 | Populate shared `ai-toolkit/skills/` + native `ai-toolkit/agents/claude/` and `ai-toolkit/agents/codex/` | — | ✅ Done | Skills have one distributable source; each agent keeps its native artifact and catalog routes (ADR-005) |
 | F1.2 | `catalog.yaml` manifest | F1.1 | ✅ Done | Declares the `default` profile: skill/agent list and source paths (ADR-003) |
-| F1.3 | Global dual-agent `setup-ai` launcher and embedded installer engine | F1.2 | ✅ Done | Detects Claude Code and Codex destinations before installation; shows an ASCII summary, requests one authorization, stops if either agent is absent to avoid partial installation, copies sources literally, and confirms post-copy skill detection (ADR-004) |
+| F1.3 | Target-scoped `setup-ai` launchers and embedded installer engine | F1.2 | ✅ Done | Requires an explicit target (`both` only when requested), copies only selected target artifacts plus automatic utils, then requests one launcher authorization. It never creates a missing global root; structural verification is required and discovery is conditional (ADR-004, ADR-007). |
 | F1.4 | README as product front | F1.3 | ✅ Done | Presents the kit, both install methods, and the `default` profile catalog |
 | F1.5 | Automated install verification check | F1.3 | ✅ Done | Installs into a dummy/scratch folder and confirms every catalog file was copied unmodified |
 
-**Phase 1 closing criterion** — F1.5's automated check runs against dummy destinations for both agents, confirms every source declared by the selected profile and agent in `catalog.yaml` was installed as a byte-for-byte copy, and verifies post-copy skill detection. Installation must stop before copying when either global agent destination is absent.
+**Phase 1 closing criterion** — Manual scratch-repo verification confirms every source declared by the selected profile, `packs.utils`, and selected native-agent list in root `catalog.yaml` is installed byte-for-byte at its `aisy.` destination. It verifies the post-copy transient SHA-256 and frontmatter where applicable; discovery is checked only when the active session exposes it. A missing selected global root prevents only the optional launcher, never the local installation.
 
 ## 🔗 Dependency Graph
 
