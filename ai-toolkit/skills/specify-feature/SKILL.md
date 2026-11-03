@@ -86,12 +86,19 @@ For the selected features, compute names **before** creating anything, so parall
 3. Folder name: `specs/{NNN}-{slug}/`. Branch name (used inside the template): `{NNN}-{slug}`.
 4. If `specs/{NNN}-{slug}/` already exists for a feature that logically matches (e.g., re-running specify on the same roadmap row), skip it and tell the user it already has a folder.
 
+### Step 3a — Read the relevant existing behavior and coverage
+
+Before dispatching writers, inspect the selected features' affected modules, relevant root specs, and existing tests and test scripts/CI configuration. Search by the behavior being changed, not only by feature names or numbered specs folders: completed feature folders may already have been deleted. Read the relevant assertions or scenarios before claiming coverage; a test filename or an old completed plan is not evidence by itself. Keep this discovery scoped to the affected behavior rather than auditing the entire suite.
+
+For each feature, distinguish the requested change from existing behavior and identify concrete test references when available. If code or tests cannot be inspected, record that limitation; do not assume either that coverage exists or that it must be built from scratch. This is a read-only inspection, not a test execution step.
+
 ### Step 4 — Generate `requirements.md` for each selected feature (in parallel)
 
 Features are independent of each other — dispatch **one subagent per feature in parallel** (single message, multiple `Agent` tool calls) rather than looping sequentially. Each subagent receives:
 
 - The absolute path to write: `specs/{NNN}-{slug}/requirements.md`
 - The feature's `raw_description` (issue body, roadmap row + surrounding phase context, file excerpt, or the user's original prompt) — this is what `$ARGUMENTS` in the template stands for
+- The scoped existing-behavior and coverage findings from Step 3a, including concrete paths/test names and inspection limitations. Share relevant findings across features that touch the same behavior.
 - The feature's `source_issue_url` when it is set — the subagent writes it verbatim into the `Source Issue:` line of the template. When it is `null`, state explicitly that there is no source issue and that the `Source Issue:` line must be deleted from the output
 - The exact template below and the instruction to fill it **using only the information available**, without inventing decisions or trying to resolve ambiguity
 
@@ -171,6 +178,12 @@ Mark anything not resolvable from the source with the inline marker, e.g.:
 - [Assumption about data/environment]
 - [Dependency on existing system/service]
 
+## Existing Behavior & Coverage
+
+- Change boundary: [what is new or modified; which existing behavior this feature relies on]
+- Related coverage: [relevant test path and test/scenario name, and the behavior its assertions cover; or state that none was found within the inspected scope]
+- Inspection limits: [unavailable code/tests or unverified coverage, if any]
+
 ## DEFINITION GAP
 
 - [ ] {open question or missing decision the source material does not resolve — worded so the user can answer it directly}
@@ -180,6 +193,12 @@ Mark anything not resolvable from the source with the inline marker, e.g.:
 Rules for filling it:
 
 - **Never invent** what the source doesn't say. If a section has nothing to draw from (e.g., no data entities mentioned), state so briefly rather than fabricating content, or omit that subsection if the template marks it optional (`Key Entities`).
+- **Specify the behavioral change.** Treat unchanged capabilities from earlier features as context or dependencies rather than new requirements to reimplement and retest. Preserve explicit compatibility constraints and required acceptance outcomes, referencing existing specs when useful.
+- **Acceptance scenarios describe outcomes, not a quota of automated tests.** Do not create one test obligation per FR/SC/scenario, multiply equivalent edge cases, or invent coverage percentages or test counts. Include distinct boundaries/errors when supported by the source or affected behavior; evidence unresolved product decisions as gaps. `Independent Test` describes how to observe the story's value, not a requirement for a separate test suite per story.
+- **Keep scenarios independent.** Describe one representative case per rule and per affected field without crossing all combinations of independent fields, rules or modes. Add combined scenarios only when an actual interaction changes the required outcome. Do not require the same behavior to be checked again at unit, integration and end-to-end levels; leave each distinct risk to the appropriate level in planning.
+- **Specify observable contracts.** Do not turn copies of constants, configuration files (such as `cdk.json`) or spec prose into expected test content. Describe the semantic behavior to protect. Mock inputs/outputs are test setup, not acceptance outcomes; a check must be able to detect a defect in the real implementation.
+- **Route editorial style to review.** Preserve applicable style constraints (for example, avoiding em dashes) as review criteria for the judge, or the reviewer when no judge exists. Do not turn them into automated test requirements.
+- **Carry coverage evidence forward.** Keep `Existing Behavior & Coverage` concise and factual. Existing tests can support several acceptance outcomes; their presence does not prove they pass or cover the requested change. Leave the choice to reuse, extend, or add tests to `plan-feature`.
 - **Do not try to resolve ambiguity.** Every open question, missing decision, or unconfirmed dependency goes into `## DEFINITION GAP` instead of being guessed at.
 - `DEFINITION GAP` always has at least one bullet. If nothing is genuinely unclear, write a single bullet: `- [x] No blocking gaps detected — source material is self-contained.`
 - Split `DEFINITION GAP` bullets naturally into clarification questions and dependency callouts; do not label them as separate subsections, just keep each bullet self-explanatory.
